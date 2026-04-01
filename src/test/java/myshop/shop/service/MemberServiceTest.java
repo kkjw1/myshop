@@ -1,12 +1,10 @@
 package myshop.shop.service;
 
 import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 import myshop.shop.dto.member.LoginMemberDto;
 import myshop.shop.dto.member.SignUpMemberDto;
 import myshop.shop.entity.Gender;
 import myshop.shop.entity.Member;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +12,6 @@ import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -39,9 +36,9 @@ class MemberServiceTest {
         memberService.signUp(signUpMemberDto);
 
         //when
-        boolean login = memberService.login(new LoginMemberDto("id", "password"));
+        Member login = memberService.login(new LoginMemberDto("id", "password"));
 
         //then
-        assertThat(login).isTrue();
+        assertThat(login.getId()).isEqualTo("id");
     }
 }

@@ -5,6 +5,8 @@ import myshop.shop.dto.member.LoginMemberDto;
 import myshop.shop.dto.member.SignUpMemberDto;
 import myshop.shop.entity.Member;
 import myshop.shop.entity.MemberLevel;
+import myshop.shop.entity.log.LoginLog;
+import myshop.shop.repository.log.LoginLogRepository;
 import myshop.shop.repository.member.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,15 +19,16 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final LoginLogRepository loginLogRepository;
 
     /**
      * 회원가입
      */
     public Member signUp(SignUpMemberDto signUpMemberDto) {
 
-        String encode = passwordEncoder.encode(signUpMemberDto.getPassword());
+        String passwordEncode = passwordEncoder.encode(signUpMemberDto.getPassword());
 
-        return memberRepository.save(new Member(signUpMemberDto.getId(), signUpMemberDto.getEmail(), encode, signUpMemberDto.getName(),
+        return memberRepository.save(new Member(signUpMemberDto.getId(), signUpMemberDto.getEmail(), passwordEncode, signUpMemberDto.getName(),
                 signUpMemberDto.getTelecom(), signUpMemberDto.getPhoneNumber(), signUpMemberDto.getGender(), MemberLevel.normal));
     }
 
@@ -40,11 +43,12 @@ public class MemberService {
     /**
      * 로그인
      */
-    public boolean login(LoginMemberDto loginMemberDto) {
+    public Member login(LoginMemberDto loginMemberDto) {
         Member member = memberRepository.findById(loginMemberDto.getId());
-        if (member != null) {
-            return passwordEncoder.matches(loginMemberDto.getPassword(), member.getPassword());
+        if (member != null && passwordEncoder.matches(loginMemberDto.getPassword(), member.getPassword())) {
+            loginLogRepository.save(new LoginLog(loginMemberDto.getId()));
+            return member;
         }
-        return false;
+        return null;
     }
 }

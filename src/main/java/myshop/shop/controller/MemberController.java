@@ -1,18 +1,18 @@
 package myshop.shop.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.dto.member.LoginMemberDto;
 import myshop.shop.dto.member.SignUpMemberDto;
-import myshop.shop.entity.Address;
 import myshop.shop.entity.Member;
-import myshop.shop.repository.address.AddressRepository;
 import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.service.AddressService;
 import myshop.shop.service.MemberService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +29,7 @@ public class MemberController {
     private final MemberService memberService;
     private final AddressService addressService;
 
-    //===============로그인===============
+    //=============================================로그인=============================================
     @GetMapping("/login")
     public String loginForm(Model model) {
         model.addAttribute("loginMemberDto", new LoginMemberDto());
@@ -42,18 +42,43 @@ public class MemberController {
         return "member/login";
     }
 
-/*    @PostMapping("/login")
-    public String login(@Validated @ModelAttribute("loginMemberDto") LoginMemberDto loginMemberDto, BindingResult bindingResult) {
+    @PostMapping("/login")
+    public String login(@Validated @ModelAttribute("loginMemberDto") LoginMemberDto loginMemberDto, BindingResult bindingResult,
+                        HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             log.info("login fail");
             return "member/login";
         }
 
+        Member login = memberService.login(loginMemberDto);
+        if (login == null) {
+            bindingResult.reject("loginFail","로그인 실패 메시지");
+            return "member/login";
+        }
 
-    }*/
+        HttpSession session = request.getSession();
+        session.setAttribute(SessionConst.LOGIN_MEMBER, new LoginCheckMemberDto(login.getId(),login.getName()));
+        return "redirect:/";
+    }
 
 
-    //===============회원가입===============
+    // 로그아웃 버튼 -> http://localhost:8080/login?logout 이렇게 감
+    @PostMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        log.info("logout Start!!!!!!!!!!!!!!!!!!!!");
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            LoginCheckMemberDto loginMember = (LoginCheckMemberDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+            log.info("logout id={}", loginMember.getId());
+            session.invalidate();
+//            session.removeAttribute(SessionConst.LOGIN_MEMBER);
+        }
+        return "redirect:/";
+    }
+
+
+
+    //=============================================회원가입=============================================
     @GetMapping("/signUp")
     public String signUpForm(Model model) {
         model.addAttribute("signUpMemberDto", new SignUpMemberDto());
@@ -81,6 +106,7 @@ public class MemberController {
         return "redirect:/login/{loginId}";
     }
 
-    //todo:2.로그인
-
+    public static class SessionConst {
+        public static final String LOGIN_MEMBER="loginMember";
+    }
 }

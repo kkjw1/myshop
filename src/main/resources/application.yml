@@ -1,6 +1,10 @@
 spring:
+  messages:
+    basename: messages,errors
+
   profiles:
     active: local
+
   datasource:
     url: jdbc:h2:tcp://localhost/~/myshop
     username: sa
@@ -19,3 +23,9 @@ spring:
 logging.level:
   org.hibernate.SQL: debug
 #  org.hibernate.type: trace
+
+server:
+  servlet:
+    session:
+      timeout: 6000   #세션 타임아웃 설정(기본:초)
+      tracking-modes: cookie  #첫 로그인할 경우 jsessionid 404오류 해결
