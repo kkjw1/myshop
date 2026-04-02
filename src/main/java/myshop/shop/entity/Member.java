@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 @Getter
 @SequenceGenerator(name = "MEMBER_SEQ", sequenceName = "MEMBER_SEQ", initialValue = 1, allocationSize = 1)
-@ToString(of = {"id", "name", "email", "phoneNumber", "gender", "memberLevel"})
+@ToString(of = {"id", "name", "email", "telecom", "phoneNumber", "gender", "memberLevel"})
 public class Member {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "MEMBER_SEQ")
     @Column(name = "member_no")

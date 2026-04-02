@@ -30,56 +30,89 @@
             border-color: #dc3545;
             color: #dc3545;
         }
+
+        /* 로고와 로그인 박스를 감싸는 래퍼 */
+        .login-wrapper {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 25px; /* 로고와 로그인 박스 사이 간격 */
+        }
+
+        .login-logo img {
+            max-width: 150px; /* 로고 이미지 크기 조정 */
+            height: auto;
+        }
+
+        .login-logo a {
+            font-size: 2rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: #0d6efd; /* 텍스트 로고일 경우의 색상 */
+        }
     </style>
 
 
 </head>
 <body class="d-flex justify-content-center align-items-center bg-light">
 
-<div class="login-container">
-    <h3 class="text-center mb-4">로그인</h3>
+<div class="login-wrapper">
+    <div class="login-logo">
+        <a th:href="@{/home}">
+            MYSHOP
+        </a>
+    </div>
 
-    <form action="signUp.html" th:action="@{/login}" th:object="${loginMemberDto}" method="post">
-        <div th:if="${#fields.hasGlobalErrors()}">
-            <div class="text-danger mb-3" id="loginErrorMessage" style="font-size: 0.875rem;"
-                 th:each="error : ${#fields.globalErrors()}" th:text="${error}">
-                글로벌 오류 메시지
+    <div class="login-container">
+        <h3 class="text-center mb-4">로그인</h3>
+
+        <form action="signUp.html" th:action="@{/login}" th:object="${loginMemberDto}" method="post">
+            <div th:if="${#fields.hasGlobalErrors()}">
+                <div class="text-danger mb-3" id="loginErrorMessage" style="font-size: 0.875rem;"
+                     th:each="error : ${#fields.globalErrors()}" th:text="${error}">
+                    글로벌 오류 메시지
+                </div>
             </div>
-        </div>
 
 
-        <div class="form-group mb-3">
-            <input type="text" class="form-control " placeholder="아이디" th:field="*{id}" th:errorclass="input-error">
-            <div class="text-danger" style="font-size: 0.875rem;" th:errors="*{id}">아이디 에러메시지</div>
-        </div>
+            <div class="form-group mb-3">
+                <input type="text" class="form-control " placeholder="아이디" th:field="*{id}" th:errorclass="input-error">
+                <div class="text-danger" style="font-size: 0.875rem;" th:errors="*{id}">아이디 에러메시지</div>
+            </div>
 
-        <div class="form-group mb-3">
-            <input type="password" class="form-control" placeholder="비밀번호" th:field="*{password}" th:errorclass="input-error">
-            <div class="text-danger" style="font-size: 0.875rem;" th:errors="*{password}">비밀번호 에러메시지</div>
-        </div>
+            <div class="form-group mb-3">
+                <input type="password" class="form-control" placeholder="비밀번호" th:field="*{password}" th:errorclass="input-error">
+                <div class="text-danger" style="font-size: 0.875rem;" th:errors="*{password}">비밀번호 에러메시지</div>
+            </div>
 
-        <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" id="rememberMe">
-            <label class="form-check-label" for="rememberMe">로그인 유지</label>
-        </div>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="rememberMe">
+                <label class="form-check-label" for="rememberMe">로그인 유지</label>
+            </div>
 
-        <div class="mb-4">
-            <button type="submit" class="btn btn-primary w-100" style="padding: 10px;"> 로그인</button>
-        </div>
-        <hr>
+            <div class="mb-4">
+                <button type="submit" class="btn btn-primary w-100" style="padding: 10px;"> 로그인</button>
+            </div>
+            <hr>
 
-        <div class="text-center mt-3">
-            <a href="#" class="text-decoration-none text-dark">아이디 찾기</a>
-            <span class="text-muted mx-2">|</span>
+            <div class="text-center mt-3">
+<!--                <a href="#" class="text-decoration-none text-dark">아이디 찾기</a>
+                <span class="text-muted mx-2">|</span>
 
-            <a href="#" class="text-decoration-none text-dark">비밀번호 찾기</a>
-            <span class="text-muted mx-2">|</span>
+                <a href="#" class="text-decoration-none text-dark">비밀번호 찾기</a>
+                <span class="text-muted mx-2">|</span>-->
 
-            <a href="#" onclick="location.href='signup.html'" class="text-decoration-none text-dark"
-               th:onclick="|location.href='@{/signUp}'|">회원가입</a>
-        </div>
-    </form>
+                <a href="#" onclick="location.href='signup.html'" class="text-decoration-none text-dark"
+                   th:onclick="|location.href='@{/signUp}'|">회원가입</a>
+            </div>
+        </form>
+    </div>
 </div>
+
 
 </body>
 </html>

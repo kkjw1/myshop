@@ -22,10 +22,11 @@ public class SignUpMemberDto {
     @NotBlank(message = "이름이 공백입니다.")
     private String name;
 
-    @NotNull(message = "통신사가 공백입니다.")
+    private Gender gender;
+
+    @NotBlank(message = "통신사가 공백입니다.")
     private String telecom;
 
-    private Gender gender;
 
     @NotNull(message = "휴대전화번호가 공백입니다.")
     private String phoneNumber;

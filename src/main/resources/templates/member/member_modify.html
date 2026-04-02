@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개인정보 수정</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style th:replace="~{/member/common::style}"></style>
+</head>
+<body>
+
+<div th:replace="~{/member/common::header}"></div>
+
+<div class="container pb-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="side-menu shadow-sm">
+                <div class="px-3 mb-2"><h5 class="font-weight-bold small text-muted">MY 쇼핑</h5></div>
+                <a href="#" th:href="@{/member/mypage/orderList}">주문목록/배송조회</a>
+                <a href="#" th:href="@{/member/mypage/exchange}">취소/반품/교환 내역</a>
+                <a href="#" th:href="@{/member/mypage/wishlist}">찜한 상품</a>
+                <hr>
+                <div class="px-3 mb-3"><h5 class="font-weight-bold">MY 정보</h5></div>
+                <a href="#" class="active" th:href="@{/member/mypage/memberModifyCheckPW(memberId=${member.getId()})}">개인정보 확인/수정</a>
+                <a href="#" th:href="@{/member/mypage/addressManage(memberId=${member.getId()})}">배송지 관리</a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="edit-form-container shadow-sm">
+                <h4 class="mb-4 font-weight-bold border-bottom pb-3">개인정보 확인/수정</h4>
+                <form th:action="@{/member/mypage/memberModify}" method="post" th:object="${updateMember}">
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">아이디</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control readonly-input" th:field="*{id}" th:value="*{id}" readonly>
+                            <small class="text-muted">아이디는 변경할 수 없습니다.</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">이름<span class="required-mark">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" th:field="*{name}" th:value="*{name}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">이메일<span class="required-mark">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="email" class="form-control" th:field="*{email}" th:value="*{email}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group row border-top pt-4">
+                        <label class="col-sm-3 col-form-label">새 비밀번호</label>
+                        <div class="col-sm-9 input-group">
+                            <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="변경 시에만 입력하세요" onblur="checkPw2()">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="toggleText" onclick="togglePassword()">보기</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">새 비밀번호 확인</label>
+                        <div class="col-sm-9 input-group">
+                            <input type="password" id="checkPassword" th:field="*{checkPassword}" class="form-control" placeholder="비밀번호 재입력" onblur="checkPw()">
+                            <div class="input-group-append">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group row border-top pt-4">
+                        <label class="col-sm-3 col-form-label">휴대폰 번호<span class="required-mark">*</span></label>
+                        <div class="col-sm-9">
+                            <div class="form-row">
+                                <div class="col-4">
+                                <select th:field="*{telecom}" class="form-control">
+                                    <option value="SKT">SKT</option>
+                                    <option value="KT">KT</option>
+                                    <option value="LG U+">LG U+</option>
+                                    <option value="SKT알뜰폰">SKT알뜰폰</option>
+                                    <option value="KT알뜰폰">KT알뜰폰</option>
+                                    <option value="LG U+알뜰폰">LG U+알뜰폰</option>
+                                </select>
+                                </div>
+                                <div class="col-8">
+                                    <input type="tel" class="form-control" th:field="*{phoneNumber}" th:value="*{phoneNumber}" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">성별</label>
+                        <div class="col-sm-9 d-flex align-items-center">
+                            <div th:each="gender : ${T(spring.jwProject.domain.member.Gender).values()}" class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input" th:field="*{gender}" th:value="${gender.name()}">
+                                <label class="custom-control-label" th:for="${#ids.prev('gender')}" th:text="${gender.getVal()}"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-danger" id="checkPasswordText"></div>
+
+                    <hr class="my-5">
+
+                    <div class="row">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-9">
+                            <button type="submit" class="btn btn-update btn-block" id="changeButton">수정하기</button>
+                        </div>
+                    </div>
+                </form>
+                <form th:action="@{/member/delete(memberId=${updateMember.getId()})}" method="post">
+                    <div class="row">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-9">
+                            <button type="submit" class="btn btn-link btn-block text-muted small mt-2">회원 탈퇴하기</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{/home/common::footer}"></div>
+
+<script th:inline="javascript">
+    function checkPw() {
+        const pw1 = document.getElementById("password");
+        const pw2 = document.getElementById("checkPassword");
+        const msg = document.getElementById("checkPasswordText");
+        const button = document.getElementById("changeButton");
+
+        if (pw1.value === "" && pw2.value === "") {
+            pw1.classList.remove("input-error");
+            pw2.classList.remove("input-error");
+            msg.innerText="";
+            button.disabled = false;
+        }
+
+        if (pw1.value !== pw2.value) {
+            pw1.classList.add("input-error");
+            pw2.classList.add("input-error");
+            msg.innerText="비밀번호가 일치하지 않습니다.";
+            button.disabled = true;
+        } else {
+            pw1.classList.remove("input-error");
+            pw2.classList.remove("input-error");
+            msg.innerText="";
+            button.disabled = false;
+        }
+    }
+
+    function checkPw2() {
+        const pw1 = document.getElementById("password");
+        const pw2 = document.getElementById("checkPassword");
+        const msg = document.getElementById("checkPasswordText");
+        const button = document.getElementById("changeButton");
+
+        if (pw1.value === "") {
+            pw1.classList.remove("input-error");
+            pw2.classList.remove("input-error");
+            msg.innerText="";
+            pw2.value=null;
+            button.disabled = false;
+        }
+
+        if (pw1.value !== pw2.value) {
+            pw1.classList.add("input-error");
+            pw2.classList.add("input-error");
+            msg.innerText="비밀번호가 일치하지 않습니다.";
+            button.disabled = true;
+        } else {
+            pw1.classList.remove("input-error");
+            pw2.classList.remove("input-error");
+            msg.innerText="";
+            button.disabled = false;
+        }
+
+    }
+    function togglePassword() {
+        const pw = document.getElementById('password');
+        const pw2 = document.getElementById('checkPassword');
+        pw.type = pw.type === 'password' ? 'text' : 'password';
+        pw2.type = pw2.type === 'password' ? 'text' : 'password';
+
+        const toggleText = document.getElementById("toggleText");
+        if (toggleText.textContent === "보기") {
+            toggleText.textContent = "안보기";
+        } else {
+            toggleText.textContent = "보기";
+        }
+    }
+</script>
+</body>
+</html>

@@ -61,21 +61,9 @@ public class MemberController {
         return "redirect:/";
     }
 
-
-    // 로그아웃 버튼 -> http://localhost:8080/login?logout 이렇게 감
-    @PostMapping("/logout")
-    public String logout(HttpServletRequest request) {
-        log.info("logout Start!!!!!!!!!!!!!!!!!!!!");
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            LoginCheckMemberDto loginMember = (LoginCheckMemberDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
-            log.info("logout id={}", loginMember.getId());
-            session.invalidate();
-//            session.removeAttribute(SessionConst.LOGIN_MEMBER);
-        }
-        return "redirect:/";
-    }
-
+    /**
+     * 로그아웃은 security Spring에서 알아서 처리(세션 쿠키 삭제)
+     */
 
 
     //=============================================회원가입=============================================
@@ -100,7 +88,7 @@ public class MemberController {
         }
 
         Member signed = memberService.signUp(signUpMemberDto);
-        log.info("signUp complete, Member={}", signed);
+        log.info("signUp complete, {}", signed);
 
         redirectAttributes.addAttribute("loginId", signUpMemberDto.getId());
         return "redirect:/login/{loginId}";
@@ -109,4 +97,7 @@ public class MemberController {
     public static class SessionConst {
         public static final String LOGIN_MEMBER="loginMember";
     }
+
+
+
 }

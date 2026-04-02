@@ -22,7 +22,7 @@ class MemberServiceTest {
 
     @Test
     public void signUpTest() {
-        SignUpMemberDto signUpMemberDto = new SignUpMemberDto("id", "password", "email", "name", "telecom", Gender.male, "phoneNumber");
+        SignUpMemberDto signUpMemberDto = new SignUpMemberDto("id", "password", "email", "name", "telecom", Gender.MAN, "phoneNumber");
         Member member = memberService.signUp(signUpMemberDto);
 
         assertThat(member.getId()).isEqualTo("id");
@@ -32,7 +32,7 @@ class MemberServiceTest {
     @Commit
     public void loginTest() throws Exception {
         //given
-        SignUpMemberDto signUpMemberDto = new SignUpMemberDto("id", "password", "email", "name", "telecom", Gender.male, "phoneNumber");
+        SignUpMemberDto signUpMemberDto = new SignUpMemberDto("id", "password", "email", "name", "telecom", Gender.MAN, "phoneNumber");
         memberService.signUp(signUpMemberDto);
 
         //when
