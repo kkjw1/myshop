@@ -102,12 +102,21 @@
             color: #0d6efd; /* 텍스트 로고일 경우의 색상 */
         }
 
+
+        /* 모달 본문 텍스트 스타일 */
+        .modal-body {
+            background-color: #fcfcfc;
+            color: #444;
+        }
+        .modal-header {
+            background-color: #f8f9fa;
+        }
+
     </style>
 </head>
-<body class="d-flex justify-content-center align-items-center bg-light">
 
-
-<body class="d-flex justify-content-center align-items-start bg-light"> <div class="register-wrapper">
+<body class="d-flex justify-content-center align-items-start bg-light">
+<div class="register-wrapper">
     <div class="register-logo">
         <a th:href="@{/}">
             MYSHOP
@@ -181,7 +190,20 @@
 
             <div class="form-group">
                 <label>휴대전화번호</label>
-                <input type="text" class="form-control" id="phoneNumber" placeholder="휴대전화번호(010-XXXX-XXXX)" th:field="*{phoneNumber}" th:errorclass="input-error">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="phoneNumber" placeholder="010-XXXX-XXXX" th:field="*{phoneNumber}" th:errorclass="input-error">
+                    <button type="button" class="btn btn-outline-secondary" id="sendSmsBtn" onclick="sendVerificationSms()">인증번호 받기</button>
+                </div>
+            </div>
+
+            <div class="form-group" id="verificationCodeGroup" style="display: none;">
+                <label>인증번호</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="verificationCode" placeholder="인증번호 6자리 입력">
+                    <span class="input-group-text text-danger" id="timer">03:00</span>
+                    <button type="button" class="btn btn-primary" onclick="verifyCode()">확인</button>
+                </div>
+                <small id="authMsg" class="form-text"></small>
             </div>
     <!--
             <div class="form-group">
@@ -204,7 +226,10 @@
             <div class="form-group form-check mb-4 mt-3">
                 <input type="checkbox" class="form-check-input" id="termsAgree">
                 <label class="form-check-label" for="termsAgree">
-                    <a href="#" class="text-primary text-decoration-none">이용약관 및 개인정보 처리방침</a>에 동의합니다.
+                    <a href="javascript:void(0)" class="text-primary text-decoration-none"
+                       data-bs-toggle="modal" data-bs-target="#termsModal">
+                        이용약관 및 개인정보 처리방침
+                    </a>에 동의합니다.
                 </label>
             </div>
 
@@ -226,8 +251,106 @@
 </div>
 
 
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">이용약관 및 개인정보 처리방침</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-size: 0.9rem; line-height: 1.6;">
+                <h6>제 1 조 (목적)</h6>
+                <p>이 약관은 MYSHOP이 운영하는 사이트에서 제공하는 서비스의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.</p>
+
+                <h6>제 2 조 (개인정보 수집항목)</h6>
+                <p>회사는 회원가입 시 서비스 제공을 위해 필요한 최소한의 개인정보(이름, 이메일, 연락처 등)를 수집합니다.</p>
+
+                <h6>제 3 조 (개인정보의 보유 및 이용기간)</h6>
+                <p>수집된 개인정보는 회원 탈퇴 시까지 보유하며, 관련 법령에 규정이 있는 경우 해당 기간 동안 보관합니다.</p>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary w-100" data-bs-dismiss="modal" onclick="document.getElementById('termsAgree').checked = true;">확인 및 동의</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script th:inline="javascript">
+    let timerInterval;
+
+    function sendVerificationSms() {
+        const phone = document.getElementById('phoneNumber').value;
+        if (!phone) {
+            alert("핸드폰 번호를 입력해주세요.");
+            return;
+        }
+
+        // 실제로는 여기서 서버로 SMS 발송 요청(fetch)을 보내야 합니다.
+        alert("인증번호가 발송되었습니다.");
+
+        // 인증번호 입력창 보여주기
+        document.getElementById('verificationCodeGroup').style.display = 'block';
+
+        // 타이머 시작
+        startTimer(180); // 180초 = 3분
+    }
+
+    function startTimer(duration) {
+        let timer = duration, minutes, seconds;
+        const display = document.getElementById('timer');
+        const sendBtn = document.getElementById('sendSmsBtn');
+
+        // 기존 타이머가 있다면 초기화
+        clearInterval(timerInterval);
+
+        sendBtn.innerText = "재발송";
+
+        timerInterval = setInterval(function () {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = minutes + ":" + seconds;
+
+            if (--timer < 0) {
+                clearInterval(timerInterval);
+                display.textContent = "시간만료";
+                alert("인증 시간이 만료되었습니다. 다시 시도해주세요.");
+                // 만료 시 처리 (예: 확인 버튼 비활성화 등)
+            }
+        }, 1000);
+    }
+
+    function verifyCode() {
+        const code = document.getElementById('verificationCode').value;
+        const msg = document.getElementById('authMsg');
+
+        if (code === "") {
+            alert("인증번호를 입력해주세요.");
+            return;
+        }
+
+        // 서버와 통신하여 인증번호가 맞는지 확인하는 로직이 들어갈 자리입니다.
+        // 예시로 "123456"일 때 성공한다고 가정합니다.
+        if (code === "123456") {
+            clearInterval(timerInterval);
+            document.getElementById('timer').textContent = "";
+            msg.innerText = "인증이 완료되었습니다.";
+            msg.style.color = "green";
+            document.getElementById('verificationCode').readOnly = true;
+            document.getElementById('phoneNumber').readOnly = true;
+        } else {
+            msg.innerText = "인증번호가 일치하지 않습니다.";
+            msg.style.color = "red";
+        }
+    }
+
+
+
     function checkDuplicateId() {
         const id = document.getElementById('id');
         const idVal = id.value;
@@ -315,4 +438,5 @@
 </script>
 
 </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </html>
