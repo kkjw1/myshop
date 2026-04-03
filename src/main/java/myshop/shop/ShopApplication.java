@@ -17,12 +17,4 @@ public class ShopApplication {
 		SpringApplication.run(ShopApplication.class, args);
 	}
 
-    /**
-     * 등록자, 수정자
-     */
-    @Bean
-    public AuditorAware<String> auditorAware() {
-        return () -> Optional.of(UUID.randomUUID().toString());
-    }
-
 }

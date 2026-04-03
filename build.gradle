@@ -50,6 +50,9 @@ dependencies {
 
     //암호화,복호화
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    //문자인증
+    implementation 'com.solapi:sdk:1.0.3'
 }
 
 tasks.named('test') {

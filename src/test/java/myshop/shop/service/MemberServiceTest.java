@@ -8,6 +8,7 @@ import myshop.shop.entity.Member;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,8 @@ class MemberServiceTest {
 
     @Autowired MemberService memberService;
     @Autowired EntityManager em;
+
+    @Autowired Environment env;
 
     @Test
     public void signUpTest() {
@@ -40,5 +43,20 @@ class MemberServiceTest {
 
         //then
         assertThat(login.getId()).isEqualTo("id");
+    }
+    
+    @Test
+    public void envTest() throws Exception {
+        System.out.println(env.getProperty("solapi.api-key"));
+        System.out.println(env.getProperty("solapi.api-secret"));
+        System.out.println(env.getProperty("solapi.sender"));
+    }
+
+    @Test
+    public void authTest() throws Exception {
+        //given
+        String authCode = memberService.smsAuth();
+        System.out.println("authCode = " + authCode);
+
     }
 }

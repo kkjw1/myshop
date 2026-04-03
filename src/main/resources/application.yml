@@ -1,4 +1,7 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
+
   messages:
     basename: messages,errors
 
@@ -29,3 +32,9 @@ server:
     session:
       timeout: 6000   #세션 타임아웃 설정(기본:초)
       tracking-modes: cookie  #첫 로그인할 경우 jsessionid 404오류 해결
+
+
+solapi:
+  api-key: ${SOLAPI_API_KEY}
+  api-secret: ${SOLAPI_API_SECRET}
+  sender: ${SOLAPI_SENDER}

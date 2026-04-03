@@ -99,5 +99,10 @@ public class MemberController {
     }
 
 
+    @PostMapping("/signUp/checkPhoneNumber")
+    @ResponseBody
+    public Boolean checkDuplicatePhoneNumber(@RequestParam("phoneNumber") String phoneNumber) {
+        return memberService.checkPhoneNumber(phoneNumber);
+    }
 
 }
