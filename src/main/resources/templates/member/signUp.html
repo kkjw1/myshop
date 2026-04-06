@@ -137,6 +137,7 @@
             <div class="text-danger" style="font-size: 0.875rem;" th:errors="*{phoneNumber}">휴대전화번호 에러</div>
 
             <div class="text-danger" style="font-size: 0.875rem;" id="duplicatedId"></div>
+            <div class="text-danger" style="font-size: 0.875rem;" id="phoneCheck"></div>
 
             <div class="text-danger mb-3" id="loginErrorMessage" style="font-size: 0.875rem;" th:if="${#fields.hasGlobalErrors()}"
                  th:each="err : ${#fields.globalErrors()}" th:text="${err}">
@@ -152,7 +153,6 @@
             <div class="input-group border-bottom form-group">
                 <input type="password" class="form-control" id="password" placeholder="최소 8자 이상의 비밀번호" th:field="*{password}" th:errorclass="input-error">
                 <span class="input-group-text eye-btn" id="toggleText" onclick="togglePassword()">보기</span>
-
             </div>
 
             <div class="form-group">
@@ -191,40 +191,24 @@
             <div class="form-group">
                 <label>휴대전화번호</label>
                 <div class="input-group">
-                    <input type="text" class="form-control" id="phoneNumber" placeholder="010-XXXX-XXXX" th:field="*{phoneNumber}" th:errorclass="input-error">
-                    <button type="button" class="btn btn-outline-secondary" id="sendSmsBtn" onclick="sendVerificationSms()">인증번호 받기</button>
+                    <input type="text" class="form-control" id="phoneNumber" placeholder="010-XXXX-XXXX" th:field="*{phoneNumber}" th:errorclass="input-error" oninput="formatPhoneNumber(this)">
+                    <button type="button" class="btn btn-outline-secondary" id="sendSmsBtn" onclick="sendSmsAuth()">인증번호 받기</button>
                 </div>
             </div>
 
             <div class="form-group" id="verificationCodeGroup" style="display: none;">
                 <label>인증번호</label>
                 <div class="input-group">
-                    <input type="text" class="form-control" id="verificationCode" placeholder="인증번호 6자리 입력">
+                    <input type="text" class="form-control" id="authCode" placeholder="인증번호 6자리 입력">
                     <span class="input-group-text text-danger" id="timer">03:00</span>
-                    <button type="button" class="btn btn-primary" onclick="verifyCode()">확인</button>
+                    <button type="button" class="btn btn-primary" onclick="checkAuthCode()">확인</button>
                 </div>
                 <small id="authMsg" class="form-text"></small>
             </div>
-    <!--
-            <div class="form-group">
-                <label>[선택]기본배송지</label>
-                <div class="row mb-2">
-                    <div class="col-6 pr-1">
-                        <input type="text" id="postcode" placeholder="우편번호" class="form-control" readonly th:field="*{postcode}" th:errorclass="input-error">
-                    </div>
-                    <div class="col-6 pl-1">
-                        <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기" class="btn btn-outline-secondary w-100">
-                    </div>
-                </div>
 
-                <input type="text" id="roadAddress" placeholder="도로명주소" class="form-control mb-2" readonly th:field="*{roadAddress}">
-                <input type="text" id="detailAddress" placeholder="상세주소 (동, 호수 등)" class="form-control mb-2" th:field="*{detailAddress}">
-                <span id="guide" style="color:#999; display:none; font-size: 0.875rem;" class="mt-2"></span>
-                <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-            </div>-->
 
             <div class="form-group form-check mb-4 mt-3">
-                <input type="checkbox" class="form-check-input" id="termsAgree">
+                <input type="checkbox" class="form-check-input" id="termsAgree" onchange="toggleSignupButton()">
                 <label class="form-check-label" for="termsAgree">
                     <a href="javascript:void(0)" class="text-primary text-decoration-none"
                        data-bs-toggle="modal" data-bs-target="#termsModal">
@@ -234,7 +218,7 @@
             </div>
 
             <div class="mb-3">
-                <button type="submit" class="btn btn-primary w-100" style="padding: 10px;" id="signupButton">
+                <button type="submit" class="btn btn-primary w-100" style="padding: 10px;" id="signupButton" disabled>
                     회원가입
                 </button>
             </div>
@@ -270,32 +254,93 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary w-100" data-bs-dismiss="modal" onclick="document.getElementById('termsAgree').checked = true;">확인 및 동의</button>
+                <button type="button" class="btn btn-primary w-100" data-bs-dismiss="modal"
+                        onclick="document.getElementById('termsAgree').checked = true; toggleSignupButton();">확인 및 동의</button>
             </div>
         </div>
     </div>
 </div>
 
 
-<script th:inline="javascript">
-    let timerInterval;
 
-    function sendVerificationSms() {
-        const phone = document.getElementById('phoneNumber').value;
-        if (!phone) {
+<script th:inline="javascript">
+
+    function toggleSignupButton() {
+        const termsAgree = document.getElementById('termsAgree');
+        const signupButton = document.getElementById('signupButton');
+
+        // 체크박스가 체크되어 있으면 disabled를 false로, 아니면 true로 설정
+        signupButton.disabled = !termsAgree.checked;
+    }
+
+    function formatPhoneNumber(input) {
+        // 1. 숫자만 남기기
+        let value = input.value.replace(/[^0-9]/g, "");
+
+        // 2. 길이에 따라 하이픈 삽입
+        let result = "";
+        if (value.length < 4) {
+            result = value;
+        } else if (value.length < 8) {
+            result = value.replace(/(\d{3})(\d{1,4})/, "$1-$2");
+        } else {
+            result = value.replace(/(\d{3})(\d{3,4})(\d{4})/, "$1-$2-$3");
+        }
+
+        // 3. 값 반영
+        input.value = result;
+    }
+
+    async function sendSmsAuth() {
+        const phoneNumberVal = document.getElementById('phoneNumber').value;
+        const phoneNumber = document.getElementById('phoneNumber');
+        const msg = document.getElementById('phoneCheck');
+
+        if (!phoneNumberVal) {
             alert("핸드폰 번호를 입력해주세요.");
             return;
         }
 
-        // 실제로는 여기서 서버로 SMS 발송 요청(fetch)을 보내야 합니다.
-        alert("인증번호가 발송되었습니다.");
+        try {
+            const checkPhoneNumber = await fetch(`signUp/checkPhoneNumber?phoneNumber=${phoneNumberVal}`);
+            const isAvailable = await checkPhoneNumber.json();
 
-        // 인증번호 입력창 보여주기
-        document.getElementById('verificationCodeGroup').style.display = 'block';
+            // 사용중인 번호
+            if(!isAvailable) {
+                msg.innerText = "사용 중인 핸드폰입니다."
+                phoneNumber.classList.add("input-error");
+                return;
+            } else {
+                msg.innerText = "";
+                phoneNumber.classList.remove("input-error");
+            }
 
-        // 타이머 시작
-        startTimer(180); // 180초 = 3분
+            const sendSmsAuth = await fetch('/signUp/sendSmsAuth',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ phoneNumber: phoneNumberVal }) // 본문에 담아 보냄
+            });
+
+            const sendSmsAuthText = await sendSmsAuth.text();
+
+            if (sendSmsAuthText === "ok") {
+                alert("인증번호가 발송되었습니다.");
+                document.getElementById('verificationCodeGroup').style.display = 'block';
+                startTimer(180); // 180초
+            } else {
+                alert(`sendSmsAuthText:${sendSmsAuthText}`);
+                throw new Error("인증번호 발송 실패");
+            }
+
+        } catch (err) {
+            console.error("checkPhoneNumber Error:", err);
+            alert("서버 통신 중 오류가 발생했습니다.");
+        }
     }
+
+    let timerInterval;
 
     function startTimer(duration) {
         let timer = duration, minutes, seconds;
@@ -325,24 +370,34 @@
         }, 1000);
     }
 
-    function verifyCode() {
-        const code = document.getElementById('verificationCode').value;
+    async function checkAuthCode() {
+        const authCode = document.getElementById('authCode').value;
+        const phoneNumber = document.getElementById('phoneNumber').value;
         const msg = document.getElementById('authMsg');
 
-        if (code === "") {
+        if (authCode === "") {
             alert("인증번호를 입력해주세요.");
             return;
         }
 
-        // 서버와 통신하여 인증번호가 맞는지 확인하는 로직이 들어갈 자리입니다.
-        // 예시로 "123456"일 때 성공한다고 가정합니다.
-        if (code === "123456") {
+        const checkAuthCode = await fetch('/signUp/checkAuthCode', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({authCode: authCode, phoneNumber: phoneNumber}) // 본문에 담아 보냄
+        });
+
+        const checkAuthCodeResult = await checkAuthCode.text();
+
+        if (checkAuthCodeResult === "ok") {
             clearInterval(timerInterval);
             document.getElementById('timer').textContent = "";
             msg.innerText = "인증이 완료되었습니다.";
             msg.style.color = "green";
             document.getElementById('verificationCode').readOnly = true;
             document.getElementById('phoneNumber').readOnly = true;
+            // document.getElementById('verificationCodeGroup').classList.add('d-none');
         } else {
             msg.innerText = "인증번호가 일치하지 않습니다.";
             msg.style.color = "red";

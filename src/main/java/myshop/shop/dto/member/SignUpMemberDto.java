@@ -28,7 +28,7 @@ public class SignUpMemberDto {
     private String telecom;
 
 
-    @NotNull(message = "휴대전화번호가 공백입니다.")
+    @NotBlank(message = "휴대전화번호가 공백입니다.")
     private String phoneNumber;
 
 

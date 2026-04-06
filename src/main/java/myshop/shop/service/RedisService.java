@@ -15,13 +15,17 @@ public class RedisService {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public void saveData(String key, String value) {
-        redisTemplate.opsForValue().set(key, value,3, TimeUnit.MINUTES);
-        log.info("인증번호 Redis 저장 {}:{}", key, value);
+    public void saveData(String key, String value, Long time) {
+        redisTemplate.opsForValue().set(key, value, time, TimeUnit.MINUTES);
+        log.info("Redis 저장 ({}:{})", key, value);
     }
 
     public String getData(String key) {
         ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
         return (String) valueOperations.get(key);
+    }
+
+    public void deleteData(String key) {
+        redisTemplate.delete(key);
     }
 }

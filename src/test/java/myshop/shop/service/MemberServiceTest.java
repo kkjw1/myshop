@@ -55,8 +55,37 @@ class MemberServiceTest {
     @Test
     public void authTest() throws Exception {
         //given
-        String authCode = memberService.smsAuth();
+        String authCode = memberService.smsAuth("01047106305");
         System.out.println("authCode = " + authCode);
+
+    }
+    
+    @Test
+    public void checkIdTest() throws Exception {
+        //given
+        SignUpMemberDto signUpMemberDto = new SignUpMemberDto("id", "password", "email", "name", "010-1111-2222", Gender.MAN, "phoneNumber");
+        memberService.signUp(signUpMemberDto);
+
+        boolean result = memberService.checkId("id");
+        boolean result2 = memberService.checkId("test");
+
+        System.out.println("result = " + result);
+        System.out.println("result2 = " + result2);
+    }
+    
+    @Test
+    public void checkPhoneNumberTest() throws Exception {
+        //given
+        SignUpMemberDto signUpMemberDto = new SignUpMemberDto("id", "password", "email@test.com", "name", "SKT", Gender.MAN, "010-1111-2222");
+        memberService.signUp(signUpMemberDto);
+
+        //when
+        boolean result1 = memberService.checkPhoneNumber("010-1111-2222");
+        boolean result2 = memberService.checkPhoneNumber("010-1111-2522");
+
+        //then
+        System.out.println("result1 = " + result1);
+        System.out.println("result2 = " + result2);
 
     }
 }

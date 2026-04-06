@@ -16,7 +16,7 @@ class RedisServiceTest {
     @Test
     public void redisTest() throws Exception {
         //given
-        redisService.saveData("AuthNum", "123456");
+        redisService.saveData("AuthNum", "123456", 3L);
         String authNum = redisService.getData("AuthNum");
 
         assertThat(authNum).isEqualTo("123456");

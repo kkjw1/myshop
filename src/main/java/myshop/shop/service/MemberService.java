@@ -71,7 +71,7 @@ public class MemberService {
     /**
      * 핸드폰 인증
      */
-    public String smsAuth() {
+    public String smsAuth(String phoneNumber) {
         DefaultMessageService messageService =  SolapiClient.INSTANCE.createInstance(env.getProperty("solapi.api-key"),
                 env.getProperty("solapi.api-secret"));
 
@@ -79,7 +79,7 @@ public class MemberService {
 
         Message message = new Message();
         message.setFrom(env.getProperty("solapi.sender"));
-        message.setTo("010-4710-6305");
+        message.setTo(phoneNumber);
         message.setText("[" + authCode + "] 본인확인 인증번호를 입력하세요.");
 
         try {
