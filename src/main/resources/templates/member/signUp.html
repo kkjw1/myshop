@@ -302,7 +302,7 @@
         }
 
         try {
-            const checkPhoneNumber = await fetch(`signUp/checkPhoneNumber?phoneNumber=${phoneNumberVal}`);
+            const checkPhoneNumber = await fetch(`/checkPhoneNumber?phoneNumber=${phoneNumberVal}`);
             const isAvailable = await checkPhoneNumber.json();
 
             // 사용중인 번호
@@ -315,7 +315,7 @@
                 phoneNumber.classList.remove("input-error");
             }
 
-            const sendSmsAuth = await fetch('/signUp/sendSmsAuth',{
+            const sendSmsAuth = await fetch('/sendSmsAuth',{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -380,7 +380,7 @@
             return;
         }
 
-        const checkAuthCode = await fetch('/signUp/checkAuthCode', {
+        const checkAuthCode = await fetch('/checkAuthCode', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -14,17 +14,12 @@ import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.service.AddressService;
 import myshop.shop.service.MemberService;
 import myshop.shop.service.RedisService;
-import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 import static org.springframework.util.StringUtils.hasText;
 
@@ -117,13 +112,13 @@ public class MemberController {
     }
 
 
-    @GetMapping("/signUp/checkPhoneNumber")
+    @GetMapping("/checkPhoneNumber")
     @ResponseBody
     public Boolean checkDuplicatePhoneNumber(@RequestParam("phoneNumber") String phoneNumber) {
         return memberService.checkPhoneNumber(phoneNumber);
     }
 
-    @PostMapping("/signUp/sendSmsAuth")
+    @PostMapping("/sendSmsAuth")
     @ResponseBody
     public String sendSmsAuth(@RequestBody SendSmsAuthDto sendSmsAuthDto) {
         log.info("phoneNumber = {}", sendSmsAuthDto.getPhoneNumber());
@@ -144,7 +139,7 @@ public class MemberController {
         private String phoneNumber;
     }
 
-    @PostMapping("/signUp/checkAuthCode")
+    @PostMapping("/checkAuthCode")
     @ResponseBody
     public String checkAuthCode(@RequestBody CheckAuthCodeDto checkAuthCodeDto,
                                  HttpServletRequest request) {
@@ -162,4 +157,19 @@ public class MemberController {
         }
         return "no";
     }
+
+    //=============================================아이디, 비밀번호 찾기=============================================
+    @GetMapping("/findMember")
+    public String findMemberForm() {
+        return "member/find_member";
+    }
+
+
+
+
+    @PostMapping("/findMember")
+    public String findMember() {
+        return "ok";
+    }
+
 }
