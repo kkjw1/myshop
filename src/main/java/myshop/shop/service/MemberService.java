@@ -6,6 +6,7 @@ import com.solapi.sdk.message.model.Message;
 import com.solapi.sdk.message.service.DefaultMessageService;
 import lombok.RequiredArgsConstructor;
 import myshop.shop.dto.member.LoginMemberDto;
+import myshop.shop.dto.member.ResetPasswordMemberDto;
 import myshop.shop.dto.member.SignUpMemberDto;
 import myshop.shop.entity.Member;
 import myshop.shop.entity.MemberLevel;
@@ -99,5 +100,13 @@ public class MemberService {
     public static String authCodeCreate() {
         int authCode = ThreadLocalRandom.current().nextInt(100000, 1000000);
         return String.valueOf(authCode);
+    }
+
+    /**
+     * 아이디 비밀번호 찾기->비밀번호 초기화
+     */
+    public int resetPassword(ResetPasswordMemberDto resetPasswordMemberDto) {
+        System.out.println("resetPasswordMemberDto = " + resetPasswordMemberDto);
+        return memberRepository.updatePassword(resetPasswordMemberDto.getId(), passwordEncoder.encode(resetPasswordMemberDto.getPassword()));
     }
 }

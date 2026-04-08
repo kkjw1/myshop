@@ -36,7 +36,7 @@ public class InitDB {
             for(int i=1; i<10; i++) {
                 String passwordEncode = passwordEncoder.encode("password" + i);
                 Member member = new Member("id" + i, "email" + i, passwordEncode, "name" + i,
-                        "telecom" + i, "phoneNumber" + i, Gender.MAN, MemberLevel.normal);
+                        "telecom" + i, "010-0000-000" + i, Gender.MAN, MemberLevel.normal);
                 memberRepository.save(member);
             }
 

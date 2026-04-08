@@ -83,15 +83,15 @@
                         <div class="text-danger" style="font-size: 0.875rem;" id="phoneCheck"></div>
                         <div class="input-group">
                             <input type="text" class="form-control form-control-lg" id="phoneNumber" placeholder="010-XXXX-XXXX" oninput="formatPhoneNumber(this)">
-                            <button class="btn btn-primary" type="button" onclick="sendSmsAuth()">인증번호 받기</button>
+                            <button class="btn btn-primary" type="button" id="sendSmsBtn" onclick="sendSmsAuth()">인증번호 받기</button>
                         </div>
                     </div>
-                    <small id="authMsg" class="form-text"></small>
+                    <div class="text-danger" style="font-size: 0.875rem;" id="smsAuthMsg"></div>
                     <div class="mb-4 input-group">
-                        <input type="text" class="form-control form-control-lg" id="authCode" placeholder="인증번호 6자리">
+                        <input type="text" class="form-control form-control-lg" id="smsAuthCode" placeholder="인증번호 6자리">
                         <span class="input-group-text text-danger" id="timer" style="display: none">03:00</span>
-<!--                        <button type="button" class="btn btn-primary" onclick="checkAuthCode()">확인</button>-->
                     </div>
+                    <button type="button" id="submit-btn1" class="btn btn-primary btn-lg w-100 py-3 mt-2" onclick="smsCheckAuthCode()" disabled>인증하기</button>
                 </div>
 
                 <div id="email-section" class="input-section">
@@ -105,6 +105,7 @@
                     <div class="mb-4">
                         <input type="text" class="form-control form-control-lg" placeholder="인증코드 입력">
                     </div>
+                    <button type="submit" id="submit-btn2" class="btn btn-primary btn-lg w-100 py-3 mt-2" onclick="checkAuthCode2()" disabled>인증하기</button>
                 </div>
 
                 <div id="integrated-section" class="input-section text-center py-3">
@@ -114,10 +115,8 @@
                     <button class="btn btn-dark btn-lg w-100 py-3">본인 확인 서비스 시작</button>
                 </div>
 
-                <button id="submit-btn" class="btn btn-primary btn-lg w-100 py-3 mt-2">다음 단계로</button>
-
                 <div class="text-center mt-4">
-                    <a href="/login" class="text-decoration-none text-muted small">로그인으로 돌아가기</a>
+                    <a href="/login" th:href="@{/login}" class="text-decoration-none text-muted small">로그인으로 돌아가기</a>
                 </div>
             </div>
         </div>
@@ -128,10 +127,38 @@
 
 <script>
 
+
+    async function smsCheckAuthCode() {
+        const authCode = document.getElementById('smsAuthCode').value;
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        const msg = document.getElementById('smsAuthMsg');
+
+        if (authCode === "") {
+            alert("인증번호를 입력해주세요.");
+            return;
+        }
+
+        const res = await fetch('/findMember/checkAuthCode', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({authCode: authCode, phoneNumber: phoneNumber}) // 본문에 담아 보냄
+        });
+
+        if (res.redirected) {
+            // 리디렉션된 URL로 페이지를 이동, 이렇게 하면 redirect가 두 번 됨
+            window.location.href = res.url;
+        } else {
+            msg.innerText = "인증번호가 일치하지 않습니다.";
+        }
+    }
+
     async function sendSmsAuth() {
         const phoneNumberVal = document.getElementById('phoneNumber').value;
         const phoneNumber = document.getElementById('phoneNumber');
         const msg = document.getElementById('phoneCheck');
+        const submitBtn = document.getElementById('submit-btn1');
 
         if (!phoneNumberVal) {
             alert("핸드폰 번호를 입력해주세요.");
@@ -143,7 +170,7 @@
             const isAvailable = await checkPhoneNumber.json();
 
             // 사용중인 번호
-            if(!isAvailable) {
+            if(isAvailable) {
                 msg.innerText = "없는 번호입니다."
                 phoneNumber.classList.add("input-error");
                 return;
@@ -165,6 +192,7 @@
             if (sendSmsAuthText === "ok") {
                 alert("인증번호가 발송되었습니다.");
                 startTimer(180); // 180초
+                submitBtn.disabled = false;
             } else {
                 alert(`sendSmsAuthText:${sendSmsAuthText}`);
                 throw new Error("인증번호 발송 실패");
@@ -182,6 +210,7 @@
         let timer = duration, minutes, seconds;
         const display = document.getElementById('timer');
         const sendBtn = document.getElementById('sendSmsBtn');
+        const submitBtn = document.getElementById('submit-btn1');
 
         display.style.display = 'block';
         // 기존 타이머가 있다면 초기화
@@ -202,7 +231,7 @@
                 clearInterval(timerInterval);
                 display.textContent = "시간만료";
                 alert("인증 시간이 만료되었습니다. 다시 시도해주세요.");
-                // 만료 시 처리 (예: 확인 버튼 비활성화 등)
+                submitBtn.disabled = true;
             }
         }, 1000);
     }
@@ -238,8 +267,6 @@
         const targetSection = document.getElementById(method + '-section');
         targetSection.classList.add('active');
 
-        // 통합인증일 경우 '다음' 버튼 숨김 (모듈 내에서 처리하므로)
-        const submitBtn = document.getElementById('submit-btn');
         if(method === 'integrated') {
             submitBtn.style.display = 'none';
         } else {

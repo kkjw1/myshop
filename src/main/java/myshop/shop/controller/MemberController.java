@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.dto.member.LoginMemberDto;
+import myshop.shop.dto.member.ResetPasswordMemberDto;
 import myshop.shop.dto.member.SignUpMemberDto;
 import myshop.shop.entity.Member;
 import myshop.shop.repository.member.MemberRepository;
@@ -115,13 +116,15 @@ public class MemberController {
     @GetMapping("/checkPhoneNumber")
     @ResponseBody
     public Boolean checkDuplicatePhoneNumber(@RequestParam("phoneNumber") String phoneNumber) {
-        return memberService.checkPhoneNumber(phoneNumber);
+        boolean result = memberService.checkPhoneNumber(phoneNumber);
+        log.info("phoneNumber={}, result={}", phoneNumber, result);
+        return result;
     }
 
     @PostMapping("/sendSmsAuth")
     @ResponseBody
     public String sendSmsAuth(@RequestBody SendSmsAuthDto sendSmsAuthDto) {
-        log.info("phoneNumber = {}", sendSmsAuthDto.getPhoneNumber());
+        log.info("phoneNumber={}", sendSmsAuthDto.getPhoneNumber());
 //        String authCode = memberService.smsAuth(sendSmsAuthDto.getPhoneNumber());
         String authCode = "123456";
         redisService.saveData(sendSmsAuthDto.getPhoneNumber(), authCode, 3L);
@@ -129,12 +132,12 @@ public class MemberController {
     }
 
     @Getter @Setter
-    static class SendSmsAuthDto {
+    public static class SendSmsAuthDto {
         private String phoneNumber;
     }
 
     @Getter @Setter
-    static class CheckAuthCodeDto {
+    public static class CheckAuthCodeDto {
         private String authCode;
         private String phoneNumber;
     }
@@ -164,12 +167,54 @@ public class MemberController {
         return "member/find_member";
     }
 
+    @PostMapping("/findMember/checkAuthCode")
+    public String findCheckAuthCode(@RequestBody CheckAuthCodeDto checkAuthCodeDto, RedirectAttributes redirectAttributes) {
 
+        String authCode = checkAuthCodeDto.getAuthCode();
+        String phoneNumber = checkAuthCodeDto.getPhoneNumber();
+        log.info("authCode:{}, phoneNumber:{}", authCode, phoneNumber);
 
-
-    @PostMapping("/findMember")
-    public String findMember() {
-        return "ok";
+        String data = redisService.getData(phoneNumber);
+        boolean result = authCode.equals(data);
+        log.info("result:{}", result);
+        if (result) {
+            redisService.deleteData(phoneNumber);
+            Member member = memberRepository.findByPhoneNumber(phoneNumber).orElse(null);
+            String memberId = member.getId();
+            redisService.saveData("findMemberId:"+ memberId, "SUCCESS", 10L);
+            redirectAttributes.addAttribute("memberId", memberId);
+            return "redirect:/resetPassword";
+        }
+        return "member/find_member";
     }
 
+    @GetMapping("/resetPassword")
+    public String resetPasswordForm(@RequestParam("memberId") String memberId, Model model) {
+        log.info("findMember:{}", memberId);
+
+        String data = redisService.getData("findMemberId:" + memberId);
+
+        if (!data.equals("SUCCESS")) {
+            log.error("잘못된 접근입니다.");
+            return "redirect:/login";
+        }
+
+        model.addAttribute("resetPasswordMemberDto", new ResetPasswordMemberDto(memberId));
+        return "member/reset_password";
+    }
+
+    @PostMapping("/resetPassword")
+    public String resetPassword(@Validated @ModelAttribute("resetPasswordMemberDto") ResetPasswordMemberDto resetPasswordMemberDto, BindingResult bindingResult,
+                                RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            return "member/reset_password";
+        }
+
+        int result = memberService.resetPassword(resetPasswordMemberDto);
+        log.info("result:{}",result);
+
+        redirectAttributes.addAttribute("loginId", resetPasswordMemberDto.getId());
+        return "redirect:/login/{loginId}";
+    }
 }
