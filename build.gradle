@@ -58,6 +58,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     // Jackson (JSON 처리를 위해 필요)
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    //이메일 인증
+    implementation "org.springframework.boot:spring-boot-starter-mail"
 }
 
 tasks.named('test') {

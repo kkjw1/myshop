@@ -13,6 +13,11 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.mail.MailMessage;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -51,5 +56,13 @@ public class MyShopConfig {
     @Bean
     public AuditorAware<String> auditorAware() {
         return () -> Optional.of(UUID.randomUUID().toString());
+    }
+
+    /**
+     * Email 설정
+     */
+    @Bean
+    public JavaMailSender javaMailSender() {
+        return new JavaMailSenderImpl();
     }
 }
