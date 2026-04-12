@@ -16,6 +16,7 @@ public class SignUpMemberDto {
     @Size(min = 8, message = "비밀번호는 8자리 이상이여야 합니다.")
     private String password;
 
+    @NotBlank(message = "이메일 주소가 공백입니다.")
     @Email(message = "이메일 주소가 정확한지 확인해 주세요.")
     private String email;
 

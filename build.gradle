@@ -56,7 +56,7 @@ dependencies {
 
     // Spring Data Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    // Jackson (JSON 처리를 위해 필요)
+    // Jackson (JSON 처리)
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     //이메일 인증

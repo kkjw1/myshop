@@ -3,7 +3,7 @@ spring:
   mail:
     host: smtp.gmail.com          # 구글 SMTP 서버 주소
     port: 587                     # 구글 SMTP 포트 번호
-    username: ${GOOGLE_MAIL}  # 사용자 이메일
+    username: ${GOOGLE_MAIL_ADDRESS}  # 사용자 이메일
     password: ${GOOGLE_MAIL_PASSWORD} # 사용자 앱 비밀번호
     properties:
       mail:

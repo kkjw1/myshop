@@ -58,11 +58,4 @@ public class MyShopConfig {
         return () -> Optional.of(UUID.randomUUID().toString());
     }
 
-    /**
-     * Email 설정
-     */
-    @Bean
-    public JavaMailSender javaMailSender() {
-        return new JavaMailSenderImpl();
-    }
 }

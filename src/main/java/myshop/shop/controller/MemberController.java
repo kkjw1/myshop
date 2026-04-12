@@ -13,6 +13,7 @@ import myshop.shop.dto.member.SignUpMemberDto;
 import myshop.shop.entity.Member;
 import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.service.AddressService;
+import myshop.shop.service.MailService;
 import myshop.shop.service.MemberService;
 import myshop.shop.service.RedisService;
 import org.springframework.stereotype.Controller;
@@ -33,6 +34,7 @@ public class MemberController {
     private final MemberService memberService;
     private final AddressService addressService;
     private final RedisService redisService;
+    private final MailService mailService;
 
     //=============================================로그인=============================================
     @GetMapping("/login")
@@ -113,6 +115,9 @@ public class MemberController {
     }
 
 
+    /**
+     * 핸드폰 중복 검사
+     */
     @GetMapping("/checkPhoneNumber")
     @ResponseBody
     public Boolean checkDuplicatePhoneNumber(@RequestParam("phoneNumber") String phoneNumber) {
@@ -121,14 +126,34 @@ public class MemberController {
         return result;
     }
 
+    /**
+     * 메시지 인증
+     */
     @PostMapping("/sendSmsAuth")
     @ResponseBody
     public String sendSmsAuth(@RequestBody SendSmsAuthDto sendSmsAuthDto) {
         log.info("phoneNumber={}", sendSmsAuthDto.getPhoneNumber());
-//        String authCode = memberService.smsAuth(sendSmsAuthDto.getPhoneNumber());
-        String authCode = "123456";
+        String authCode = memberService.smsAuth(sendSmsAuthDto.getPhoneNumber());
+//        String authCode = "123456";
         redisService.saveData(sendSmsAuthDto.getPhoneNumber(), authCode, 3L);
         return "ok";
+    }
+
+    /**
+     * 이메일 인증
+     */
+    @PostMapping("/sendMailAuth")
+    @ResponseBody
+    public String sendMailAuth(@RequestBody SendMailAuthDto sendMailAuthDto) {
+        log.info("toAddress={}", sendMailAuthDto.getToAddress());
+        String authCode = mailService.authCodeCreate();
+        mailService.sendMail(sendMailAuthDto.getToAddress(), authCode);
+        return "ok";
+    }
+
+    @Getter @Setter
+    public static class SendMailAuthDto {
+        private String toAddress;
     }
 
     @Getter @Setter
@@ -217,4 +242,5 @@ public class MemberController {
         redirectAttributes.addAttribute("loginId", resetPasswordMemberDto.getId());
         return "redirect:/login/{loginId}";
     }
+
 }

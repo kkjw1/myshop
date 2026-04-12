@@ -97,7 +97,7 @@ public class MemberService {
     /**
      * 인증번호6자리
      */
-    public static String authCodeCreate() {
+    public String authCodeCreate() {
         int authCode = ThreadLocalRandom.current().nextInt(100000, 1000000);
         return String.valueOf(authCode);
     }
