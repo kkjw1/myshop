@@ -5,11 +5,10 @@ import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import myshop.shop.dto.member.LoginCheckMemberDto;
-import myshop.shop.dto.member.LoginMemberDto;
-import myshop.shop.dto.member.ResetPasswordMemberDto;
-import myshop.shop.dto.member.SignUpMemberDto;
+import myshop.shop.dto.member.*;
+import myshop.shop.entity.Gender;
 import myshop.shop.entity.Member;
 import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.service.AddressService;
@@ -18,10 +17,14 @@ import myshop.shop.service.MemberService;
 import myshop.shop.service.RedisService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Map;
+import java.util.Objects;
 
 import static org.springframework.util.StringUtils.hasText;
 
@@ -348,4 +351,164 @@ public class MemberController {
         redirectAttributes.addAttribute("loginId", resetPasswordMemberDto.getId());
         return "redirect:/login/{loginId}";
     }
+
+
+
+    /**
+     * 개인정보 확인/수정 폼
+     */
+    @GetMapping("/myPage/memberModify")
+    public String memberModifyForm(@RequestParam("memberId") String memberId, Model model, HttpServletRequest request,
+                                   RedirectAttributes redirectAttributes) {
+
+        String access = redisService.getData("ModifyCheckPW:" + memberId);
+        if (access == null) {
+            redirectAttributes.addAttribute("memberId", memberId);
+            return "redirect:/memberModifyCheckPW";
+        }
+
+        if (!new LoginCheckMemberDto().loginCheck(request, model)) {
+            return "redirect:/member/login?redirectURL=" + request.getRequestURI();
+        }
+
+        Member member = memberRepository.findById(memberId).orElse(null);
+        UpdateMemberDto updateMember = new UpdateMemberDto(member.getId(),
+                member.getName(),
+                member.getEmail(),
+                member.getPassword(),
+                member.getTelecom(),
+                member.getPhoneNumber(),
+                member.getGender());
+        model.addAttribute("updateMember", updateMember);
+
+        return "member/member_modify";
+    }
+
+
+
+    /**
+     * 개인정보 확인/수정 -> 비밀번호 확인 폼
+     */
+    @GetMapping("/memberModifyCheckPW")
+    public String memberModifyCheckPWForm(@RequestParam("memberId") String memberId, Model model) {
+        LoginMemberDto loginMemberDto = new LoginMemberDto();
+        loginMemberDto.setId(memberId);
+        model.addAttribute("loginMemberDto", loginMemberDto);
+        return "member/member_modify_checkPW";
+    }
+
+
+
+    /**
+     * 비밀번호 확인 폼 -> 비밀번호 확인
+     */
+    @PostMapping("/memberModifyCheckPW")
+    public String memberModifyCheckPW(@Validated @ModelAttribute LoginMemberDto loginMemberDto, BindingResult bindingResult,
+                                      Model model, RedirectAttributes redirectAttributes) {
+        log.info("{}", loginMemberDto);
+
+        if (bindingResult.hasErrors()) {
+            return "member/member_modify_checkPW";
+        }
+
+        Member member = memberService.login(loginMemberDto);
+
+        if (member == null) {
+            log.info("memberModifyCheckPW Error");
+            bindingResult.reject("CheckPWError", "비밀번호 체크 에러");
+            return "member/member_modify_checkPW";
+        }
+
+        redisService.saveData("ModifyCheckPW:"+member.getId(), "SUCCESS", 10L);
+
+        redirectAttributes.addAttribute("memberId", member.getId());
+        return "redirect:/myPage/memberModify";
+    }
+
+
+
+    /**
+     * 개인정보 확인/수정 -> 수정하기
+     */
+    @PostMapping("/myPage/memberModify")
+    public String memberModify(@Validated @ModelAttribute("updateMember") UpdateMemberDto updateMemberDto, BindingResult bindingResult,
+                               RedirectAttributes redirectAttributes, HttpServletRequest request) {
+
+        if (bindingResult.hasErrors()) {
+            log.info("myPageUpdate Fail={}", bindingResult);
+            return "member/member_modify";
+        }
+        Member beforeMember = memberRepository.findById(updateMemberDto.getId()).orElse(null);
+        Member updateMember = memberService.memberModify(updateMemberDto);
+        log.info("beforeMember:{}", beforeMember);
+        log.info("updateMember:{}", updateMember);
+
+        ChangedDataDto changedDataDto = new ChangedDataDto(beforeMember, updateMember);
+        if (StringUtils.hasText(updateMemberDto.getPassword())) {
+            changedDataDto.setPassword("비밀번호가 변경되었습니다.");
+        }
+
+        log.info("changedDataDto:{}", changedDataDto);
+        redirectAttributes.addFlashAttribute("changedDataDto", changedDataDto); //model에 바로 보냄
+        redirectAttributes.addAttribute("memberId", updateMemberDto.getId());
+        return "redirect:/myPage/memberModify/complete";
+    }
+
+    @Getter @Setter
+    @ToString(of = {"name", "email", "password", "telecom", "phoneNumber", "gender"})
+    public static class ChangedDataDto {
+        private String name;
+        private String email;
+        private String password;
+        private String telecom;
+        private String phoneNumber;
+        private Gender gender;
+
+        public ChangedDataDto(Member before, Member after) {
+            if (!Objects.equals(before.getName(), after.getName())) {
+                this.name = after.getName();
+            }
+            if (!Objects.equals(before.getEmail(), after.getEmail())) {
+                this.email = after.getEmail();
+            }
+            if (!Objects.equals(before.getTelecom(), after.getTelecom())) {
+                this.telecom = after.getTelecom();
+            }
+            if (!Objects.equals(before.getPhoneNumber(), after.getPhoneNumber())) {
+                this.phoneNumber = after.getPhoneNumber();
+            }
+            if (!Objects.equals(before.getGender(), after.getGender())) {
+                this.gender = after.getGender();
+            }
+        }
+    }
+
+
+
+    /**
+     * 개인정보 수정 후, 확인 폼
+     */
+    @GetMapping("/myPage/memberModify/complete")
+    public String memberModifyCompleteForm(@RequestParam("memberId") String memberId, Model model) {
+        model.addAttribute("memberId", memberId);
+        return "member/member_modify_complete";
+    }
+
+
+ /*   //미완
+    @PostMapping("/delete")
+    public String delete(@RequestParam("memberId") String memberId, HttpServletRequest request) {
+        boolean result = memberService.withdraw(memberId);
+
+        if (result) {
+            log.info("delete member={}", memberId);
+            HttpSession session = request.getSession(false);
+            session.invalidate();
+            return "redirect:/";
+        }
+
+        log.info("delete fail memberId={}", memberId);
+        return "redirect:/";
+    }
+*/
 }

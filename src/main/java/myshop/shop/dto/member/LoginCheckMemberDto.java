@@ -30,15 +30,14 @@ public class LoginCheckMemberDto {
             return false;
         }
 
-        LoginCheckMemberDto loginMember = (LoginCheckMemberDto) session.getAttribute(LOGIN_MEMBER);
+        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) session.getAttribute(LOGIN_MEMBER);
 
-        if (loginMember == null) {
+        if (loginCheckMemberDto == null) {
             model.addAttribute("isLogin", false);
             return false;
         }
 
-
-        model.addAttribute("loginMember", loginMember);
+        model.addAttribute("loginCheckMemberDto", loginCheckMemberDto);
         model.addAttribute("isLogin", true);
         return true;
     }

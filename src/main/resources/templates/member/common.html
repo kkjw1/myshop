@@ -5,18 +5,18 @@
 
     <style th:fragment="style">
 
-            body { background-color: #f0f1f4; color: #333; }
-            .mypage-header { background-color: #fff; border-bottom: 1px solid #ddd; padding: 20px 0; }
+        body { background-color: #f0f1f4; color: #333; }
+        .mypage-header { background-color: #fff; border-bottom: 1px solid #ddd; padding: 20px 0; }
 
-            /* 수정 폼 스타일 */
-            .edit-form-container { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 40px; }
-            .form-group label { font-weight: bold; font-size: 0.9rem; color: #555; }
-            .form-control:focus { border-color: #4285f4; box-shadow: 0 0 0 0.2rem rgba(66, 133, 244, 0.1); }
+        /* 수정 폼 스타일 */
+        .edit-form-container { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 40px; }
+        .form-group label { font-weight: bold; font-size: 0.9rem; color: #555; }
+        .form-control:focus { border-color: #4285f4; box-shadow: 0 0 0 0.2rem rgba(66, 133, 244, 0.1); }
 
-            .readonly-input { background-color: #f8f9fa !important; cursor: not-allowed; }
-            .btn-update { background-color: #4285f4; color: white; font-weight: bold; height: 50px; font-size: 1.1rem; }
-            .btn-update:hover { background-color: #357abd; color: white; }
-            .required-mark { color: #ae0000; margin-left: 2px; }
+        .readonly-input { background-color: #f8f9fa !important; cursor: not-allowed; }
+        .btn-update { background-color: #4285f4; color: white; font-weight: bold; height: 50px; font-size: 1.1rem; }
+        .btn-update:hover { background-color: #357abd; color: white; }
+        .required-mark { color: #ae0000; margin-left: 2px; }
 
         .input-error {
             border-color: #dc3545 !important;
@@ -174,12 +174,12 @@
     <div class="container">
         <div class="top-utility-bar">
             <div class="container d-flex justify-content-end" th:unless="${isLogin}">
-                <a href="#" th:href="@{/member/login}">로그인</a>
-                <a href="#" th:href="@{/member/signup}">회원가입</a>
+                <a href="#" th:href="@{/login}">로그인</a>
+                <a href="#" th:href="@{/signup}">회원가입</a>
             </div>
             <div class="container d-flex justify-content-end" th:if="${isLogin}">
-                <a th:text="|${member.getName()} 님|" th:href="@{/member/mypage/memberModifyCheckPW(memberId=${member.getId()})}">닉네임</a>
-                <form id="logoutForm" th:action="@{/member/logout}" method="post">
+                <a th:text="|${loginCheckMemberDto.getName()} 님|" th:href="@{/myPage/memberModify(memberId=${loginCheckMemberDto.getId()})}">닉네임</a>
+                <form id="logoutForm" th:action="@{/logout}" method="post">
                     <a href="javascript:void(0);" onclick="document.getElementById('logoutForm').submit();">로그아웃</a>
                 </form>
                 <a href="#">판매자 가입</a>
@@ -206,9 +206,9 @@
                         <a class="nav-link mx-2" href="#">장바구니</a>
                     </div>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="mypageMenu">
-                        <a class="dropdown-item" href="#" th:href="@{/member/mypage/orderList}">주문목록</a>
-                        <a class="dropdown-item" href="#" th:href="@{/member/mypage/exchange}">취소/반품</a>
-                        <a class="dropdown-item" href="#" th:href="@{/member/mypage/wishlist}">찜한상품</a>
+                        <a class="dropdown-item" href="#" th:href="@{/myPage/orderList}">주문목록</a>
+                        <a class="dropdown-item" href="#" th:href="@{/myPage/exchange}">취소/반품</a>
+                        <a class="dropdown-item" href="#" th:href="@{/myPage/wishlist}">찜한상품</a>
                     </div>
                 </div>
                 <a class="nav-link mx-2" href="#">장바구니</a>

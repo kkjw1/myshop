@@ -127,7 +127,7 @@
             비밀번호를 다시 한번 입력해 주세요.
         </p>
 
-        <form th:action="@{/member/mypage/memberModifyCheckPW(memberId=${param.memberId})}" method="post" th:object="${checkPWMember}">
+        <form th:action="@{/memberModifyCheckPW}" method="post" th:object="${loginMemberDto}">
 
             <div class="text-danger mb-3" id="globalErrorMsg" th:if="${#fields.hasGlobalErrors()}"
                  th:each="error : ${#fields.globalErrors()}" th:text="${error}">
@@ -135,7 +135,8 @@
             </div>
 
             <div class="user-info">
-                아이디 : <span th:field="*{id}" th:text="${param.memberId}">user1234</span>
+                아이디 : <span th:text="*{id}">userId</span>
+                <input type="hidden" th:field="*{id}">
             </div>
 
             <div class="form-group">

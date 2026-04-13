@@ -135,14 +135,14 @@
 <body>
 
 
-<header>
+<header th:replace="~{/shop/common :: header}">
     <div class="top-utility-bar">
         <div class="container d-flex justify-content-end" th:unless="${isLogin}">
             <a href="#" th:href="@{/login}">로그인</a>
             <a href="#" th:href="@{/signUp}">회원가입</a>
         </div>
         <div class="container d-flex justify-content-end" th:if="${isLogin}">
-            <a id="name" th:text="|${loginMember.getName()} 님|" th:href="@{/member/memberModifyCheckPW(memberId=${loginMember.getId()})}">닉네임</a>
+            <a id="name" th:text="|${loginCheckMemberDto.getName()} 님|" th:href="@{/myPage/memberModify(memberId=${loginCheckMemberDto.getId()})}">닉네임</a>
             <form id="logoutForm" th:action="@{/logout}" method="post">
                 <a href="javascript:void(0);" onclick="document.getElementById('logoutForm').submit();">로그아웃</a>
             </form>
@@ -170,9 +170,9 @@
                     <a class="nav-link mx-2" href="#">장바구니</a>
                 </div>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="mypageMenu">
-                    <a class="dropdown-item" href="#" th:href="@{/member/mypage/orderList}">주문목록</a>
-                    <a class="dropdown-item" href="#" th:href="@{/member/mypage/exchange}">취소/반품</a>
-                    <a class="dropdown-item" href="#" th:href="@{/member/mypage/wishlist}">찜한상품</a>
+                    <a class="dropdown-item" href="#" th:href="@{/myPage/orderList}">주문목록</a>
+                    <a class="dropdown-item" href="#" th:href="@{/myPage/exchange}">취소/반품</a>
+                    <a class="dropdown-item" href="#" th:href="@{/myPage/wishlist}">찜한상품</a>
                     <!--                <div class="dropdown-divider"></div>-->
                 </div>
             </div>
@@ -229,7 +229,7 @@
 </main>
 
 
-<footer class="shop-footer">
+<footer class="shop-footer" th:replace="~{shop/common :: footer}">
     <div class="container">
         <div class="row footer-cs align-items-center">
             <div class="col-md-4">

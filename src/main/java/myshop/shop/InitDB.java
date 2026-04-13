@@ -39,8 +39,8 @@ public class InitDB {
                         "telecom" + i, "010-0000-000" + i, Gender.MAN, MemberLevel.normal);
                 memberRepository.save(member);
             }*/
-
-            Member admin = new Member("test", "kkjjoo1212@naver.com", "test", "테스트아이디", "KT", "010-4710-6305", Gender.MAN, MemberLevel.vip);
+            String passwordEncode = passwordEncoder.encode("test");
+            Member admin = new Member("test", "kkjjoo1212@naver.com", passwordEncode, "테스트아이디", "KT", "010-4710-6305", Gender.MAN, MemberLevel.vip);
             memberRepository.save(admin);
         }
     }
