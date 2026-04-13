@@ -13,6 +13,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     Optional<Member> findByPhoneNumber(String phoneNumber);
 
+    Optional<Member> findByEmail(String email);
+
     @Modifying(clearAutomatically = true)
     @Query("update Member m set m.password=:password where m.id=:id")
     int updatePassword(@Param("id") String id, @Param("password") String password);

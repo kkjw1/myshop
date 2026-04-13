@@ -21,7 +21,7 @@ class MailServiceTest {
         System.out.println("authCode = " + authCode);
         System.out.println("fromAddress = " + fromAddress);
 
-        mailService.sendMail("kkjjoo1212@naver.com", authCode);
+//        mailService.sendMail("kkjjoo1212@naver.com", authCode);
     }
 
 }

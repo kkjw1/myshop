@@ -1,5 +1,4 @@
 spring:
-
   mail:
     host: smtp.gmail.com          # 구글 SMTP 서버 주소
     port: 587                     # 구글 SMTP 포트 번호

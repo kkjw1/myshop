@@ -105,15 +105,18 @@
                 <div id="email-section" class="input-section">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">등록된 이메일 주소</label>
+                        <div class="text-danger" style="font-size: 0.875rem;" id="emailCheck"></div>
                         <div class="input-group">
-                            <input type="email" class="form-control form-control-lg" id="toEmailAddress" placeholder="example@mail.com">
-                            <button class="btn btn-primary" type="button" onclick="sendMailAuth()">메일발송</button>
+                            <input type="email" class="form-control form-control-lg" id="toAddress" placeholder="example@mail.com">
+                            <button class="btn btn-primary" type="button" onclick="sendEmailAuth()">메일발송</button>
                         </div>
                     </div>
-                    <div class="mb-4">
-                        <input type="text" class="form-control form-control-lg" placeholder="인증코드 입력">
+                    <div class="text-danger" style="font-size: 0.875rem;" id="emailAuthMsg"></div>
+                    <div class="mb-4 input-group">
+                        <input type="text" class="form-control form-control-lg" id="mailAuthCode" placeholder="인증번호 6자리">
+                        <span class="input-group-text text-danger" id="emailTimer" style="display: none">03:00</span>
                     </div>
-                    <button type="submit" id="submit-btn2" class="btn btn-primary btn-lg w-100 py-3 mt-2" onclick="checkAuthCode2()" disabled>인증하기</button>
+                    <button type="submit" id="submit-btn2" class="btn btn-primary btn-lg w-100 py-3 mt-2" onclick="emailCheckAuthCode()" disabled>인증하기</button>
                 </div>
 
 
@@ -141,36 +144,91 @@
 <script>
 
 
-    async function sendMailAuth() {
+    async function emailCheckAuthCode() {
+        const authCodeVal = document.getElementById('mailAuthCode').value;
+        const toAddressVal = document.getElementById('toAddress').value;
+        const msg = document.getElementById('smsAuthMsg');
 
-        const toEmailAddressVal = document.getElementById('toEmailAddress').value;
-        const toEmailAddress = document.getElementById('toEmailAddress');
-
-        const msg = document.getElementById('phoneCheck');
-        const submitBtn = document.getElementById('submit-btn1');
-
-        if (!toEmailAddressVal) {
-            alert("핸드폰 번호를 입력해주세요.");
+        if (authCodeVal === "") {
+            alert("인증번호를 입력해주세요.");
             return;
         }
 
+        const res = await fetch('/findMember/checkEmailAuthCode', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({authCode: authCodeVal, toAddress: toAddressVal})
+        });
+
+        if (res.redirected) {
+            // 리디렉션된 URL로 페이지를 이동, 이렇게 하면 redirect가 두 번 됨
+            window.location.href = res.url;
+        } else {
+            msg.innerText = "인증번호가 일치하지 않습니다.";
+        }
+    }
+
+
+    function checkEmail(str) {
+        const emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+        return emailRegExp.test(str);
+    }
+
+
+    async function sendEmailAuth() {
+
+        const toAddressVal = document.getElementById('toAddress').value;
+        const toAddress = document.getElementById('toAddress');
+        const submitBtn = document.getElementById('submit-btn2');
+        const msg = document.getElementById('emailCheck');
+
+        if (!toAddressVal) {
+            alert("이메일을 입력해주세요.");
+            return;
+        }
+
+        if(!checkEmail(toAddressVal)) {
+            msg.innerText = "올바른 이메일 형태가 아닙니다."
+            toAddress.classList.add("input-error");
+            return;
+        } else {
+            msg.innerText = "";
+            toAddress.classList.remove("input-error");
+        }
+
         try {
-            const sendMailAuth = await fetch('/sendMailAuth',{
+            const checkEmail = await fetch(`checkEmail?email=${toAddressVal}`);
+            const isAvailable = await checkEmail.json();
+
+            // 사용중인 번호
+            if(isAvailable) {
+                msg.innerText = "없는 이메일입니다."
+                toAddress.classList.add("input-error");
+                return;
+            } else {
+                msg.innerText = "";
+                toAddress.classList.remove("input-error");
+            }
+
+
+            const sendEmailAuth = await fetch('/sendEmailAuth',{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ toAddress: toEmailAddressVal }) // 본문에 담아 보냄
+                body: JSON.stringify({ toAddress: toAddressVal }) // 본문에 담아 보냄
             });
 
-            const sendMailAuthText = await sendMailAuth.text();
+            const sendEmailAuthText = await sendEmailAuth.text();
 
-            if (sendMailAuthText === "ok") {
+            if (sendEmailAuthText === "ok") {
                 alert("인증번호가 발송되었습니다.");
-                startTimer(180); // 180초
+                startTimer(180, 'emailTimer'); // 180초
                 submitBtn.disabled = false;
             } else {
-                alert(`sendMailAuthText:${sendMailAuthText}`);
+                alert(`sendEmailAuthText:${sendEmailAuthText}`);
                 throw new Error("인증번호 발송 실패");
             }
 
@@ -193,7 +251,7 @@
             return;
         }
 
-        const res = await fetch('/findMember/checkAuthCode', {
+        const res = await fetch('/findMember/checkSmsAuthCode', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -246,7 +304,7 @@
 
             if (sendSmsAuthText === "ok") {
                 alert("인증번호가 발송되었습니다.");
-                startTimer(180); // 180초
+                startTimer(180, 'smsTimer'); // 180초
                 submitBtn.disabled = false;
             } else {
                 alert(`sendSmsAuthText:${sendSmsAuthText}`);
@@ -261,9 +319,9 @@
 
     let timerInterval;
 
-    function startTimer(duration) {
+    function startTimer(duration, timerType) {
         let timer = duration, minutes, seconds;
-        const display = document.getElementById('smsTimer');
+        const display = document.getElementById(timerType);
         const sendBtn = document.getElementById('sendSmsBtn');
         const submitBtn = document.getElementById('submit-btn1');
 
@@ -274,15 +332,15 @@
         sendBtn.innerText = "재발송";
 
         timerInterval = setInterval(function () {
-            minutes = parseInt(smsTimer / 60, 10);
-            seconds = parseInt(smsTimer % 60, 10);
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
 
             minutes = minutes < 10 ? "0" + minutes : minutes;
             seconds = seconds < 10 ? "0" + seconds : seconds;
 
             display.textContent = minutes + ":" + seconds;
 
-            if (--smsTimer < 0) {
+            if (--timer < 0) {
                 clearInterval(timerInterval);
                 display.textContent = "시간만료";
                 alert("인증 시간이 만료되었습니다. 다시 시도해주세요.");

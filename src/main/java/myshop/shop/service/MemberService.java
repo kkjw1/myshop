@@ -30,6 +30,9 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final LoginLogRepository loginLogRepository;
     private final Environment env;
+
+
+
     /**
      * 회원가입
      */
@@ -41,6 +44,8 @@ public class MemberService {
                 signUpMemberDto.getTelecom(), signUpMemberDto.getPhoneNumber(), signUpMemberDto.getGender(), MemberLevel.normal));
     }
 
+
+
     /**
      * 회원 중복체크
      * @return 중복아니면 true, 중복이면 false
@@ -48,6 +53,8 @@ public class MemberService {
     public boolean checkId(String id) {
         return memberRepository.findById(id).orElse(null) == null;
     }
+
+
 
     /**
      * 로그인
@@ -61,6 +68,8 @@ public class MemberService {
         return null;
     }
 
+
+
     /**
      * 핸드폰 중복체크
      * @return 중복아니면 true, 중복이면 false
@@ -68,6 +77,18 @@ public class MemberService {
     public boolean checkPhoneNumber(String phoneNumber) {
         return memberRepository.findByPhoneNumber(phoneNumber).orElse(null) == null;
     }
+
+
+
+    /**
+     * 이메일 중복 체크
+     * @return 중복아니면 true, 중복이면 false
+     */
+    public boolean checkEmail(String email) {
+        return memberRepository.findByEmail(email).orElse(null) == null;
+    }
+
+
 
     /**
      * 핸드폰 인증
@@ -94,6 +115,8 @@ public class MemberService {
         return authCode;
     }
 
+
+
     /**
      * 인증번호6자리
      */
@@ -101,6 +124,8 @@ public class MemberService {
         int authCode = ThreadLocalRandom.current().nextInt(100000, 1000000);
         return String.valueOf(authCode);
     }
+
+
 
     /**
      * 아이디 비밀번호 찾기->비밀번호 초기화

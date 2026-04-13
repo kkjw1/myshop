@@ -36,19 +36,32 @@ public class MemberController {
     private final RedisService redisService;
     private final MailService mailService;
 
-    //=============================================로그인=============================================
+    /**
+     * 로그인 폼
+     */
     @GetMapping("/login")
     public String loginForm(Model model) {
         model.addAttribute("loginMemberDto", new LoginMemberDto());
         return "member/login";
     }
 
+
+
+    /**
+     * 회원가입 완료 후 로그인 폼
+     * 아이디 찾기 완료 후 로그인 폼
+     */
     @GetMapping("login/{loginId}")
     public String loginForm2(@PathVariable("loginId") String id, Model model) {
         model.addAttribute("loginMemberDto", new LoginMemberDto(id));
         return "member/login";
     }
 
+
+
+    /**
+     * 로그인
+     */
     @PostMapping("/login")
     public String login(@Validated @ModelAttribute("loginMemberDto") LoginMemberDto loginMemberDto, BindingResult bindingResult,
                         HttpServletRequest request) {
@@ -68,24 +81,39 @@ public class MemberController {
         return "redirect:/";
     }
 
+
+
     /**
-     * 로그아웃은 security Spring에서 알아서 처리(세션 쿠키 삭제)
+     * 로그아웃은 security Spring에서 알아서 처리("/logout", 세션 쿠키 삭제)
      */
 
 
-    //=============================================회원가입=============================================
+
+    /**
+     * 회원가입 폼
+     */
     @GetMapping("/signUp")
     public String signUpForm(Model model) {
         model.addAttribute("signUpMemberDto", new SignUpMemberDto());
         return "member/signUp";
     }
 
-    @GetMapping("/signUp/checkId")
+
+
+    /**
+     * 회원가입 -> 아이디 중복 체크(onblur)
+     */
+    @GetMapping("/checkId")
     @ResponseBody
     public boolean checkDuplicateId(@RequestParam("id") String id) {
         return memberService.checkId(id);
     }
 
+
+
+    /**
+     * 회원가입
+     */
     @PostMapping("/signUp")
     public String signUp(@Validated @ModelAttribute("signUpMemberDto") SignUpMemberDto signUpMemberDto, BindingResult bindingResult,
                          RedirectAttributes redirectAttributes, HttpServletRequest request) {
@@ -94,7 +122,6 @@ public class MemberController {
             return "member/signUp";
         }
 
-        //핸드폰 인증 체크
         String data = redisService.getData("confirmedPhone:" + signUpMemberDto.getPhoneNumber());
         log.info("data={}", data);
         if (data == null) {
@@ -115,19 +142,38 @@ public class MemberController {
     }
 
 
+
     /**
-     * 핸드폰 중복 검사
+     * 회원가입 -> 핸드폰번호 중복 체크
+     * 아이디,비밀번호 찾기 -> 핸드폰번호 체크
      */
     @GetMapping("/checkPhoneNumber")
     @ResponseBody
     public Boolean checkDuplicatePhoneNumber(@RequestParam("phoneNumber") String phoneNumber) {
         boolean result = memberService.checkPhoneNumber(phoneNumber);
-        log.info("phoneNumber={}, result={}", phoneNumber, result);
+        log.info("checkDuplicatePhoneNumber, phoneNumber={} result={}", phoneNumber, result);
         return result;
     }
 
+
+
     /**
-     * 메시지 인증
+     * 회원가입 -> 이메일 중복 확인(onblur)
+     * 아이디,비밀번호 찾기 -> 이메일 중복 체크
+     */
+    @GetMapping("/checkEmail")
+    @ResponseBody
+    public Boolean checkDuplicateEmail(@RequestParam("email") String email) {
+        boolean result = memberService.checkEmail(email);
+        log.info("checkDuplicateEmail, email={} result={}", email, result);
+        return result;
+    }
+
+
+
+    /**
+     * 회원가입 -> 핸드폰 인증
+     * 아이디,비밀번호 찾기 -> 핸드폰 인증
      */
     @PostMapping("/sendSmsAuth")
     @ResponseBody
@@ -135,25 +181,8 @@ public class MemberController {
         log.info("phoneNumber={}", sendSmsAuthDto.getPhoneNumber());
         String authCode = memberService.smsAuth(sendSmsAuthDto.getPhoneNumber());
 //        String authCode = "123456";
-        redisService.saveData(sendSmsAuthDto.getPhoneNumber(), authCode, 3L);
+        redisService.saveData("sendSmsAuth:" + sendSmsAuthDto.getPhoneNumber(), authCode, 3L);
         return "ok";
-    }
-
-    /**
-     * 이메일 인증
-     */
-    @PostMapping("/sendMailAuth")
-    @ResponseBody
-    public String sendMailAuth(@RequestBody SendMailAuthDto sendMailAuthDto) {
-        log.info("toAddress={}", sendMailAuthDto.getToAddress());
-        String authCode = mailService.authCodeCreate();
-        mailService.sendMail(sendMailAuthDto.getToAddress(), authCode);
-        return "ok";
-    }
-
-    @Getter @Setter
-    public static class SendMailAuthDto {
-        private String toAddress;
     }
 
     @Getter @Setter
@@ -161,49 +190,63 @@ public class MemberController {
         private String phoneNumber;
     }
 
-    @Getter @Setter
-    public static class CheckAuthCodeDto {
-        private String authCode;
-        private String phoneNumber;
-    }
 
+
+    /**
+     * 회원가입 -> 핸드폰 인증번호 확인
+     */
     @PostMapping("/checkAuthCode")
     @ResponseBody
-    public String checkAuthCode(@RequestBody CheckAuthCodeDto checkAuthCodeDto,
-                                 HttpServletRequest request) {
-        String authCode = checkAuthCodeDto.getAuthCode();
-        String phoneNumber = checkAuthCodeDto.getPhoneNumber();
+    public String checkAuthCode(@RequestBody CheckSmsAuthCodeDto checkSmsAuthCodeDto,
+                                HttpServletRequest request) {
+        String authCode = checkSmsAuthCodeDto.getAuthCode();
+        String phoneNumber = checkSmsAuthCodeDto.getPhoneNumber();
         log.info("authCode:{}, phoneNumber:{}", authCode, phoneNumber);
 
-        String data = redisService.getData(phoneNumber);
+        String data = redisService.getData("sendSmsAuth:"+phoneNumber);
         boolean result = authCode.equals(data);
-        log.info("result:{}", result);
+        log.info("authCode.equals:{}", result);
         if (result) {
-            redisService.deleteData(phoneNumber);
+            redisService.deleteData("sendSmsAuth:"+phoneNumber);
             redisService.saveData("confirmedPhone:"+phoneNumber, "SUCCESS", 10L);
             return "ok";
         }
         return "no";
     }
 
-    //=============================================아이디, 비밀번호 찾기=============================================
+    @Getter @Setter
+    public static class CheckSmsAuthCodeDto {
+        private String authCode;
+        private String phoneNumber;
+    }
+
+
+
+    /**
+     * 아이디, 비밀번호 찾기 폼
+     */
     @GetMapping("/findMember")
     public String findMemberForm() {
         return "member/find_member";
     }
 
-    @PostMapping("/findMember/checkAuthCode")
-    public String findCheckAuthCode(@RequestBody CheckAuthCodeDto checkAuthCodeDto, RedirectAttributes redirectAttributes) {
 
-        String authCode = checkAuthCodeDto.getAuthCode();
-        String phoneNumber = checkAuthCodeDto.getPhoneNumber();
-        log.info("authCode:{}, phoneNumber:{}", authCode, phoneNumber);
 
-        String data = redisService.getData(phoneNumber);
+    /**
+     * 아이디,비밀번호 찾기 -> 핸드폰 인증번호 확인
+     */
+    @PostMapping("/findMember/checkSmsAuthCode")
+    public String checkSmsAuthCode(@RequestBody CheckSmsAuthCodeDto checkSmsAuthCodeDto, RedirectAttributes redirectAttributes) {
+
+        String authCode = checkSmsAuthCodeDto.getAuthCode();
+        String phoneNumber = checkSmsAuthCodeDto.getPhoneNumber();
+        log.info("checkSmsAuthCode authCode:{}, phoneNumber:{}", authCode, phoneNumber);
+
+        String data = redisService.getData("sendSmsAuth:"+phoneNumber);
         boolean result = authCode.equals(data);
         log.info("result:{}", result);
         if (result) {
-            redisService.deleteData(phoneNumber);
+            redisService.deleteData("sendSmsAuth:"+phoneNumber);
             Member member = memberRepository.findByPhoneNumber(phoneNumber).orElse(null);
             String memberId = member.getId();
             redisService.saveData("findMemberId:"+ memberId, "SUCCESS", 10L);
@@ -213,6 +256,65 @@ public class MemberController {
         return "member/find_member";
     }
 
+
+
+    /**
+     * 아이디 비밀번호 찾기 -> 이메일 인증
+     */
+    @PostMapping("/sendEmailAuth")
+    @ResponseBody
+    public String sendEmailAuth(@RequestBody SendEmailAuthDto sendEmailAuthDto) {
+        log.info("toAddress={}", sendEmailAuthDto.getToAddress());
+        String authCode = mailService.authCodeCreate();
+        mailService.sendMail(sendEmailAuthDto.getToAddress(), authCode);
+        redisService.saveData("sendEmailAuth:" + sendEmailAuthDto.getToAddress(), authCode, 3L);
+        return "ok";
+    }
+
+    @Getter @Setter
+    public static class SendEmailAuthDto {
+        private String toAddress;
+    }
+
+
+
+    /**
+     * 아이디,비밀번호 찾기 -> 이메일 인증번호 확인
+     */
+    @PostMapping("/findMember/checkEmailAuthCode")
+    public String checkEmailAuthCode(@RequestBody CheckEmailAuthCode checkEmailAuthCode, RedirectAttributes redirectAttributes) {
+
+        String authCode = checkEmailAuthCode.getAuthCode();
+        String toAddress = checkEmailAuthCode.getToAddress();
+        log.info("checkEmailAuthCode authCode:{}, toAddress:{}", authCode, toAddress);
+
+        String data = redisService.getData("sendEmailAuth:" + toAddress);
+        boolean result = authCode.equals(data);
+        log.info("authCode.equals:{}", result);
+
+        if (result) {
+            redisService.deleteData("sendEmailAuth:" + toAddress);
+            Member member = memberRepository.findByEmail(toAddress).orElse(null);
+            String memberId = member.getId();
+            redisService.saveData("findMemberId:"+ memberId, "SUCCESS", 10L);
+            redirectAttributes.addAttribute("memberId", memberId);
+            return "redirect:/resetPassword";
+        }
+        return "member/find_member";
+    }
+
+    @Getter @Setter
+    public static class CheckEmailAuthCode {
+
+        private String authCode;
+        private String toAddress;
+    }
+
+
+
+    /**
+     * 비밀번호 재설정 폼
+     */
     @GetMapping("/resetPassword")
     public String resetPasswordForm(@RequestParam("memberId") String memberId, Model model) {
         log.info("findMember:{}", memberId);
@@ -228,6 +330,10 @@ public class MemberController {
         return "member/reset_password";
     }
 
+
+    /**
+     * 비밀번호 재설정
+     */
     @PostMapping("/resetPassword")
     public String resetPassword(@Validated @ModelAttribute("resetPasswordMemberDto") ResetPasswordMemberDto resetPasswordMemberDto, BindingResult bindingResult,
                                 RedirectAttributes redirectAttributes) {
@@ -242,5 +348,4 @@ public class MemberController {
         redirectAttributes.addAttribute("loginId", resetPasswordMemberDto.getId());
         return "redirect:/login/{loginId}";
     }
-
 }
