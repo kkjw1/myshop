@@ -422,10 +422,11 @@ public class MemberController {
      */
     @PostMapping("/myPage/memberModify")
     public String memberModify(@Validated @ModelAttribute("updateMember") UpdateMemberDto updateMemberDto, BindingResult bindingResult,
-                               RedirectAttributes redirectAttributes, HttpServletRequest request) {
+                               RedirectAttributes redirectAttributes, HttpServletRequest request, Model model) {
 
         if (bindingResult.hasErrors()) {
             log.info("myPageUpdate Fail={}", bindingResult);
+            new LoginCheckMemberDto().loginCheck(request, model);
             return "member/mypage/member_modify";
         }
 

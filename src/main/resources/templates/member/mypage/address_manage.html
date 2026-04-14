@@ -244,7 +244,7 @@
                 </div>
 
                 <div class="address-card default shadow-sm" th:if="${mainAddress != null}" th:object="${mainAddress}">
-                    <form id="addressDelete" th:action="@{/myPage/addressManage/delete(addressNo=${mainAddress.getNo()})}" method="post"></form>
+                    <form id="addressDelete" th:action="@{/myPage/addressManage/delete(addressNo=${mainAddress.getAddressNo()})}" method="post"></form>
                     <div class="p-4">
                         <div class="d-flex justify-content-between mb-2">
                             <div>
@@ -252,7 +252,7 @@
                                 <span class="badge-default ml-2">기본배송지</span>
                             </div>
                             <div class="action-links">
-                                <a href="#" th:href="@{/myPage/addressManage/update(addressNo=${mainAddress.getNo()})}">수정</a>
+                                <a href="#" th:href="@{/myPage/addressManage/update(addressNo=${mainAddress.getAddressNo()})}">수정</a>
                                 <a href="javascript:void(0)" onclick="document.getElementById('addressDelete').submit()" class="text-danger">삭제</a>
                             </div>
                         </div>
@@ -266,17 +266,17 @@
                 </div>
 
                 <div class="address-card shadow-sm" th:each="manageAddressDto : ${manageAddressDtoList}">
-                    <form th:id="|addressDelete_${manageAddressDto.getNo()}|" th:action="@{/myPage/addressManage/delete(addressNo=${manageAddressDto.getNo()})}" method="post"></form>
-                    <form th:id="|addressMainUpdate_${manageAddressDto.getNo()}|" th:action="@{/myPage/addressManage/updateMain(addressNo=${manageAddressDto.getNo()})}" method="post"></form>
+                    <form th:id="|addressDelete_${manageAddressDto.getAddressNo()}|" th:action="@{/myPage/addressManage/delete(addressNo=${manageAddressDto.getAddressNo()})}" method="post"></form>
+                    <form th:id="|addressMainUpdate_${manageAddressDto.getAddressNo()}|" th:action="@{/myPage/addressManage/updateMain(addressNo=${manageAddressDto.getAddressNo()})}" method="post"></form>
                     <div class="p-4">
                         <div class="d-flex justify-content-between mb-2">
                             <div>
                                 <span class="address-name" th:text="${manageAddressDto.getAddressName()}">회사</span>
                             </div>
                             <div class="action-links">
-                                <a href="javascript:void(0)" th:onclick="|document.getElementById('addressMainUpdate_${manageAddressDto.getNo()}').submit()|" class="text-primary">기본배송지로 설정</a>
-                                <a href="#" th:href="@{/myPage/addressManage/update(addressNo=${manageAddressDto.getNo()})}">수정</a>
-                                <a href="javascript:void(0)" th:onclick="|document.getElementById('addressDelete_${manageAddressDto.getNo()}').submit()|" class="text-danger">삭제</a>
+                                <a href="javascript:void(0)" th:onclick="|document.getElementById('addressMainUpdate_${manageAddressDto.getAddressNo()}').submit()|" class="text-primary">기본배송지로 설정</a>
+                                <a href="#" th:href="@{/myPage/addressManage/update(addressNo=${manageAddressDto.getAddressNo()})}">수정</a>
+                                <a href="javascript:void(0)" th:onclick="|document.getElementById('addressDelete_${manageAddressDto.getAddressNo()}').submit()|" class="text-danger">삭제</a>
                             </div>
                         </div>
                         <div class="address-detail">

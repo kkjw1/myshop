@@ -2,7 +2,9 @@ package myshop.shop.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import myshop.shop.dto.Address.AddAddressDto;
 import myshop.shop.dto.Address.ManageAddressDto;
+import myshop.shop.dto.Address.UpdateAddressDto;
 import myshop.shop.entity.Address;
 import myshop.shop.entity.Member;
 import myshop.shop.repository.address.AddressRepository;
@@ -27,17 +29,17 @@ public class AddressService {
     /**
      * 주소 저장
      */
-    public void saveAddress(Long memberNo, ManageAddressDto manageAddressDto) {
+    public void saveAddress(Long memberNo, AddAddressDto AddAddressDto) {
         Member memberProxy = memberRepository.getReferenceById(memberNo);
         Address address = new Address(memberProxy,
-                manageAddressDto.getAddressName(),
-                manageAddressDto.getRecipientName(),
-                manageAddressDto.getPhoneNumber(),
-                manageAddressDto.getPostcode(),
-                manageAddressDto.getRoadAddress(),
-                manageAddressDto.getDetailAddress(),
-                manageAddressDto.getDeliveryRequest(),
-                manageAddressDto.getMainAddress());
+                AddAddressDto.getAddressName(),
+                AddAddressDto.getRecipientName(),
+                AddAddressDto.getPhoneNumber(),
+                AddAddressDto.getPostcode(),
+                AddAddressDto.getRoadAddress(),
+                AddAddressDto.getDetailAddress(),
+                AddAddressDto.getDeliveryRequest(),
+                AddAddressDto.getMainAddress());
         addressRepository.save(address);
     }
 
@@ -70,5 +72,25 @@ public class AddressService {
      */
     public int deleteAddress(Long addressNo) {
         return addressRepository.deleteAddressByNo(addressNo);
+    }
+
+
+    /**
+     * 주소 수정
+     */
+    public Address addressModify(UpdateAddressDto updateAddressDto) {
+        em.flush();
+        em.clear();
+
+        Address address = addressRepository.findByNo(updateAddressDto.getAddressNo()).orElse(null);
+        address.updateAddressName(updateAddressDto.getAddressName());
+        address.updateRecipientName(updateAddressDto.getRecipientName());
+        address.updatePhoneNumber(updateAddressDto.getPhoneNumber());
+        address.updatePostcode(updateAddressDto.getPostcode());
+        address.updateRoadAddress(updateAddressDto.getRoadAddress());
+        address.updateDetailAddress(updateAddressDto.getDetailAddress());
+        address.updateDeliveryRequest(updateAddressDto.getDeliveryRequest());
+
+        return address;
     }
 }

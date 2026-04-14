@@ -239,6 +239,10 @@
             <div class="edit-form-container shadow-sm">
                 <h4 class="mb-4 font-weight-bold border-bottom pb-3">개인정보 확인/수정</h4>
                 <form th:action="@{/myPage/memberModify}" method="post" th:object="${updateMember}">
+                    <div class="text-danger" style="font-size: 0.875rem;" th:errors="*{name}">이름 에러</div>
+                    <div class="text-danger" style="font-size: 0.875rem;" th:errors="*{email}">이메일 에러</div>
+                    <div class="text-danger" style="font-size: 0.875rem;" th:errors="*{telecom}">통신사 에러</div>
+                    <div class="text-danger" style="font-size: 0.875rem;" th:errors="*{phoneNumber}">휴대전화번호 에러</div>
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label">아이디</label>
                         <div class="col-sm-9">
@@ -250,14 +254,14 @@
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label">이름<span class="required-mark">*</span></label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" th:field="*{name}" th:value="*{name}" required>
+                            <input type="text" class="form-control" th:field="*{name}" th:value="*{name}" th:errorclass="input-error">
                         </div>
                     </div>
 
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label">이메일<span class="required-mark">*</span></label>
                         <div class="col-sm-9">
-                            <input type="email" class="form-control" th:field="*{email}" th:value="*{email}" required>
+                            <input type="email" class="form-control" th:field="*{email}" th:value="*{email}" th:errorclass="input-error">
                         </div>
                     </div>
 
@@ -285,7 +289,7 @@
                         <div class="col-sm-9">
                             <div class="form-row">
                                 <div class="col-4">
-                                <select th:field="*{telecom}" class="form-control">
+                                <select th:field="*{telecom}" class="form-control" th:errorclass="input-error">
                                     <option value="SKT">SKT</option>
                                     <option value="KT">KT</option>
                                     <option value="LG U+">LG U+</option>
@@ -295,7 +299,7 @@
                                 </select>
                                 </div>
                                 <div class="col-8">
-                                    <input type="tel" class="form-control" th:field="*{phoneNumber}" th:value="*{phoneNumber}" required>
+                                    <input type="tel" class="form-control" th:field="*{phoneNumber}" th:value="*{phoneNumber}" th:errorclass="input-error">
                                 </div>
                             </div>
                         </div>

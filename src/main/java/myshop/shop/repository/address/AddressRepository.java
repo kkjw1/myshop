@@ -27,4 +27,6 @@ public interface AddressRepository extends JpaRepository<Address, Long>, Address
     @Modifying(clearAutomatically = true)
     @Query("delete Address a where a.no=:addressNo")
     int deleteAddressByNo(@Param("addressNo") Long no);
+
+    Optional<Address> findByNo(Long addressNo);
 }

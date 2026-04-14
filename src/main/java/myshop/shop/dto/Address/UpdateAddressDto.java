@@ -3,28 +3,27 @@ package myshop.shop.dto.Address;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import myshop.shop.entity.Address;
 
 @Getter @Setter
-@ToString(of = {"addressName", "recipientName", "phoneNumber", "postcode", "roadAddress", "detailAddress", "deliveryRequest", "mainAddress"})
-public class ManageAddressDto {
+public class UpdateAddressDto {
     private Long addressNo;
     private String addressName;
+    @NotBlank(message = "수령인 이름이 비어있습니다.")
     private String recipientName;
+    @NotBlank(message = "휴대폰 번호가 비어있습니다.")
     private String phoneNumber;
+    @NotBlank(message = "주소가 비어있습니다.")
     private String postcode;
+    @NotBlank(message = "주소가 비어있습니다.")
     private String roadAddress;
     private String detailAddress;
     private String deliveryRequest;
-    private Boolean mainAddress;
 
-    public ManageAddressDto() {
+    public UpdateAddressDto() {
     }
 
-    public ManageAddressDto(Long addressNo, String addressName, String recipientName, String phoneNumber,
-                            String postcode, String roadAddress, String detailAddress, String deliveryRequest, Boolean mainAddress) {
-        this.addressNo = addressNo;
+    public UpdateAddressDto(String addressName, String recipientName, String phoneNumber, String postcode, String roadAddress, String detailAddress, String deliveryRequest) {
         this.addressName = addressName;
         this.recipientName = recipientName;
         this.phoneNumber = phoneNumber;
@@ -32,10 +31,9 @@ public class ManageAddressDto {
         this.roadAddress = roadAddress;
         this.detailAddress = detailAddress;
         this.deliveryRequest = deliveryRequest;
-        this.mainAddress = mainAddress;
     }
 
-    public ManageAddressDto(Address address) {
+    public UpdateAddressDto(Address address) {
         this.addressNo = address.getNo();
         this.addressName = address.getAddressName();
         this.recipientName = address.getRecipientName();
@@ -44,6 +42,6 @@ public class ManageAddressDto {
         this.roadAddress = address.getRoadAddress();
         this.detailAddress = address.getDetailAddress();
         this.deliveryRequest = address.getDeliveryRequest();
-        this.mainAddress = address.getMainAddress();
     }
+
 }

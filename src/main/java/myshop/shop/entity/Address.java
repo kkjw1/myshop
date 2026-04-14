@@ -42,7 +42,7 @@ public class Address {
     }
 
     public Address(Member member, String addressName, String recipientName, String phoneNumber, String postcode,
-                   String roadAddress, String detailAddress, String deliveryRequest, Boolean mainAddress) {
+                   String roadAddress, String detailAddress, String deliveryRequest, boolean mainAddress) {
         this.member = member;
         this.addressName = addressName;
         this.recipientName = recipientName;

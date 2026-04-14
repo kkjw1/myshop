@@ -15,15 +15,16 @@ public class UpdateMemberDto {
     @NotBlank(message = "이름이 공백입니다.")
     private String name;
 
+    @NotBlank
     @Email(message = "이메일 주소가 정확한지 확인해 주세요.")
     private String email;
 
     private String password;
     private String checkPassword;
 
-    @NotNull(message = "통신사가 공백입니다.")
+    @NotBlank(message = "통신사가 공백입니다.")
     private String telecom;
-    @NotNull(message = "휴대전화번호가 공백입니다.")
+    @NotBlank(message = "휴대전화번호가 공백입니다.")
     private String phoneNumber;
 
     private Gender gender;

@@ -53,7 +53,7 @@ public class InitDB {
             Member findMember = memberRepository.findById("test").orElse(null);
             Address mainAddress = new Address(findMember, "테스트 메인주소", "메인수령인",
                     "010-1234-1234", "12345", "인천광역시 서구",
-                    "A아파트", "메인 배송요청사항", false);
+                    "A아파트", "메인 배송요청사항", true);
             addressRepository.save(mainAddress);
 
             for (int i=1; i<5; i++) {
