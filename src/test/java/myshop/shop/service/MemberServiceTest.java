@@ -3,8 +3,10 @@ package myshop.shop.service;
 import jakarta.persistence.EntityManager;
 import myshop.shop.dto.member.LoginMemberDto;
 import myshop.shop.dto.member.SignUpMemberDto;
+import myshop.shop.dto.member.UpdateMemberDto;
 import myshop.shop.entity.Gender;
 import myshop.shop.entity.Member;
+import myshop.shop.repository.member.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +24,8 @@ class MemberServiceTest {
     @Autowired EntityManager em;
 
     @Autowired Environment env;
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Test
     public void signUpTest() {
@@ -87,5 +91,22 @@ class MemberServiceTest {
         System.out.println("result1 = " + result1);
         System.out.println("result2 = " + result2);
 
+    }
+    
+    @Test
+    @Commit
+    public void memberModifyTest() throws Exception {
+        //given
+        SignUpMemberDto signUpMemberDto = new SignUpMemberDto("id", "password", "email", "name", "telecom", Gender.MAN, "phoneNumber");
+        memberService.signUp(signUpMemberDto);
+        memberService.memberModify(new UpdateMemberDto("id", "name", "email_change", "password", "telecom_change", "phoneNumber", Gender.MAN));
+        em.flush();
+        em.clear();
+
+        Member member = memberRepository.findById("id").orElse(null);
+
+        assertThat(member.getEmail()).isEqualTo("email_change");
+        assertThat(member.getTelecom()).isEqualTo("telecom_change");
+        assertThat(member.getName()).isEqualTo("name");
     }
 }

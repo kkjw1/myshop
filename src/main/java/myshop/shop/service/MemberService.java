@@ -169,4 +169,13 @@ public class MemberService {
         member.updateGender(updateMemberDto.getGender());
         return member;
     }
+
+
+
+    /**
+     * 회원 삭제
+     */
+    public int withdraw(String id) {
+        return memberRepository.deleteById(id);
+    }
 }

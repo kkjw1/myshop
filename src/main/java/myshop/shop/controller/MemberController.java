@@ -23,7 +23,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Map;
 import java.util.Objects;
 
 import static org.springframework.util.StringUtils.hasText;
@@ -381,42 +380,39 @@ public class MemberController {
                 member.getGender());
         model.addAttribute("updateMember", updateMember);
 
-        return "member/member_modify";
+        return "member/mypage/member_modify";
     }
 
 
 
     /**
-     * 개인정보 확인/수정 -> 비밀번호 확인 폼
+     * 개인정보 확인/수정 -> 비밀번호 재확인 폼
      */
     @GetMapping("/memberModifyCheckPW")
     public String memberModifyCheckPWForm(@RequestParam("memberId") String memberId, Model model) {
         LoginMemberDto loginMemberDto = new LoginMemberDto();
         loginMemberDto.setId(memberId);
         model.addAttribute("loginMemberDto", loginMemberDto);
-        return "member/member_modify_checkPW";
+        return "member/mypage/member_modify_checkPW";
     }
 
 
 
     /**
-     * 비밀번호 확인 폼 -> 비밀번호 확인
+     * 비밀번호 재확인 폼 -> 비밀번호 확인
      */
     @PostMapping("/memberModifyCheckPW")
     public String memberModifyCheckPW(@Validated @ModelAttribute LoginMemberDto loginMemberDto, BindingResult bindingResult,
                                       Model model, RedirectAttributes redirectAttributes) {
-        log.info("{}", loginMemberDto);
-
         if (bindingResult.hasErrors()) {
-            return "member/member_modify_checkPW";
+            return "member/mypage/member_modify_checkPW";
         }
 
         Member member = memberService.login(loginMemberDto);
-
         if (member == null) {
             log.info("memberModifyCheckPW Error");
             bindingResult.reject("CheckPWError", "비밀번호 체크 에러");
-            return "member/member_modify_checkPW";
+            return "member/mypage/member_modify_checkPW";
         }
 
         redisService.saveData("ModifyCheckPW:"+member.getId(), "SUCCESS", 10L);
@@ -436,19 +432,18 @@ public class MemberController {
 
         if (bindingResult.hasErrors()) {
             log.info("myPageUpdate Fail={}", bindingResult);
-            return "member/member_modify";
+            return "member/mypage/member_modify";
         }
+
         Member beforeMember = memberRepository.findById(updateMemberDto.getId()).orElse(null);
         Member updateMember = memberService.memberModify(updateMemberDto);
-        log.info("beforeMember:{}", beforeMember);
-        log.info("updateMember:{}", updateMember);
 
         ChangedDataDto changedDataDto = new ChangedDataDto(beforeMember, updateMember);
         if (StringUtils.hasText(updateMemberDto.getPassword())) {
             changedDataDto.setPassword("비밀번호가 변경되었습니다.");
         }
-
         log.info("changedDataDto:{}", changedDataDto);
+
         redirectAttributes.addFlashAttribute("changedDataDto", changedDataDto); //model에 바로 보냄
         redirectAttributes.addAttribute("memberId", updateMemberDto.getId());
         return "redirect:/myPage/memberModify/complete";
@@ -491,16 +486,19 @@ public class MemberController {
     @GetMapping("/myPage/memberModify/complete")
     public String memberModifyCompleteForm(@RequestParam("memberId") String memberId, Model model) {
         model.addAttribute("memberId", memberId);
-        return "member/member_modify_complete";
+        return "member/mypage/member_modify_complete";
     }
 
 
- /*   //미완
+
+    /**
+     * 개인정보 확인/수정 -> 회원 탈퇴하기
+     */
     @PostMapping("/delete")
     public String delete(@RequestParam("memberId") String memberId, HttpServletRequest request) {
-        boolean result = memberService.withdraw(memberId);
+        int result = memberService.withdraw(memberId);
 
-        if (result) {
+        if (result == 1) {
             log.info("delete member={}", memberId);
             HttpSession session = request.getSession(false);
             session.invalidate();
@@ -510,5 +508,8 @@ public class MemberController {
         log.info("delete fail memberId={}", memberId);
         return "redirect:/";
     }
-*/
+
+
+
+    
 }

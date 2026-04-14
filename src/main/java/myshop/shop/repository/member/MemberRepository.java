@@ -18,4 +18,10 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     @Modifying(clearAutomatically = true)
     @Query("update Member m set m.password=:password where m.id=:id")
     int updatePassword(@Param("id") String id, @Param("password") String password);
+
+    @Modifying(clearAutomatically = true)
+    @Query("delete Member m where m.id=:id")
+    int deleteById(@Param("id") String id);
+
+    String id(String id);
 }
