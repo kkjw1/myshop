@@ -79,7 +79,7 @@ public class MemberController {
         }
 
         HttpSession session = request.getSession();
-        session.setAttribute(SessionConst.LOGIN_MEMBER, new LoginCheckMemberDto(login.getId(),login.getName()));
+        session.setAttribute(SessionConst.LOGIN_MEMBER, new LoginCheckMemberDto(login.getNo(), login.getId(),login.getName()));
         return "redirect:/";
     }
 
@@ -371,13 +371,7 @@ public class MemberController {
         }
 
         Member member = memberRepository.findById(memberId).orElse(null);
-        UpdateMemberDto updateMember = new UpdateMemberDto(member.getId(),
-                member.getName(),
-                member.getEmail(),
-                member.getPassword(),
-                member.getTelecom(),
-                member.getPhoneNumber(),
-                member.getGender());
+        UpdateMemberDto updateMember = new UpdateMemberDto(member);
         model.addAttribute("updateMember", updateMember);
 
         return "member/mypage/member_modify";
@@ -508,8 +502,4 @@ public class MemberController {
         log.info("delete fail memberId={}", memberId);
         return "redirect:/";
     }
-
-
-
-    
 }

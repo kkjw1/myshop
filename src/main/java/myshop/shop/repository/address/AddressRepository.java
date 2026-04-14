@@ -2,7 +2,29 @@ package myshop.shop.repository.address;
 
 import myshop.shop.entity.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface AddressRepository extends JpaRepository<Address, Long> {
+import javax.swing.text.html.Option;
+import java.util.List;
+import java.util.Optional;
 
+public interface AddressRepository extends JpaRepository<Address, Long>, AddressRepositoryCustom {
+    List<Address> findByMemberNo(Long memberNo);
+
+    @Modifying(clearAutomatically = true)
+    @Query("update Address a set a.mainAddress = false where a.member.no=:memberNo and a.mainAddress=true")
+    int updateMainAddressToFalse(@Param("memberNo") Long memberNo);
+
+    @Modifying(clearAutomatically = true)
+    @Query("update Address a set a.mainAddress = true where a.no=:addressNo")
+    int updateMainAddressToTrue(@Param("addressNo") Long addressNo);
+
+
+    List<Address> findByMemberNoOrderByMainAddressDesc(Long memberNo);
+
+    @Modifying(clearAutomatically = true)
+    @Query("delete Address a where a.no=:addressNo")
+    int deleteAddressByNo(@Param("addressNo") Long no);
 }

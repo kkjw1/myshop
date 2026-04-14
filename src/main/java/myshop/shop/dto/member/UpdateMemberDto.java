@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import myshop.shop.entity.Gender;
+import myshop.shop.entity.Member;
 
 @Getter @Setter
 public class UpdateMemberDto {
@@ -38,6 +39,16 @@ public class UpdateMemberDto {
         this.telecom = telecom;
         this.phoneNumber = phoneNumber;
         this.gender = gender;
+    }
+
+    public UpdateMemberDto(Member member) {
+        this.id = member.getId();
+        this.name = member.getName();
+        this.email = member.getEmail();
+        this.password = member.getPassword();
+        this.telecom = member.getTelecom();
+        this.phoneNumber = member.getPhoneNumber();
+        this.gender = member.getGender();
     }
 
 

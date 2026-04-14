@@ -1,10 +1,7 @@
 package myshop.shop.config;
 
-import com.solapi.sdk.message.service.DefaultMessageService;
-import jakarta.servlet.http.HttpServletRequest;
-import myshop.shop.controller.MemberController;
-import myshop.shop.dto.member.LoginCheckMemberDto;
-import org.springframework.beans.factory.annotation.Value;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -13,17 +10,9 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.mail.MailMessage;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-
-import static myshop.shop.controller.MemberController.SessionConst.LOGIN_MEMBER;
 
 @Configuration
 public class MyShopConfig {
@@ -56,6 +45,15 @@ public class MyShopConfig {
     @Bean
     public AuditorAware<String> auditorAware() {
         return () -> Optional.of(UUID.randomUUID().toString());
+    }
+
+
+    /**
+     * Querydsl
+     */
+    @Bean
+    public JPAQueryFactory jpaQueryFactory(EntityManager em) {
+        return new JPAQueryFactory(em);
     }
 
 }

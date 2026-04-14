@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>개인정보 수정</title>
+    <title>배송지 관리 - 마이쿠팡</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style th:replace="~{/member/common::style}">
+    <style th:replace="~{/member/common :: style}">
 
         body { background-color: #f0f1f4; color: #333; }
-        .myPage-header { background-color: #fff; border-bottom: 1px solid #ddd; padding: 20px 0; }
+        .mypage-header { background-color: #fff; border-bottom: 1px solid #ddd; padding: 20px 0; }
 
         /* 수정 폼 스타일 */
         .edit-form-container { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 40px; }
@@ -167,12 +167,11 @@
         .btn-prev { border: 1px solid #ccc; color: #333; font-weight: bold; height: 50px; font-size: 1.1rem; }
         .btn-update { background-color: #4285f4; color: white; font-weight: bold; height: 50px; font-size: 1.1rem; }
 
-
     </style>
 </head>
 <body>
 
-<div class="myPage-header mb-4 text-center" th:replace="~{/member/common::header}">
+<div class="mypage-header mb-4 text-center" th:replace="~{/member/common :: header}">
     <div class="container">
         <div class="top-utility-bar">
             <div class="container d-flex justify-content-end" th:unless="${isLogin}">
@@ -204,10 +203,10 @@
                 </div>
 
                 <div class="text-center mx-2 dropdown my-coupang-dropdown" style="cursor:pointer;">
-                    <div id="myPageMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <div id="mypageMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <a class="nav-link mx-2" href="#">장바구니</a>
                     </div>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="myPageMenu">
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="mypageMenu">
                         <a class="dropdown-item" href="#" th:href="@{/myPage/orderList}">주문목록</a>
                         <a class="dropdown-item" href="#" th:href="@{/myPage/exchange}">취소/반품</a>
                         <a class="dropdown-item" href="#" th:href="@{/myPage/wishlist}">찜한상품</a>
@@ -223,118 +222,75 @@
 <div class="container pb-5">
     <div class="row">
         <div class="col-md-3">
-            <div class="side-menu shadow-sm">
+            <div class="side-menu shadow-sm mb-4">
                 <div class="px-3 mb-2"><h5 class="font-weight-bold small text-muted">MY 쇼핑</h5></div>
                 <a href="#" th:href="@{/myPage/orderList}">주문목록/배송조회</a>
                 <a href="#" th:href="@{/myPage/exchange}">취소/반품/교환 내역</a>
                 <a href="#" th:href="@{/myPage/wishlist}">찜한 상품</a>
                 <hr>
                 <div class="px-3 mb-3"><h5 class="font-weight-bold">MY 정보</h5></div>
-                <a href="#" class="active" th:href="@{/myPage/memberModify(memberId=${loginCheckMemberDto.getId()})}">개인정보 확인/수정</a>
-                <a href="#" th:href="@{/myPage/addressManage}">배송지 관리</a>
+                <a href="#" th:href="@{/myPage/memberModify(memberId=${loginCheckMemberDto.getId()})}">개인정보 확인/수정</a>
+                <a href="#" class="active" th:href="@{/myPage/addressManage}">배송지 관리</a>
             </div>
         </div>
 
         <div class="col-md-9">
             <div class="edit-form-container shadow-sm">
-                <h4 class="mb-4 font-weight-bold border-bottom pb-3">개인정보 확인/수정</h4>
-                <form th:action="@{/myPage/memberModify}" method="post" th:object="${updateMember}">
-                    <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">아이디</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control readonly-input" th:field="*{id}" th:value="*{id}" readonly>
-                            <small class="text-muted">아이디는 변경할 수 없습니다.</small>
-                        </div>
-                    </div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="mb-0 font-weight-bold">배송지 관리</h4>
+                    <form  th:action="@{/myPage/addressManage/add(memberId=${loginCheckMemberDto.getId()})}" method="get">
+                        <button type="submit" class="btn btn-add-address px-4 shadow-sm" data-toggle="modal" data-target="#addressModal">+ 배송지 추가</button>
+                    </form>
+                </div>
 
-                    <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">이름<span class="required-mark">*</span></label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" th:field="*{name}" th:value="*{name}" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">이메일<span class="required-mark">*</span></label>
-                        <div class="col-sm-9">
-                            <input type="email" class="form-control" th:field="*{email}" th:value="*{email}" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group row border-top pt-4">
-                        <label class="col-sm-3 col-form-label">새 비밀번호</label>
-                        <div class="col-sm-9 input-group">
-                            <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="변경 시에만 입력하세요" onblur="checkPw2()">
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="button" id="toggleText" onclick="togglePassword()">보기</button>
+                <div class="address-card default shadow-sm" th:if="${mainAddress != null}" th:object="${mainAddress}">
+                    <form id="addressDelete" th:action="@{/myPage/addressManage/delete(addressNo=${mainAddress.getNo()})}" method="post"></form>
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="address-name" th:text="*{addressName}">우리집</span>
+                                <span class="badge-default ml-2">기본배송지</span>
+                            </div>
+                            <div class="action-links">
+                                <a href="#" th:href="@{/myPage/addressManage/update(addressNo=${mainAddress.getNo()})}">수정</a>
+                                <a href="javascript:void(0)" onclick="document.getElementById('addressDelete').submit()" class="text-danger">삭제</a>
                             </div>
                         </div>
+                        <div class="address-detail">
+                            <p class="mb-1 font-weight-bold" th:text="|*{recipientName} (*{phoneNumber})|">홍길동 (010-1234-5678)</p>
+                            <p class="mb-0" th:text="*{roadAddress}" th:if="*{detailAddress == ''}">서울특별시 강남구 테헤란로 123 (역삼동, 쿠팡빌딩)</p>
+                            <p class="mb-0" th:text="|*{roadAddress} (*{detailAddress})|" th:if="*{detailAddress != ''}">서울특별시 강남구 테헤란로 123 (역삼동, 쿠팡빌딩)</p>
+                            <p class="mb-0 text-muted small mt-2" th:text="*{deliveryRequest}">문 앞 / 공동현관 출입번호: 1234#</p>
+                        </div>
                     </div>
-                    <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">새 비밀번호 확인</label>
-                        <div class="col-sm-9 input-group">
-                            <input type="password" id="checkPassword" th:field="*{checkPassword}" class="form-control" placeholder="비밀번호 재입력" onblur="checkPw()">
-                            <div class="input-group-append">
+                </div>
+
+                <div class="address-card shadow-sm" th:each="manageAddressDto : ${manageAddressDtoList}">
+                    <form th:id="|addressDelete_${manageAddressDto.getNo()}|" th:action="@{/myPage/addressManage/delete(addressNo=${manageAddressDto.getNo()})}" method="post"></form>
+                    <form th:id="|addressMainUpdate_${manageAddressDto.getNo()}|" th:action="@{/myPage/addressManage/updateMain(addressNo=${manageAddressDto.getNo()})}" method="post"></form>
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span class="address-name" th:text="${manageAddressDto.getAddressName()}">회사</span>
+                            </div>
+                            <div class="action-links">
+                                <a href="javascript:void(0)" th:onclick="|document.getElementById('addressMainUpdate_${manageAddressDto.getNo()}').submit()|" class="text-primary">기본배송지로 설정</a>
+                                <a href="#" th:href="@{/myPage/addressManage/update(addressNo=${manageAddressDto.getNo()})}">수정</a>
+                                <a href="javascript:void(0)" th:onclick="|document.getElementById('addressDelete_${manageAddressDto.getNo()}').submit()|" class="text-danger">삭제</a>
                             </div>
                         </div>
-                    </div>
-
-
-                    <div class="form-group row border-top pt-4">
-                        <label class="col-sm-3 col-form-label">휴대폰 번호<span class="required-mark">*</span></label>
-                        <div class="col-sm-9">
-                            <div class="form-row">
-                                <div class="col-4">
-                                <select th:field="*{telecom}" class="form-control">
-                                    <option value="SKT">SKT</option>
-                                    <option value="KT">KT</option>
-                                    <option value="LG U+">LG U+</option>
-                                    <option value="SKT알뜰폰">SKT알뜰폰</option>
-                                    <option value="KT알뜰폰">KT알뜰폰</option>
-                                    <option value="LG U+알뜰폰">LG U+알뜰폰</option>
-                                </select>
-                                </div>
-                                <div class="col-8">
-                                    <input type="tel" class="form-control" th:field="*{phoneNumber}" th:value="*{phoneNumber}" required>
-                                </div>
-                            </div>
+                        <div class="address-detail">
+                            <p class="mb-1 font-weight-bold" th:text="|${manageAddressDto.getRecipientName()} (${manageAddressDto.getPhoneNumber()})|">홍길동 (010-1234-5678)</p>
+                            <p class="mb-0" th:text="${manageAddressDto.getDetailAddress() == ''} ? ${manageAddressDto.getRoadAddress()} : ${manageAddressDto.getRoadAddress()}+' ('+${manageAddressDto.getDetailAddress()}+')'">경기도 성남시 분당구 판교역로 231 (H스퀘어 S동)</p>
+                            <p class="mb-0 text-muted small mt-2" th:text="${manageAddressDto.getDeliveryRequest()}">경비실에 맡겨주세요</p>
                         </div>
                     </div>
-
-                    <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">성별</label>
-                        <div class="col-sm-9 d-flex align-items-center">
-                            <div th:each="gender : ${T(myshop.shop.entity.Gender).values()}" class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" th:field="*{gender}" th:value="${gender.name()}">
-                                <label class="custom-control-label" th:for="${#ids.prev('gender')}" th:text="${gender.getVal()}"></label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="text-danger" id="checkPasswordText"></div>
-
-                    <hr class="my-5">
-
-                    <div class="row">
-                        <div class="col-sm-3"></div>
-                        <div class="col-sm-9">
-                            <button type="submit" class="btn btn-update btn-block" id="changeButton">수정하기</button>
-                        </div>
-                    </div>
-                </form>
-                <form th:action="@{/delete(memberId=${updateMember.getId()})}" method="post">
-                    <div class="row">
-                        <div class="col-sm-3"></div>
-                        <div class="col-sm-9">
-                            <button type="submit" class="btn btn-link btn-block text-muted small mt-2">회원 탈퇴하기</button>
-                        </div>
-                    </div>
-                </form>
+                </div>
+<!--                <p class="text-muted small mt-4">* 배송지는 최대 10개까지 등록 가능합니다.</p>-->
             </div>
         </div>
     </div>
 </div>
-
 
 <footer class="shop-footer" th:replace="~{/shop/common::footer}">
     <div class="container">
@@ -383,75 +339,5 @@
         </div>
     </div>
 </footer>
-
-
-<script th:inline="javascript">
-    function checkPw() {
-        const pw1 = document.getElementById("password");
-        const pw2 = document.getElementById("checkPassword");
-        const msg = document.getElementById("checkPasswordText");
-        const button = document.getElementById("changeButton");
-
-        if (pw1.value === "" && pw2.value === "") {
-            pw1.classList.remove("input-error");
-            pw2.classList.remove("input-error");
-            msg.innerText="";
-            button.disabled = false;
-        }
-
-        if (pw1.value !== pw2.value) {
-            pw1.classList.add("input-error");
-            pw2.classList.add("input-error");
-            msg.innerText="비밀번호가 일치하지 않습니다.";
-            button.disabled = true;
-        } else {
-            pw1.classList.remove("input-error");
-            pw2.classList.remove("input-error");
-            msg.innerText="";
-            button.disabled = false;
-        }
-    }
-
-    function checkPw2() {
-        const pw1 = document.getElementById("password");
-        const pw2 = document.getElementById("checkPassword");
-        const msg = document.getElementById("checkPasswordText");
-        const button = document.getElementById("changeButton");
-
-        if (pw1.value === "") {
-            pw1.classList.remove("input-error");
-            pw2.classList.remove("input-error");
-            msg.innerText="";
-            pw2.value=null;
-            button.disabled = false;
-        }
-
-        if (pw1.value !== pw2.value) {
-            pw1.classList.add("input-error");
-            pw2.classList.add("input-error");
-            msg.innerText="비밀번호가 일치하지 않습니다.";
-            button.disabled = true;
-        } else {
-            pw1.classList.remove("input-error");
-            pw2.classList.remove("input-error");
-            msg.innerText="";
-            button.disabled = false;
-        }
-
-    }
-    function togglePassword() {
-        const pw = document.getElementById('password');
-        const pw2 = document.getElementById('checkPassword');
-        pw.type = pw.type === 'password' ? 'text' : 'password';
-        pw2.type = pw2.type === 'password' ? 'text' : 'password';
-
-        const toggleText = document.getElementById("toggleText");
-        if (toggleText.textContent === "보기") {
-            toggleText.textContent = "안보기";
-        } else {
-            toggleText.textContent = "보기";
-        }
-    }
-</script>
 </body>
 </html>

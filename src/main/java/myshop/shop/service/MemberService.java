@@ -10,6 +10,7 @@ import myshop.shop.dto.member.LoginMemberDto;
 import myshop.shop.dto.member.ResetPasswordMemberDto;
 import myshop.shop.dto.member.SignUpMemberDto;
 import myshop.shop.dto.member.UpdateMemberDto;
+import myshop.shop.entity.Address;
 import myshop.shop.entity.Member;
 import myshop.shop.entity.MemberLevel;
 import myshop.shop.entity.log.LoginLog;
@@ -22,10 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.springframework.util.StringUtils.hasText;
@@ -177,5 +175,13 @@ public class MemberService {
      */
     public int withdraw(String id) {
         return memberRepository.deleteById(id);
+    }
+
+
+    /**
+     * 주소리스트 가져오기
+     */
+    public List<Address> getAddress() {
+        return null;
     }
 }

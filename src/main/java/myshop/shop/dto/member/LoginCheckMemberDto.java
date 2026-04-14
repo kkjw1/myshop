@@ -10,14 +10,15 @@ import static myshop.shop.controller.MemberController.SessionConst.LOGIN_MEMBER;
 
 @Getter
 public class LoginCheckMemberDto {
-
+    private Long no;
     private String id;
     private String name;
 
     public LoginCheckMemberDto() {
     }
 
-    public LoginCheckMemberDto(String id, String name) {
+    public LoginCheckMemberDto(Long no, String id, String name) {
+        this.no = no;
         this.id = id;
         this.name = name;
     }

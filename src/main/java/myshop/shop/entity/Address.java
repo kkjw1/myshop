@@ -2,10 +2,12 @@ package myshop.shop.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.ToString;
 
 @Entity
 @Getter
 @SequenceGenerator(name = "ADDRESS_SEQ", sequenceName = "ADDRESS_SEQ", initialValue = 1, allocationSize = 1)
+@ToString(of = {"addressName", "recipientName", "phoneNumber", "postcode", "roadAddress", "detailAddress", "deliveryRequest", "mainAddress"})
 public class Address {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ADDRESS_SEQ")
     @Column(name = "address_no")
@@ -28,7 +30,19 @@ public class Address {
     public Address() {
     }
 
-    public Address(Member member, String addressName, String recipientName, String phoneNumber, String postcode, String roadAddress, String detailAddress, String deliveryRequest, Boolean mainAddress) {
+    // 회원가입
+    public Address(Member member, String addressName, String postcode, String roadAddress, String detailAddress, String recipientName, String phoneNumber) {
+        this.member = member;
+        this.addressName = addressName;
+        this.postcode = postcode;
+        this.roadAddress = roadAddress;
+        this.detailAddress = detailAddress;
+        this.recipientName = recipientName;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public Address(Member member, String addressName, String recipientName, String phoneNumber, String postcode,
+                   String roadAddress, String detailAddress, String deliveryRequest, Boolean mainAddress) {
         this.member = member;
         this.addressName = addressName;
         this.recipientName = recipientName;

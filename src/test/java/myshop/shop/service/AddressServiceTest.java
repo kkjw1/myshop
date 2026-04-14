@@ -1,0 +1,159 @@
+package myshop.shop.service;
+
+import jakarta.persistence.EntityManager;
+import myshop.shop.dto.Address.ManageAddressDto;
+import myshop.shop.dto.member.SignUpMemberDto;
+import myshop.shop.entity.Address;
+import myshop.shop.entity.Gender;
+import myshop.shop.entity.Member;
+import myshop.shop.repository.address.AddressRepository;
+import myshop.shop.repository.address.AddressRepositoryImpl;
+import myshop.shop.repository.member.MemberRepository;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
+@Transactional
+class AddressServiceTest {
+
+    @Autowired AddressService addressService;
+    @Autowired AddressRepository addressRepository;
+    @Autowired MemberService memberService;
+    @Autowired MemberRepository memberRepository;
+    @Autowired
+    EntityManager em;
+
+    @BeforeEach
+    public void beforeInit() {
+        SignUpMemberDto signUpMemberDto = new SignUpMemberDto("id", "password", "email", "name", "telecom", Gender.MAN, "phoneNumber");
+        memberService.signUp(signUpMemberDto);
+    }
+
+    @Test
+    @Commit
+    public void saveAddressTest() throws Exception {
+        Member member = memberRepository.findById("id").orElse(null);
+        Long no = member.getNo();
+        ManageAddressDto manageAddressDto = new ManageAddressDto(1L, "addressName", "recipientName", "phoneNumber",
+                "postcode", "roadAddress", "detailAddress", "deliveryRequest", true);
+        ManageAddressDto manageAddressDto2 = new ManageAddressDto(2L, "addressName2", "recipientName2", "phoneNumber2",
+                "postcode2", "roadAddress2", "detailAddress2", "deliveryRequest2", false);
+
+
+        addressService.saveAddress(no, manageAddressDto);
+        addressService.saveAddress(no, manageAddressDto2);
+
+
+        List<Address> all = addressRepository.findAll();
+        for (Address address : all) {
+            System.out.println("address = " + address);
+        }
+    }
+
+    @Test
+    @Commit
+    public void findByMemberNoTest() throws Exception {
+        //given
+        Member member = memberRepository.findById("id").orElse(null);
+        Long no = member.getNo();
+        ManageAddressDto manageAddressDto = new ManageAddressDto(1L, "addressName", "recipientName", "phoneNumber",
+                "postcode", "roadAddress", "detailAddress", "deliveryRequest", true);
+        ManageAddressDto manageAddressDto2 = new ManageAddressDto(2L, "addressName2", "recipientName2", "phoneNumber2",
+                "postcode2", "roadAddress2", "detailAddress2", "deliveryRequest2", false);
+        addressService.saveAddress(no, manageAddressDto);
+        addressService.saveAddress(no, manageAddressDto2);
+
+        List<Address> byMemberNo = addressRepository.findByMemberNo(no);
+        for (Address address : byMemberNo) {
+            System.out.println("address = " + address);
+        }
+
+        List<ManageAddressDto> addressesByMemberNo = addressService.getAddressesByMemberNo(no);
+        for (ManageAddressDto addressDto : addressesByMemberNo) {
+            System.out.println("addressDto = " + addressDto);
+        }
+
+    }
+
+    @Test
+    @DisplayName("메인이 있는 경우")
+    public void mainUpdateTest1() throws Exception {
+        //given
+        Member member = memberRepository.findById("id").orElse(null);
+        Long no = member.getNo();
+        ManageAddressDto manageAddressDto = new ManageAddressDto(1L, "addressName", "recipientName", "phoneNumber",
+                "postcode", "roadAddress", "detailAddress", "deliveryRequest", true);
+        ManageAddressDto manageAddressDto2 = new ManageAddressDto(2L, "addressName2", "recipientName2", "phoneNumber2",
+                "postcode2", "roadAddress2", "detailAddress2", "deliveryRequest2", false);
+        addressService.saveAddress(no, manageAddressDto);
+        addressService.saveAddress(no, manageAddressDto2);
+
+        //when
+        addressService.mainUpdate(2L, no);
+
+        //then
+        List<Address> all = addressRepository.findAll();
+        for (Address address : all) {
+            System.out.println("address = " + address);
+        }
+    }
+
+    @Test
+    @DisplayName("메인이 없는 경우")
+    public void mainUpdateTest2() throws Exception {
+        //given
+        Member member = memberRepository.findById("id").orElse(null);
+        Long no = member.getNo();
+        ManageAddressDto manageAddressDto = new ManageAddressDto(1L, "addressName", "recipientName", "phoneNumber",
+                "postcode", "roadAddress", "detailAddress", "deliveryRequest", false);
+        ManageAddressDto manageAddressDto2 = new ManageAddressDto(2L, "addressName2", "recipientName2", "phoneNumber2",
+                "postcode2", "roadAddress2", "detailAddress2", "deliveryRequest2", false);
+        addressService.saveAddress(no, manageAddressDto);
+        addressService.saveAddress(no, manageAddressDto2);
+
+        //when
+        addressService.mainUpdate(2L, no);
+
+        //then
+        List<Address> all = addressRepository.findAll();
+        for (Address address : all) {
+            System.out.println("address = " + address);
+        }
+    }
+
+    @Test
+    public void deleteAddressTest() throws Exception {
+        //given
+        Member member = memberRepository.findById("id").orElse(null);
+        Long no = member.getNo();
+        ManageAddressDto manageAddressDto = new ManageAddressDto(1L, "addressName", "recipientName", "phoneNumber",
+                "postcode", "roadAddress", "detailAddress", "deliveryRequest", true);
+        ManageAddressDto manageAddressDto2 = new ManageAddressDto(2L, "addressName2", "recipientName2", "phoneNumber2",
+                "postcode2", "roadAddress2", "detailAddress2", "deliveryRequest2", false);
+        addressService.saveAddress(no, manageAddressDto);
+        addressService.saveAddress(no, manageAddressDto2);
+
+        //when
+        addressService.deleteAddress(1L);
+
+        //then
+        List<Address> byMemberNo = addressRepository.findByMemberNo(no);
+        assertThat(byMemberNo.size()).isEqualTo(1);
+        for (Address address : byMemberNo) {
+            System.out.println("address = " + address);
+        }
+    }
+
+}
