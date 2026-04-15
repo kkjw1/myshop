@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Objects;
 
+import static myshop.shop.controller.MemberController.SessionConst.LOGIN_MEMBER;
 import static org.springframework.util.StringUtils.hasText;
 
 @Controller
@@ -42,8 +43,9 @@ public class MemberController {
      * 로그인 폼
      */
     @GetMapping("/login")
-    public String loginForm(Model model) {
+    public String loginForm(Model model, @RequestParam(required = false) String redirectURL) {
         model.addAttribute("loginMemberDto", new LoginMemberDto());
+        model.addAttribute("redirectURL", redirectURL);
         return "member/login";
     }
 
@@ -66,7 +68,7 @@ public class MemberController {
      */
     @PostMapping("/login")
     public String login(@Validated @ModelAttribute("loginMemberDto") LoginMemberDto loginMemberDto, BindingResult bindingResult,
-                        HttpServletRequest request) {
+                        HttpServletRequest request, @RequestParam(required = false) String redirectURL) {
         if (bindingResult.hasErrors()) {
             log.info("login fail");
             return "member/login";
@@ -79,8 +81,11 @@ public class MemberController {
         }
 
         HttpSession session = request.getSession();
-        session.setAttribute(SessionConst.LOGIN_MEMBER, new LoginCheckMemberDto(login.getNo(), login.getId(),login.getName()));
-        return "redirect:/";
+        session.setAttribute(LOGIN_MEMBER, new LoginCheckMemberDto(login.getNo(), login.getId(),login.getName()));
+
+        String target = (redirectURL != null && !redirectURL.isBlank()) ? redirectURL : "/";
+        log.info("redirectURL={} target={}", redirectURL, target);
+        return "redirect:" + target;
     }
 
 
@@ -357,8 +362,10 @@ public class MemberController {
      * 개인정보 확인/수정 폼
      */
     @GetMapping("/myPage/memberModify")
-    public String memberModifyForm(@RequestParam("memberId") String memberId, Model model, HttpServletRequest request,
+    public String memberModifyForm(Model model, HttpServletRequest request,
                                    RedirectAttributes redirectAttributes) {
+        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+        String memberId = loginCheckMemberDto.getId();
 
         String access = redisService.getData("ModifyCheckPW:" + memberId);
         if (access == null) {
@@ -367,7 +374,7 @@ public class MemberController {
         }
 
         if (!new LoginCheckMemberDto().loginCheck(request, model)) {
-            return "redirect:/member/login?redirectURL=" + request.getRequestURI();
+            return "redirect:/login?redirectURL=" + request.getRequestURI();
         }
 
         Member member = memberRepository.findById(memberId).orElse(null);
@@ -396,8 +403,7 @@ public class MemberController {
      * 비밀번호 재확인 폼 -> 비밀번호 확인
      */
     @PostMapping("/memberModifyCheckPW")
-    public String memberModifyCheckPW(@Validated @ModelAttribute LoginMemberDto loginMemberDto, BindingResult bindingResult,
-                                      Model model, RedirectAttributes redirectAttributes) {
+    public String memberModifyCheckPW(@Validated @ModelAttribute LoginMemberDto loginMemberDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "member/mypage/member_modify_checkPW";
         }
@@ -411,7 +417,6 @@ public class MemberController {
 
         redisService.saveData("ModifyCheckPW:"+member.getId(), "SUCCESS", 10L);
 
-        redirectAttributes.addAttribute("memberId", member.getId());
         return "redirect:/myPage/memberModify";
     }
 

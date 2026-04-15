@@ -2,6 +2,10 @@ package myshop.shop.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.servlet.Filter;
+import myshop.shop.filter.LogbackFilter;
+import myshop.shop.interceptor.LoginCheckInterceptor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -10,12 +14,14 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Configuration
-public class MyShopConfig {
+public class MyShopConfig implements WebMvcConfigurer {
 
     /**
      * redis 설정
@@ -56,4 +62,27 @@ public class MyShopConfig {
         return new JPAQueryFactory(em);
     }
 
+
+    /**
+     * 필터 설정
+     */
+    @Bean
+    public FilterRegistrationBean LogFilter() {
+        FilterRegistrationBean<Filter> filter = new FilterRegistrationBean<>();
+        filter.setFilter(new LogbackFilter());
+        filter.setOrder(1);
+        filter.addUrlPatterns("/*");
+        return filter;
+    }
+
+    /**
+     * 인터셉터 설정
+     */
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new LoginCheckInterceptor())
+                .order(1)
+                .addPathPatterns("/myPage/**");
+//                .excludePathPatterns("/member/login/**", "/member/signup/**");
+    }
 }
