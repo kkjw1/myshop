@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주문/배송 관리 | 판매자 센터</title>
+    <th:block th:replace="~{seller/common :: common_style}"></th:block>
+
+    <style th:insert="~{seller/common :: sidebar_style}">
+        /* 테이블 체크박스 중앙 정렬 */
+        .table-checkbox { vertical-align: middle; }
+    </style>
+</head>
+<body>
+
+<div class="d-flex">
+
+    <th:block th:replace="~{seller/common :: sidebar}"></th:block>
+
+    <div id="page-content-wrapper" class="flex-grow-1 p-4">
+        <header class="mb-4 border-bottom pb-3">
+            <h1 class="h3 mb-0 text-dark"><i class="fas fa-truck me-2"></i> 주문/배송 관리</h1>
+        </header>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form class="row g-3 align-items-center">
+                    <div class="col-md-3">
+                        <label class="form-label visually-hidden" for="orderStatus">주문 상태</label>
+                        <select id="orderStatus" class="form-select">
+                            <option selected>전체 주문 상태</option>
+                            <option>결제 완료</option>
+                            <option>상품 준비 중</option>
+                            <option>배송 중</option>
+                            <option>배송 완료</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label visually-hidden" for="searchKeyword">검색어</label>
+                        <input type="text" class="form-control" id="searchKeyword" placeholder="주문번호, 상품명, 수취인 검색">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label visually-hidden" for="dateRange">기간 설정</label>
+                        <input type="text" class="form-control" id="dateRange" placeholder="주문일자 범위 설정">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-1"></i> 검색</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">총 150건의 주문 검색 결과</h5>
+            <div class="btn-group">
+                <button class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#batchProcessModal"><i class="fas fa-boxes me-1"></i> 선택 주문 처리</button>
+                <button class="btn btn-outline-success"><i class="fas fa-file-download me-1"></i> 주문 엑셀 다운로드</button>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th style="width: 30px;" class="text-center">
+                                <input class="form-check-input table-checkbox" type="checkbox" id="selectAll">
+                            </th>
+                            <th>주문 상태</th>
+                            <th>주문번호</th>
+                            <th>상품 정보</th>
+                            <th>수량</th>
+                            <th>결제 금액</th>
+                            <th>주문일자</th>
+                            <th style="width: 80px;">관리</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr data-status="결제 완료">
+                            <td class="text-center"><input class="form-check-input order-checkbox table-checkbox" type="checkbox" data-order-id="123"></td>
+                            <td><span class="badge bg-warning text-dark">결제 완료</span></td>
+                            <td>20240720-00123</td>
+                            <td>프리미엄 와이드 팬츠 (블랙/L)</td>
+                            <td>1</td>
+                            <td>42,000원</td>
+                            <td>2024-07-20</td>
+                            <td><a href="order-detail.html" class="btn btn-sm btn-outline-secondary" th:href="@{/order_delivery_detail}">관리</a></td>
+                        </tr>
+                        <tr data-status="상품 준비 중">
+                            <td class="text-center"><input class="form-check-input order-checkbox table-checkbox" type="checkbox" data-order-id="124" checked></td>
+                            <td><span class="badge bg-info">상품 준비 중</span></td>
+                            <td>20240720-00124</td>
+                            <td>초경량 백팩 (그레이)</td>
+                            <td>2</td>
+                            <td>60,000원</td>
+                            <td>2024-07-20</td>
+                            <td><a href="order-detail.html" class="btn btn-sm btn-outline-secondary">관리</a></td>
+                        </tr>
+                        <tr data-status="배송 중">
+                            <td class="text-center"><input class="form-check-input order-checkbox table-checkbox" type="checkbox" data-order-id="125" checked></td>
+                            <td><span class="badge bg-primary">배송 중</span></td>
+                            <td>20240719-00125</td>
+                            <td>미니멀 가죽 지갑</td>
+                            <td>1</td>
+                            <td>25,000원</td>
+                            <td>2024-07-19</td>
+                            <td><a href="order-detail.html" class="btn btn-sm btn-outline-secondary">관리</a></td>
+                        </tr>
+                        <tr data-status="배송 완료">
+                            <td class="text-center"><input class="form-check-input order-checkbox table-checkbox" type="checkbox" data-order-id="126"></td>
+                            <td><span class="badge bg-success">배송 완료</span></td>
+                            <td>20240718-00126</td>
+                            <td>친환경 텀블러 (화이트)</td>
+                            <td>3</td>
+                            <td>75,000원</td>
+                            <td>2024-07-18</td>
+                            <td><a href="order-detail.html" class="btn btn-sm btn-outline-secondary">관리</a></td>
+                        </tr>
+                        <tr data-status="상품 준비 중">
+                            <td class="text-center"><input class="form-check-input order-checkbox table-checkbox" type="checkbox" data-order-id="127" checked></td>
+                            <td><span class="badge bg-info">상품 준비 중</span></td>
+                            <td>20240720-00127</td>
+                            <td>프리미엄 와이드 팬츠 (네이비/M)</td>
+                            <td>1</td>
+                            <td>42,000원</td>
+                            <td>2024-07-20</td>
+                            <td><a href="order-detail.html" class="btn btn-sm btn-outline-secondary">관리</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-center">
+                <nav>
+                    <ul class="pagination mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">다음</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade" id="batchProcessModal" tabindex="-1" aria-labelledby="batchProcessModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="batchProcessModalLabel"><i class="fas fa-tasks me-2"></i> 선택 주문 일괄 처리</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="alert alert-primary" role="alert">
+                    현재 **<span id="selectedOrderCount">0</span>** 건의 주문이 선택되었습니다.
+                </div>
+
+                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pills-manual-tab" data-bs-toggle="pill" data-bs-target="#pills-manual" type="button" role="tab" aria-controls="pills-manual" aria-selected="true"><i class="fas fa-keyboard me-1"></i> 직접 일괄 입력</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-excel-tab" data-bs-toggle="pill" data-bs-target="#pills-excel" type="button" role="tab" aria-controls="pills-excel" aria-selected="false"><i class="fas fa-file-excel me-1"></i> 엑셀 파일 업로드</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="pills-tabContent">
+
+                    <div class="tab-pane fade show active" id="pills-manual" role="tabpanel" aria-labelledby="pills-manual-tab">
+                        <form id="batchManualForm">
+                            <h6 class="text-info border-bottom pb-2">📦 선택 주문 일괄 배송 정보 입력</h6>
+                            <div class="mb-3">
+                                <label for="batchCourier" class="form-label required">택배사 선택</label>
+                                <select id="batchCourier" class="form-select" required>
+                                    <option selected disabled value="">선택하세요</option>
+                                    <option>CJ대한통운</option>
+                                    <option>우체국택배</option>
+                                    <option>롯데택배</option>
+                                </select>
+                                <div class="form-text">선택된 모든 주문에 동일하게 적용됩니다.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="batchTrackingNumber" class="form-label required">운송장 번호 (일괄)</label>
+                                <input type="text" class="form-control" id="batchTrackingNumber" placeholder="선택된 모든 주문에 적용할 운송장 번호를 입력하세요" required>
+                                <div class="form-text text-danger">주의: 이 방법은 모든 주문이 같은 운송장 번호를 사용할 때만 사용하거나, 단순 상태 변경(예: '상품 준비 중'으로 변경) 시에 사용하세요.</div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane fade" id="pills-excel" role="tabpanel" aria-labelledby="pills-excel-tab">
+                        <form id="batchExcelForm">
+                            <h6 class="text-info border-bottom pb-2">📋 주문별 송장 정보 엑셀 업로드</h6>
+                            <div class="mb-3">
+                                <label for="excelUpload" class="form-label required">엑셀 파일 업로드 (.xlsx, .xls)</label>
+                                <input class="form-control" type="file" id="excelUpload" accept=".xlsx, .xls" required>
+                            </div>
+                            <div class="alert alert-warning">
+                                <i class="fas fa-download me-1"></i> **[필수] 엑셀 양식 다운로드**
+                                <p class="mb-0 mt-1"><small>주문번호, 택배사명, 운송장번호 3개 필드가 포함된 양식에 맞춰 업로드해야 합니다.</small></p>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-info text-white" id="processBatchButton"><i class="fas fa-paper-plane me-2"></i> 일괄 배송 처리 완료</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const batchProcessModal = document.getElementById('batchProcessModal');
+        const countSpan = document.getElementById('selectedOrderCount');
+        const processBatchButton = document.getElementById('processBatchButton');
+        const orderCheckboxes = document.querySelectorAll('.order-checkbox');
+        const selectAllCheckbox = document.getElementById('selectAll');
+
+        // --- 기능 1: 체크된 주문 개수 계산 및 업데이트 ---
+        function updateSelectedCount() {
+            // 'checked' 상태인 주문 체크박스만 선택하여 개수를 셉니다.
+            const checkedCount = document.querySelectorAll('.order-checkbox:checked').length;
+            countSpan.textContent = checkedCount;
+            // 일괄 처리 버튼의 활성화/비활성화
+            processBatchButton.disabled = checkedCount === 0;
+            if (checkedCount === 0) {
+                processBatchButton.textContent = '선택된 주문이 없습니다';
+            } else {
+                processBatchButton.innerHTML = `<i class="fas fa-paper-plane me-2"></i> 일괄 배송 처리 완료 (${checkedCount}건)`;
+            }
+            return checkedCount;
+        }
+
+        // 개별 체크박스 리스너
+        orderCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedCount);
+        });
+
+        // '모두 선택' 체크박스 리스너
+        selectAllCheckbox.addEventListener('change', function() {
+            orderCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+            updateSelectedCount();
+        });
+
+        // 페이지 로드 시 초기 상태 업데이트
+        updateSelectedCount();
+
+
+        // --- 기능 2: 모달이 열릴 때 데이터 설정 및 초기화 ---
+        batchProcessModal.addEventListener('show.bs.modal', function (event) {
+            const currentCount = updateSelectedCount();
+
+            // 폼 필드 초기화
+            document.getElementById('batchCourier').value = '';
+            document.getElementById('batchTrackingNumber').value = '';
+
+            // 일괄 처리 탭이 기본으로 선택되도록 합니다.
+            new bootstrap.Tab(document.getElementById('pills-manual-tab')).show();
+        });
+
+        // --- 기능 3: 모달 내 일괄 처리 버튼 클릭 로직 ---
+        processBatchButton.addEventListener('click', function() {
+            const currentCount = updateSelectedCount();
+            if (currentCount === 0) return;
+
+            const activeTabId = document.querySelector('.tab-pane.fade.show.active').id;
+
+            if (activeTabId === 'pills-manual') {
+                // 직접 일괄 입력 처리
+                const courier = document.getElementById('batchCourier').value;
+                const trackingNum = document.getElementById('batchTrackingNumber').value;
+
+                if (!courier || !trackingNum) {
+                    alert('택배사와 운송장 번호를 모두 입력해야 합니다.');
+                    return;
+                }
+
+                alert(`✅ 선택된 주문 ${currentCount}건에 대해 [${courier}]의 운송장 번호 [${trackingNum}]으로 일괄 처리되었습니다. (실제 서버 통신 필요)`);
+
+            } else if (activeTabId === 'pills-excel') {
+                // 엑셀 업로드 처리
+                const excelFile = document.getElementById('excelUpload').files[0];
+
+                if (!excelFile) {
+                    alert('처리할 엑셀 파일을 업로드해 주세요.');
+                    return;
+                }
+
+                alert(`✅ 선택된 주문 ${currentCount}건에 대해 [${excelFile.name}] 파일로 일괄 처리 요청이 접수되었습니다. (실제 파일 처리 로직 필요)`);
+            }
+
+            // 모달 닫기
+            const modal = bootstrap.Modal.getInstance(batchProcessModal);
+            modal.hide();
+
+            // 처리 완료 후 체크박스 해제 (선택된 주문 초기화)
+            selectAllCheckbox.checked = false;
+            orderCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateSelectedCount();
+        });
+
+    });
+</script>
+
+</body>
+</html>

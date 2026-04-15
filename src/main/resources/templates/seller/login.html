@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>판매자 로그인 페이지</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css">
+    <style>
+        /* body 높이를 뷰포트 전체로 설정하고 Flexbox를 사용하여 내용을 수직/수평 중앙에 배치 */
+        html, body {
+            height: 100%;
+        }
+        .login-container {
+            /* 로그인 폼 컨테이너의 최대 너비를 제한하여 너무 커지지 않게 합니다. */
+            max-width: 400px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px; /* 모서리 둥글게 */
+            box-shadow: 0 4px 8px rgba(0,0,0,.05); /* 은은한 그림자 */
+            background-color: #fff;
+        }
+
+        .login-container #loginErrorMessage {
+            /* 메시지 내용이 두 줄일 경우를 가정하여 충분한 높이를 설정합니다. */
+            /* 메시지 텍스트 크기(0.875rem)와 mb-3(1rem) 마진을 포함하여 높이 설정 */
+            min-height: 48px;
+        }
+
+        .input-error {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+    </style>
+
+
+</head>
+<body class="d-flex justify-content-center align-items-center bg-light">
+
+<div class="login-container">
+    <h3 class="text-center mb-4">판매자 로그인</h3>
+
+    <form action="signup.html" th:action="@{/seller/login}" th:object="${loginSeller}" method="post">
+        <div th:if="${#fields.hasGlobalErrors()}">
+            <div class="text-danger mb-3" id="loginErrorMessage" style="font-size: 0.875rem;"
+                 th:each="error : ${#fields.globalErrors()}" th:text="${error}">
+                글로벌 오류 메시지
+            </div>
+        </div>
+
+
+        <div class="form-group mb-3">
+            <input type="text" class="form-control " placeholder="아이디" th:field="*{id}" th:errorclass="input-error">
+            <div class="text-danger" style="font-size: 0.875rem;" th:errors="*{id}">아이디 에러메시지</div>
+        </div>
+
+        <div class="form-group mb-3">
+            <input type="password" class="form-control" placeholder="비밀번호" th:field="*{password}" th:errorclass="input-error">
+            <div class="text-danger" style="font-size: 0.875rem;" th:errors="*{password}">비밀번호 에러메시지</div>
+        </div>
+
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="rememberMe">
+            <label class="form-check-label" for="rememberMe">로그인 유지</label>
+        </div>
+
+        <div class="mb-4">
+            <button type="submit" class="btn btn-primary w-100" style="padding: 10px;"> 로그인</button>
+        </div>
+        <hr>
+
+        <div class="text-center mt-3">
+            <a href="#" class="text-decoration-none text-dark">아이디 찾기</a>
+            <span class="text-muted mx-2">|</span>
+
+            <a href="#" class="text-decoration-none text-dark">비밀번호 찾기</a>
+            <span class="text-muted mx-2">|</span>
+
+            <a href="#" onclick="location.href='signup.html'" class="text-decoration-none text-dark"
+               th:onclick="|location.href='@{/seller/signup}'|">판매자 회원가입</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

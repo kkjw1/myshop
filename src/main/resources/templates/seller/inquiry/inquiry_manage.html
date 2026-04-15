@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고객 문의 관리 | 판매자 센터</title>
+    <th:block th:replace="~{seller/common :: common_style}"></th:block>
+
+    <style th:insert="~{seller/common :: sidebar_style}">
+        /* 답변 상태 강조 */
+        .status-unanswered { font-weight: bold; color: #dc3545; }
+        .status-answered { color: #28a745; }
+    </style>
+</head>
+<body>
+
+<div class="d-flex">
+
+    <th:block th:replace="~{seller/common :: sidebar}"></th:block>
+
+    <div id="page-content-wrapper" class="flex-grow-1 p-4">
+
+        <header th:replace="~{seller/common :: header('고객 문의 관리')}"></header>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-start border-danger border-5 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-danger fw-bold">미처리 문의 (긴급)</div>
+                                <div class="h1 mb-0 text-danger">5</div>
+                                <div class="text-muted">건 (즉시 처리 필요)</div>
+                            </div>
+                            <i class="fas fa-exclamation-circle fa-4x text-danger opacity-25"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-start border-success border-5 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-success fw-bold">총 문의 건수 (최근 7일)</div>
+                                <div class="h1 mb-0 text-success">35</div>
+                                <div class="text-muted">건 (답변 완료율 85%)</div>
+                            </div>
+                            <i class="fas fa-check-circle fa-4x text-success opacity-25"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form class="row g-3 align-items-center">
+                    <div class="col-md-3">
+                        <label for="inquiryType" class="form-label visually-hidden">문의 유형</label>
+                        <select id="inquiryType" class="form-select">
+                            <option selected>전체 유형</option>
+                            <option>상품 문의</option>
+                            <option>배송/반품 문의</option>
+                            <option>결제/취소 문의</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="replyStatus" class="form-label visually-hidden">답변 상태</label>
+                        <select id="replyStatus" class="form-select">
+                            <option selected>전체 답변 상태</option>
+                            <option>답변 대기</option>
+                            <option>답변 완료</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="searchInput" class="form-label visually-hidden">검색어</label>
+                        <input type="text" class="form-control" id="searchInput" placeholder="주문번호, 문의 제목, 고객명 검색">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-dark w-100"><i class="fas fa-search me-1"></i> 검색</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">총 문의 목록: 50건</h5>
+                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-envelope-open-text me-1"></i> 미처리 문의만 보기</button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>번호</th>
+                            <th>문의 유형</th>
+                            <th>제목 (관련 상품)</th>
+                            <th>작성자/주문번호</th>
+                            <th>작성일</th>
+                            <th>답변 상태</th>
+                            <th style="width: 80px;">관리</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="table-danger-light">
+                            <td>1</td>
+                            <td><span class="badge bg-warning text-dark">배송/반품 문의</span></td>
+                            <td>**[긴급] 반품 신청 후 수거가 안 되고 있습니다.**</td>
+                            <td>홍길동 / 20240720-00123</td>
+                            <td>2024-07-21</td>
+                            <td class="status-unanswered"><span class="badge bg-danger">답변 대기</span></td>
+                            <td><a href="#" class="btn btn-sm btn-danger" th:href="@{/inquiry_reply}">답변하기</a></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><span class="badge bg-secondary">상품 문의</span></td>
+                            <td>프리미엄 와이드 팬츠의 소재가 궁금합니다.</td>
+                            <td>구매자 A</td>
+                            <td>2024-07-20</td>
+                            <td class="status-answered"><span class="badge bg-success">답변 완료</span></td>
+                            <td><a href="#" class="btn btn-sm btn-outline-secondary">확인</a></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><span class="badge bg-info">결제/취소 문의</span></td>
+                            <td>주문번호 20240721-00150 취소 요청합니다.</td>
+                            <td>김철수 / 20240721-00150</td>
+                            <td>2024-07-21</td>
+                            <td class="status-unanswered"><span class="badge bg-danger">답변 대기</span></td>
+                            <td><a href="#" class="btn btn-sm btn-danger">답변하기</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card-footer bg-white d-flex justify-content-center">
+                <nav>
+                    <ul class="pagination mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">다음</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
