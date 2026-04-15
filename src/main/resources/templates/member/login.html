@@ -71,6 +71,7 @@
         <h3 class="text-center mb-4">로그인</h3>
 
         <form action="signUp.html" th:action="@{/login}" th:object="${loginMemberDto}" method="post">
+            <input type="hidden" name="redirectURL" th:value="${redirectURL}">
             <div th:if="${#fields.hasGlobalErrors()}">
                 <div class="text-danger mb-3" id="loginErrorMessage" style="font-size: 0.875rem;"
                      th:each="error : ${#fields.globalErrors()}" th:text="${error}">
