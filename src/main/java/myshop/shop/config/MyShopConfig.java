@@ -82,7 +82,7 @@ public class MyShopConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LoginCheckInterceptor())
                 .order(1)
-                .addPathPatterns("/myPage/**");
-//                .excludePathPatterns("/member/login/**", "/member/signup/**");
+                .addPathPatterns("/myPage/**")
+                .excludePathPatterns("/error-page/**", "/error/**");
     }
 }
