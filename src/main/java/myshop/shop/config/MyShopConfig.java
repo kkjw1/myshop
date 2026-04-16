@@ -4,7 +4,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.Filter;
 import myshop.shop.filter.LogbackFilter;
-import myshop.shop.interceptor.LoginCheckInterceptor;
+import myshop.shop.interceptor.LoginCheckMemberInterceptor;
+import myshop.shop.interceptor.LoginCheckSellerInterceptor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -80,9 +81,13 @@ public class MyShopConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoginCheckInterceptor())
+        registry.addInterceptor(new LoginCheckMemberInterceptor())
                 .order(1)
-                .addPathPatterns("/myPage/**")
-                .excludePathPatterns("/error-page/**", "/error/**");
+                .addPathPatterns("/myPage/**");
+
+        registry.addInterceptor(new LoginCheckSellerInterceptor())
+                .order(2)
+                .addPathPatterns("/seller/**")
+                .excludePathPatterns("/seller/login");
     }
 }

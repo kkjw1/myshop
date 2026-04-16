@@ -7,20 +7,21 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import static myshop.shop.controller.MemberController.SessionConst.LOGIN_MEMBER;
+import static myshop.shop.controller.MemberController.SessionConst.LOGIN_SELLER;
 
-public class LoginCheckInterceptor implements HandlerInterceptor {
+public class LoginCheckSellerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         //@Controller @RequestMapping
         if (handler instanceof HandlerMethod) {
             HttpSession session = request.getSession(false);
-            if (session == null || session.getAttribute(LOGIN_MEMBER) == null) {
+            if (session == null || session.getAttribute(LOGIN_SELLER) == null) {
 
                 String uri = request.getRequestURI();
                 String queryString = request.getQueryString();
                 String redirectURL = (queryString != null) ? uri + "?" + queryString : uri;
-                response.sendRedirect("/login?redirectURL=" + redirectURL);
+                response.sendRedirect("/seller/login?redirectURL=" + redirectURL);
                 return false;
             }
         }

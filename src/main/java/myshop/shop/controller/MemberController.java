@@ -81,7 +81,7 @@ public class MemberController {
         }
 
         HttpSession session = request.getSession();
-        session.setAttribute(LOGIN_MEMBER, new LoginCheckMemberDto(login.getNo(), login.getId(),login.getName()));
+        session.setAttribute(LOGIN_MEMBER, new LoginCheckMemberDto(login));
 
         String target = (redirectURL != null && !redirectURL.isBlank()) ? redirectURL : "/";
         log.info("redirectURL={} target={}", redirectURL, target);
@@ -146,6 +146,7 @@ public class MemberController {
 
     public static class SessionConst {
         public static final String LOGIN_MEMBER="loginMember";
+        public static final String LOGIN_SELLER="loginSeller";
     }
 
 

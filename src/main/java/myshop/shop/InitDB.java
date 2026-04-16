@@ -3,12 +3,10 @@ package myshop.shop;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import myshop.shop.entity.Address;
-import myshop.shop.entity.Gender;
-import myshop.shop.entity.Member;
-import myshop.shop.entity.MemberLevel;
+import myshop.shop.entity.*;
 import myshop.shop.repository.address.AddressRepository;
 import myshop.shop.repository.member.MemberRepository;
+import myshop.shop.repository.seller.SellerRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -36,16 +34,17 @@ public class InitDB {
         private final PasswordEncoder passwordEncoder;
         private final AddressRepository addressRepository;
         private final EntityManager em;
+        private final SellerRepository sellerRepository;
 
         public void dbInit() {
-            for(int i=1; i<10; i++) {
-                String passwordEncode = passwordEncoder.encode("password" + i);
-                Member member = new Member("id" + i, "email" + i, passwordEncode, "name" + i,
+            for(int i=1; i<5; i++) {
+                String testPasswordEncode = passwordEncoder.encode("password" + i);
+                Member member = new Member("id" + i, "email" + i, testPasswordEncode, "name" + i,
                         "telecom" + i, "010-0000-000" + i, Gender.MAN, MemberLevel.normal);
                 memberRepository.save(member);
             }
-            String passwordEncode = passwordEncoder.encode("test");
-            Member admin = new Member("test", "kkjjoo1212@naver.com", passwordEncode,
+            String memberPassword = passwordEncoder.encode("test");
+            Member admin = new Member("test", "kkjjoo1212@naver.com", memberPassword,
                     "테스트아이디", "KT", "010-4710-6305", Gender.MAN, MemberLevel.vip);
             memberRepository.save(admin);
             em.flush();
@@ -62,6 +61,11 @@ public class InitDB {
                         "010-0000-000" + i, "0000" + i, "도로명" + i,
                         "아파트" + i, "배송요청사항" + i, false));
             }
+
+            String sellerPassword = passwordEncoder.encode("test");
+            Seller seller = new Seller("test", sellerPassword, "kkjjoo1212@naver.com", "판매자테스트", "010-4710-6305", "테스트회사명",
+                    "테스트회사전화번호", "테스트회사우편번호", "테스트회사 도로명", "테스트회사 상세주소");
+            sellerRepository.save(seller);
 
 
         }

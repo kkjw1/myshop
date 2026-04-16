@@ -2,9 +2,9 @@ package myshop.shop.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import myshop.shop.dto.Address.AddAddressDto;
-import myshop.shop.dto.Address.ManageAddressDto;
-import myshop.shop.dto.Address.UpdateAddressDto;
+import myshop.shop.dto.address.AddAddressDto;
+import myshop.shop.dto.address.ManageAddressDto;
+import myshop.shop.dto.address.UpdateAddressDto;
 import myshop.shop.entity.Address;
 import myshop.shop.entity.Member;
 import myshop.shop.repository.address.AddressRepository;

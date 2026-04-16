@@ -1,34 +1,36 @@
-package myshop.shop.dto.member;
+package myshop.shop.dto.seller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
-import myshop.shop.controller.MemberController;
-import myshop.shop.entity.Member;
+import lombok.Setter;
+import myshop.shop.entity.Seller;
 import org.springframework.ui.Model;
 
-import static myshop.shop.controller.MemberController.SessionConst.LOGIN_MEMBER;
+import static myshop.shop.controller.MemberController.SessionConst.LOGIN_SELLER;
 
-@Getter
-public class LoginCheckMemberDto {
+@Getter @Setter
+public class LoginCheckSellerDto {
+
     private Long no;
     private String id;
     private String name;
 
-    public LoginCheckMemberDto() {
+    public LoginCheckSellerDto() {
     }
 
-    public LoginCheckMemberDto(Long no, String id, String name) {
+    public LoginCheckSellerDto(Long no, String id, String name) {
         this.no = no;
         this.id = id;
         this.name = name;
     }
 
-    public LoginCheckMemberDto(Member member) {
-        this.no = member.getNo();
-        this.id = member.getId();
-        this.name = member.getName();
+    public LoginCheckSellerDto(Seller seller) {
+        this.no = seller.getNo();
+        this.id = seller.getId();
+        this.name = seller.getName();
     }
+
 
     public boolean loginCheck(HttpServletRequest request, Model model) {
         HttpSession session = request.getSession(false);
@@ -38,14 +40,14 @@ public class LoginCheckMemberDto {
             return false;
         }
 
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) session.getAttribute(LOGIN_MEMBER);
+        LoginCheckSellerDto loginCheckSellerDto = (LoginCheckSellerDto) session.getAttribute(LOGIN_SELLER);
 
-        if (loginCheckMemberDto == null) {
+        if (loginCheckSellerDto == null) {
             model.addAttribute("isLogin", false);
             return false;
         }
 
-        model.addAttribute("loginCheckMemberDto", loginCheckMemberDto);
+        model.addAttribute("loginCheckSellerDto", loginCheckSellerDto);
         model.addAttribute("isLogin", true);
         return true;
     }

@@ -1,8 +1,8 @@
 package myshop.shop.service;
 
 import jakarta.persistence.EntityManager;
-import myshop.shop.dto.Address.AddAddressDto;
-import myshop.shop.dto.Address.ManageAddressDto;
+import myshop.shop.dto.address.AddAddressDto;
+import myshop.shop.dto.address.ManageAddressDto;
 import myshop.shop.dto.member.SignUpMemberDto;
 import myshop.shop.entity.Address;
 import myshop.shop.entity.Gender;

@@ -11,7 +11,7 @@
             <table width="500" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
                 <tr>
                     <td style="background-color: #4A90E2; padding: 40px 20px; text-align: center;">
-                        <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700; letter-spacing: -1px;">MYSHOP</h1>
+                        <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700; letter-spacing: -1px;" th:text="#{email.title}"></h1>
                     </td>
                 </tr>
                 <tr>
@@ -35,7 +35,7 @@
                     <td style="background-color: #f1f3f5; padding: 20px; text-align: center;">
                         <p style="margin: 0; font-size: 12px; color: #adb5bd; line-height: 1.4;">
                             본 메일은 발신 전용입니다. 문의 사항은 고객센터를 이용해 주세요.<br>
-                            &copy; 2026 MYSHOP.
+                            &copy;<span th:text="#{email.footer.title}"></span>
                         </p>
                     </td>
                 </tr>

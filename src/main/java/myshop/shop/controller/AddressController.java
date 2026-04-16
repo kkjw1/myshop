@@ -1,13 +1,11 @@
 package myshop.shop.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import myshop.shop.dto.Address.AddAddressDto;
-import myshop.shop.dto.Address.ManageAddressDto;
-import myshop.shop.dto.Address.UpdateAddressDto;
+import myshop.shop.dto.address.AddAddressDto;
+import myshop.shop.dto.address.ManageAddressDto;
+import myshop.shop.dto.address.UpdateAddressDto;
 import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.entity.Address;
 import myshop.shop.entity.Member;
@@ -16,11 +14,9 @@ import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.service.AddressService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.Collections;

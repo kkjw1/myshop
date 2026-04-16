@@ -1,4 +1,4 @@
-package myshop.shop.dto.Address;
+package myshop.shop.dto.address;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
