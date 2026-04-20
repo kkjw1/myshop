@@ -1,11 +1,8 @@
 package myshop.shop.service;
 
 import lombok.RequiredArgsConstructor;
-import myshop.shop.dto.member.LoginMemberDto;
 import myshop.shop.dto.seller.LoginSellerDto;
-import myshop.shop.entity.Member;
 import myshop.shop.entity.Seller;
-import myshop.shop.entity.log.LoginLog;
 import myshop.shop.repository.seller.SellerRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

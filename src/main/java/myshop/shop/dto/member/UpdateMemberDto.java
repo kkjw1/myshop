@@ -2,11 +2,10 @@ package myshop.shop.dto.member;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import myshop.shop.entity.Gender;
-import myshop.shop.entity.Member;
+import myshop.shop.entity.member.Gender;
+import myshop.shop.entity.member.Member;
 
 @Getter @Setter
 public class UpdateMemberDto {

@@ -3,12 +3,13 @@ package myshop.shop.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.ToString;
+import myshop.shop.entity.member.Member;
 
 @Entity
 @Getter
 @SequenceGenerator(name = "ADDRESS_SEQ", sequenceName = "ADDRESS_SEQ", initialValue = 1, allocationSize = 1)
 @ToString(of = {"addressName", "recipientName", "phoneNumber", "postcode", "roadAddress", "detailAddress", "deliveryRequest", "mainAddress"})
-public class Address {
+public class Address extends BaseDateEntity{
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ADDRESS_SEQ")
     @Column(name = "address_no")
     private Long no;

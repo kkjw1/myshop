@@ -1,8 +1,10 @@
-package myshop.shop.entity;
+package myshop.shop.entity.member;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.ToString;
+import myshop.shop.entity.Address;
+import myshop.shop.entity.BaseDateEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
 @Getter
 @SequenceGenerator(name = "MEMBER_SEQ", sequenceName = "MEMBER_SEQ", initialValue = 1, allocationSize = 1)
 @ToString(of = {"id", "name", "email", "telecom", "phoneNumber", "gender", "memberLevel"})
-public class Member {
+public class Member extends BaseDateEntity {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "MEMBER_SEQ")
     @Column(name = "member_no")
     private Long no;

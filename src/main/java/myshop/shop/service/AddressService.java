@@ -6,7 +6,7 @@ import myshop.shop.dto.address.AddAddressDto;
 import myshop.shop.dto.address.ManageAddressDto;
 import myshop.shop.dto.address.UpdateAddressDto;
 import myshop.shop.entity.Address;
-import myshop.shop.entity.Member;
+import myshop.shop.entity.member.Member;
 import myshop.shop.repository.address.AddressRepository;
 import myshop.shop.repository.member.MemberRepository;
 import org.springframework.stereotype.Service;

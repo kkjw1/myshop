@@ -1,6 +1,6 @@
 package myshop.shop.repository.member;
 
-import myshop.shop.entity.Member;
+import myshop.shop.entity.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

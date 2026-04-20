@@ -4,11 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import myshop.shop.dto.member.LoginCheckMemberDto;
-import myshop.shop.dto.member.LoginMemberDto;
 import myshop.shop.dto.seller.LoginCheckSellerDto;
 import myshop.shop.dto.seller.LoginSellerDto;
-import myshop.shop.entity.Member;
 import myshop.shop.entity.Seller;
 import myshop.shop.service.SellerService;
 import org.springframework.stereotype.Controller;
@@ -20,7 +17,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import static myshop.shop.controller.MemberController.SessionConst.LOGIN_MEMBER;
 import static myshop.shop.controller.MemberController.SessionConst.LOGIN_SELLER;
 
 @Controller

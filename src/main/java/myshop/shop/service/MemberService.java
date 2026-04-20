@@ -11,8 +11,8 @@ import myshop.shop.dto.member.ResetPasswordMemberDto;
 import myshop.shop.dto.member.SignUpMemberDto;
 import myshop.shop.dto.member.UpdateMemberDto;
 import myshop.shop.entity.Address;
-import myshop.shop.entity.Member;
-import myshop.shop.entity.MemberLevel;
+import myshop.shop.entity.member.Member;
+import myshop.shop.entity.member.MemberLevel;
 import myshop.shop.entity.log.LoginLog;
 import myshop.shop.repository.log.LoginLogRepository;
 import myshop.shop.repository.member.MemberRepository;
@@ -20,9 +20,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 

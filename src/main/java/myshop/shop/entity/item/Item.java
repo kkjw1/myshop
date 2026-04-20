@@ -1,12 +1,14 @@
-package myshop.shop.entity;
+package myshop.shop.entity.item;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import myshop.shop.entity.BaseDateEntity;
+import myshop.shop.entity.Seller;
 
 @Entity
 @Getter
 @SequenceGenerator(name = "ITEM_SEQ", sequenceName = "ITEM_SEQ", initialValue = 1, allocationSize = 1)
-public class Item {
+public class Item extends BaseDateEntity {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ITEM_SEQ")
     @Column(name = "ITME_NO")
     private Long no;
@@ -18,7 +20,6 @@ public class Item {
     private String name;
     private int price;
     private int discount;
-    private String itemCategory;
     private String content;
     @Lob
     private String mainImage;
@@ -27,8 +28,9 @@ public class Item {
 
     @Enumerated(EnumType.STRING)
     private ItemStatus itemStatus;
+    @Enumerated(EnumType.STRING)
+    private ItemCategory itemCategory;
 
     private Long viewCount;
-    private String madeIn;
 
 }

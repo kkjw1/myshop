@@ -1,7 +1,6 @@
-package myshop.shop.entity;
+package myshop.shop.entity.member;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public enum Gender {

@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상품 관리 | 판매자 센터</title>
-    <th:block th:replace="~{seller/common :: common_style}"></th:block>
+<!--    <th:block th:replace="~{seller/common :: common_style}"></th:block>-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <style th:insert="~{seller/common :: sidebar_style}">
+    <style>
         /* 테이블 내 이미지 스타일 */
         .product-thumb {
             width: 50px;
@@ -15,12 +17,48 @@
             border-radius: 4px;
         }
     </style>
+
+    <style th:replace="~{seller/common :: sidebar_style}">
+        body {
+            background-color: #f8f9fa; /* 밝은 배경색 */
+        }
+        .sidebar {
+            background-color: #2c3e50; /* 다크 네이비 */
+            min-height: 100vh;
+            color: white;
+            padding-top: 20px;
+        }
+        .sidebar .nav-link {
+            color: #ecf0f1;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s;
+        }
+        .sidebar .nav-link.active-menu,
+        .sidebar .nav-link:hover {
+            background-color: #34495e;
+            border-left: 5px solid #3498db;
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
 <div class="d-flex">
 
-    <th:block th:replace="~{seller/common :: sidebar}"></th:block>
+    <div th:replace="~{seller/common :: sidebar}">
+        <div class="sidebar d-none d-md-block" style="width: 250px;">
+            <h3 class="text-center mb-4 text-white">📦 판매자 센터</h3>
+            <nav class="nav flex-column">
+                <a class="nav-link" href="home.html" th:href="@{/seller/item_manage}"><i class="fas fa-tachometer-alt me-2"></i> 대시보드</a>
+                <a class="nav-link" href="item/item_manage.html" th:href="@{/seller/item_manage}"><i class="fas fa-box me-2"></i> 상품 관리</a>
+                <a class="nav-link" href="delivery/order_delivery.html" th:href="@{/seller/order_delivery}"><i class="fas fa-shopping-cart me-2"></i> 주문/배송</a>
+                <a class="nav-link" href="inquiry/inquiry_manage.html" th:href="@{/seller/inquiry_manage}"><i class="fas fa-comment-dots me-2"></i> 고객 문의</a>
+                <a class="nav-link" href="../home/home.html" th:href="@{/}"><i class="fas fa-sign-out-alt me-2"></i> 로그아웃</a>
+            </nav>
+        </div>
+    </div>
+
 
     <div id="page-content-wrapper" class="flex-grow-1 p-4">
         <header class="mb-4 d-flex justify-content-between align-items-center border-bottom pb-3">
@@ -63,14 +101,20 @@
         <div class="card shadow-sm">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">총 등록 상품: 50개</h5>
-                <button class="btn btn-sm btn-outline-secondary" type="button"><i class="fas fa-undo-alt me-1"></i> 일괄 수정</button>
+                <button class="btn btn-sm btn-outline-secondary" type="button"
+                        id="bulkEditBtn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#bulkEditModal"
+                        disabled>
+                    <i class="fas fa-undo-alt me-1"></i> 일괄 수정
+                </button>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
                         <tr>
-                            <th style="width: 20px;"><input class="form-check-input" type="checkbox"></th>
+                            <th style="width: 20px;"><input class="form-check-input" type="checkbox" id="checkAll"></th>
                             <th style="width: 80px;">이미지</th>
                             <th>상품 정보</th>
                             <th style="width: 100px;">판매가</th>
@@ -93,7 +137,12 @@
                             <td><span class="badge bg-success">판매 중</span></td>
                             <td>2024-05-01</td>
                             <td>
-                                <button class="btn btn-sm btn-outline-primary me-1" title="수정"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-outline-primary me-1"
+                                        title="수정"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal">
+                                    <i class="fas fa-edit"></i>
+                                </button>
                                 <button class="btn btn-sm btn-outline-danger" title="삭제"><i class="fas fa-trash-alt"></i></button>
                             </td>
                         </tr>
@@ -132,6 +181,239 @@
 
     </div>
 </div>
+
+
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel"><i class="fas fa-edit me-2"></i>상품 정보 수정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">상품명</label>
+                            <input type="text" class="form-control" id="editProductName" value="프리미엄 와이드 팬츠">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">판매가</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="editProductPrice" value="39000">
+                                <span class="input-group-text">원</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">재고 수량</label>
+                            <input type="number" class="form-control" id="editProductStock" value="5">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">판매 상태</label>
+                            <select class="form-select" id="editProductStatus">
+                                <option value="ON_SALE" selected>판매 중</option>
+                                <option value="STOPPED">판매 중지</option>
+                                <option value="OUT_OF_STOCK">품절</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">할인율</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="editProductDiscount" value="10" min="0" max="100">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" onclick="saveChanges()">수정 완료</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="bulkEditModal" tabindex="-1" aria-labelledby="bulkEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title" id="bulkEditModalLabel"><i class="fas fa-layer-group me-2"></i>선택 상품 일괄 수정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small"><span id="selectedCount" class="fw-bold text-primary">0</span>개의 상품이 선택되었습니다.</p>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold"><i class="fas fa-tag me-1"></i> 판매 상태 변경</label>
+                    <select class="form-select" id="bulkStatus">
+                        <option value="" selected>-- 변경 안 함 --</option>
+                        <option value="ON_SALE">판매 중</option>
+                        <option value="STOPPED">판매 중지</option>
+                        <option value="OUT_OF_STOCK">품절</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold"><i class="fas fa-percentage me-1"></i> 일괄 할인율 설정</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="bulkDiscount" placeholder="0" min="0" max="100">
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <div class="form-text text-danger">
+                        * 0 입력 시 할인이 해제됩니다. (0~100 사이 입력)
+                    </div>
+                </div>
+
+                <div class="alert alert-warning mb-0 mt-4">
+                    <small><i class="fas fa-exclamation-triangle me-1"></i> 빈 칸으로 두는 항목은 기존 정보가 유지됩니다.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" onclick="applyBulkEdit()">일괄 적용</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script th:inline="javascript">
+    // 1. 전체 선택 체크박스 기능
+    const checkAll = document.getElementById('checkAll');
+    const checkboxes = document.querySelectorAll('tbody .form-check-input');
+    const bulkEditBtn = document.getElementById('bulkEditBtn');
+    const selectedCountSpan = document.getElementById('selectedCount');
+
+    // 체크박스 상태에 따라 일괄 수정 버튼 활성화 여부 결정
+    function updateBulkButtonState() {
+        const checkedCount = document.querySelectorAll('tbody .form-check-input:checked').length;
+
+        // 버튼 활성화/비활성화
+        bulkEditBtn.disabled = checkedCount === 0;
+
+        // 모달 내 선택된 개수 텍스트 업데이트
+        if(selectedCountSpan) {
+            selectedCountSpan.innerText = checkedCount;
+        }
+    }
+
+    // 1. 전체 선택 기능
+    checkAll.addEventListener('change', function() {
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateBulkButtonState();
+    });
+
+
+    if(checkAll) {
+        checkAll.addEventListener('change', function() {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+    }
+
+    // 2. 개별 체크박스 상태에 따른 전체 선택 해제/체크
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const checkedCount = document.querySelectorAll('tbody .form-check-input:checked').length;
+            checkAll.checked = (checkedCount === checkboxes.length);
+            updateBulkButtonState();
+        });
+    });
+
+    // 3. 수정 완료 버튼 클릭 시 (예시)
+    function saveChanges() {
+        const name = document.getElementById('editProductName').value;
+        const price = document.getElementById('editProductPrice').value;
+        const stock = document.getElementById('editProductStock').value;
+        const status = document.getElementById('editProductStatus').value;
+        const discount = document.getElementById('editProductDiscount').value;
+
+        // 간단한 유효성 검사
+        if (!name || !price || discount === "") {
+            alert("모든 필드를 입력해주세요.");
+            return;
+        }
+
+        if (discount < 0 || discount > 100) {
+            alert("할인율은 0%에서 100% 사이여야 합니다.");
+            return;
+        }
+
+        if (confirm("상품 정보를 수정하시겠습니까?")) {
+            // 서버로 보낼 데이터 객체
+            const pData = {
+                productName: name,
+                productPrice: price,
+                productStock: stock,
+                productStatus: status,
+                discountRate: discount
+            };
+
+            console.log("수정된 데이터:", pData);
+
+            // AJAX 또는 fetch 통신 후 처리
+            alert("수정이 완료되었습니다.");
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+            modal.hide();
+
+            // 데이터 반영을 위해 리로드 (혹은 DOM 업데이트)
+            location.reload();
+        }
+    }
+
+
+    // 4. 일괄 수정 실행
+    function applyBulkEdit() {
+        const statusValue = document.getElementById('bulkStatus').value;
+        const discountValue = document.getElementById('bulkDiscount').value;
+        const selectedItems = document.querySelectorAll('tbody .form-check-input:checked').length;
+
+        // 아무것도 입력하지 않았을 경우
+        if (!statusValue && discountValue === "") {
+            alert("변경할 항목을 최소 하나 이상 입력하거나 선택해주세요.");
+            return;
+        }
+
+        // 할인율 유효성 검사
+        if (discountValue !== "") {
+            const discount = parseInt(discountValue);
+            if (discount < 0 || discount > 100) {
+                alert("할인율은 0%에서 100% 사이로 입력해주세요.");
+                return;
+            }
+        }
+
+        if (confirm(`선택한 ${selectedItems}개의 상품 정보를 일괄 수정하시겠습니까?`)) {
+            // 전송할 데이터 객체 예시
+            const updateData = {
+                status: statusValue || "KEEP", // 변경 안함일 경우
+                discountRate: discountValue !== "" ? discountValue : "KEEP"
+            };
+
+            console.log("전송 데이터:", updateData);
+
+            // 여기에 API 호출(fetch) 로직이 들어갑니다.
+            alert("일괄 수정 요청이 완료되었습니다.");
+
+            const modal = bootstrap.Modal.getInstance(document.getElementById('bulkEditModal'));
+            modal.hide();
+
+            // 페이지 새로고침 (데이터 반영 확인용)
+            location.reload();
+        }
+    }
+
+</script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>

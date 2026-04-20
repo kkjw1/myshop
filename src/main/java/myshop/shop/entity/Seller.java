@@ -2,6 +2,7 @@ package myshop.shop.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import myshop.shop.entity.item.Item;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 @Entity
 @Getter
 @SequenceGenerator(name = "SELLER_SEQ", sequenceName = "SELLER_SEQ", initialValue = 1, allocationSize = 1)
-public class Seller {
+public class Seller extends BaseDateEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SELLER_SEQ")
     @Column(name = "SELLER_NO")

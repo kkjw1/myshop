@@ -3,8 +3,7 @@ package myshop.shop.dto.member;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
-import myshop.shop.controller.MemberController;
-import myshop.shop.entity.Member;
+import myshop.shop.entity.member.Member;
 import org.springframework.ui.Model;
 
 import static myshop.shop.controller.MemberController.SessionConst.LOGIN_MEMBER;

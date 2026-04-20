@@ -2,10 +2,9 @@ package myshop.shop.repository.member;
 
 import jakarta.persistence.EntityManager;
 import myshop.shop.dto.member.SignUpMemberDto;
-import myshop.shop.entity.Gender;
-import myshop.shop.entity.Member;
+import myshop.shop.entity.member.Gender;
+import myshop.shop.entity.member.Member;
 import myshop.shop.service.MemberService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
