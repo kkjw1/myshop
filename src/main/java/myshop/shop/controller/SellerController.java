@@ -68,6 +68,7 @@ public class SellerController {
     }
 
 
+
     /**
      * 판매자 대시보드
      */
@@ -77,14 +78,26 @@ public class SellerController {
     }
 
 
+
     /**
      * 상품 관리 폼
      */
     @GetMapping("/seller/item_manage")
-    public String item_manage() {
+    public String itemManageForm() {
         return "seller/item/item_manage";
     }
-    // todo: 상품관리폼부터 하면됨
+
+
+
+    /**
+     * 상품 관리 -> 새 상품 등록 폼
+     */
+    @GetMapping("/seller/item_new")
+    public String itemNewForm() {
+        return "seller/item/item_new";
+    }
+    //todo: item_option 엔티티 만들기, 아이템 컨트롤러 만들기, 아이템 추가 기능 만들기
+
 
     @GetMapping("/seller/order_delivery")
     public String order_delivery() {
@@ -94,11 +107,6 @@ public class SellerController {
     @GetMapping("/seller/inquiry_manage")
     public String inquiry_manage() {
         return "seller/inquiry/inquiry_manage";
-    }
-
-    @GetMapping("/seller/item_new")
-    public String item_new() {
-        return "seller/item/item_new";
     }
 
 

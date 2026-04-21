@@ -177,13 +177,14 @@
             <div class="container d-flex justify-content-end" th:unless="${isLogin}">
                 <a href="#" th:href="@{/login}">로그인</a>
                 <a href="#" th:href="@{/signup}">회원가입</a>
+                <a href="#" th:href="@{/seller}">판매자 페이지</a>
             </div>
             <div class="container d-flex justify-content-end" th:if="${isLogin}">
                 <a th:text="|${loginCheckMemberDto.getName()} 님|" th:href="@{/myPage/memberModify(memberId=${loginCheckMemberDto.getId()})}">닉네임</a>
                 <form id="logoutForm" th:action="@{/logout}" method="post">
                     <a href="javascript:void(0);" onclick="document.getElementById('logoutForm').submit();">로그아웃</a>
                 </form>
-                <a href="#">판매자 가입</a>
+                <a href="#" th:href="@{/seller}">판매자 페이지</a>
             </div>
         </div>
 

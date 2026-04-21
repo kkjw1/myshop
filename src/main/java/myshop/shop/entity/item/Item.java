@@ -18,18 +18,19 @@ public class Item extends BaseDateEntity {
     private Seller seller;
 
     private String name;
+    @Enumerated(EnumType.STRING)
+    private ItemCategory itemCategory;
     private int price;
+    private int totalStock;
     private int discount;
-    private String content;
     @Lob
     private String mainImage;
     @Lob
     private String subImage;
+    private String content;
 
     @Enumerated(EnumType.STRING)
     private ItemStatus itemStatus;
-    @Enumerated(EnumType.STRING)
-    private ItemCategory itemCategory;
 
     private Long viewCount;
 
