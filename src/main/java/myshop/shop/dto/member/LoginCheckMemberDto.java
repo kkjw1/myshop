@@ -6,7 +6,7 @@ import lombok.Getter;
 import myshop.shop.entity.member.Member;
 import org.springframework.ui.Model;
 
-import static myshop.shop.controller.MemberController.SessionConst.LOGIN_MEMBER;
+import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
 
 @Getter
 public class LoginCheckMemberDto {

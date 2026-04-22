@@ -1,4 +1,4 @@
-package myshop.shop.controller;
+package myshop.shop.controller.sellerWeb;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import static myshop.shop.controller.MemberController.SessionConst.LOGIN_SELLER;
+import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_SELLER;
 
 @Controller
 @Slf4j
@@ -77,26 +77,6 @@ public class SellerController {
         return "seller/home";
     }
 
-
-
-    /**
-     * 상품 관리 폼
-     */
-    @GetMapping("/seller/item_manage")
-    public String itemManageForm() {
-        return "seller/item/item_manage";
-    }
-
-
-
-    /**
-     * 상품 관리 -> 새 상품 등록 폼
-     */
-    @GetMapping("/seller/item_new")
-    public String itemNewForm() {
-        return "seller/item/item_new";
-    }
-    //todo: item_option 엔티티 만들기, 아이템 컨트롤러 만들기, 아이템 추가 기능 만들기
 
 
     @GetMapping("/seller/order_delivery")

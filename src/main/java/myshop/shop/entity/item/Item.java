@@ -34,4 +34,19 @@ public class Item extends BaseDateEntity {
 
     private Long viewCount;
 
+    public Item() {
+    }
+
+    public Item(Seller seller, String name, ItemCategory itemCategory, int price, int totalStock, int discount, String mainImage, String subImage, String content, ItemStatus itemStatus) {
+        this.seller = seller;
+        this.name = name;
+        this.itemCategory = itemCategory;
+        this.price = price;
+        this.totalStock = totalStock;
+        this.discount = discount;
+        this.mainImage = mainImage;
+        this.subImage = subImage;
+        this.content = content;
+        this.itemStatus = itemStatus;
+    }
 }

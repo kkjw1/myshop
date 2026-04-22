@@ -46,9 +46,9 @@
             <h3 class="text-center mb-4 text-white">📦 판매자 센터</h3>
             <nav class="nav flex-column">
                 <a class="nav-link" href="home.html" th:href="@{/seller}"><i class="fas fa-tachometer-alt me-2"></i> 대시보드</a>
-                <a class="nav-link" href="item/item_manage.html" th:href="@{/item_manage}"><i class="fas fa-box me-2"></i> 상품 관리</a>
-                <a class="nav-link" href="delivery/order_delivery.html" th:href="@{/order_delivery}"><i class="fas fa-shopping-cart me-2"></i> 주문/배송</a>
-                <a class="nav-link" href="inquiry/inquiry_manage.html" th:href="@{/inquiry_manage}"><i class="fas fa-comment-dots me-2"></i> 고객 문의</a>
+                <a class="nav-link" href="item/item_manage.html" th:href="@{/seller/item_manage}"><i class="fas fa-box me-2"></i> 상품 관리</a>
+                <a class="nav-link" href="delivery/order_delivery.html" th:href="@{/seller/order_delivery}"><i class="fas fa-shopping-cart me-2"></i> 주문/배송</a>
+                <a class="nav-link" href="inquiry/inquiry_manage.html" th:href="@{/seller/inquiry_manage}"><i class="fas fa-comment-dots me-2"></i> 고객 문의</a>
                 <a class="nav-link" href="../home/home.html" th:href="@{/}"><i class="fas fa-sign-out-alt me-2"></i> 로그아웃</a>
             </nav>
         </div>
@@ -60,7 +60,7 @@
             <h1 class="h3 mb-0 text-dark"><i class="fas fa-plus me-2"></i> 새 상품 등록</h1>
         </header>
 
-        <form>
+        <form th:action="@{/seller/item_new}" method="post" th:object="${addItemDto}">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5><i class="fas fa-info-circle me-2"></i> 1. 기본 상품 정보</h5>
@@ -69,15 +69,15 @@
                     <div class="row g-3">
                         <div class="col-md-8">
                             <label for="productName" class="form-label required">상품명</label>
-                            <input type="text" class="form-control" id="productName" required placeholder="판매할 상품의 정확한 이름을 입력해주세요.">
+                            <input type="text" class="form-control" id="productName" th:field="*{name}" required placeholder="판매할 상품의 정확한 이름을 입력해주세요.">
                         </div>
                         <div class="col-md-4">
-                            <label for="category" class="form-label required">카테고리</label>
-                            <select id="category" class="form-select" required>
+                            <label for="itemCategory" class="form-label required">카테고리</label>
+                            <select id="itemCategory" th:field="*{itemCategory}" class="form-select" required>
                                 <option selected disabled value="">선택하세요</option>
-                                <option>의류/패션</option>
-                                <option>생활/가전</option>
-                                <option>식품</option>
+                                <option th:each="itemCategory : ${T(myshop.shop.entity.item.ItemCategory).values()}"
+                                        th:value="${itemCategory.name()}"
+                                        th:text="${itemCategory}">의류/패션</option>
                             </select>
                         </div>
                     </div>
@@ -92,19 +92,19 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label for="price" class="form-label required">판매 가격 (원)</label>
-                            <input type="number" class="form-control" id="price" required min="100">
+                            <input type="number" class="form-control" id="price" th:field="*{price}" required min="100">
                         </div>
                         <div class="col-md-4">
-                            <label for="discountRate" class="form-label">할인율 (%)</label>
-                            <input type="number" class="form-control" id="discountRate" value="0" min="0" max="100">
+                            <label for="discount" class="form-label">할인율 (%)</label>
+                            <input type="number" class="form-control" id="discount" th:field="*{discount}" value="0" min="0" max="100">
                         </div>
                         <div class="col-md-4">
-                            <label for="stock" class="form-label required">총 재고 수량</label>
-                            <input type="number" class="form-control" id="stock" required min="1">
+                            <label for="totalStock" class="form-label required">총 재고 수량</label>
+                            <input type="number" class="form-control" id="totalStock" th:field="*{totalStock}" required min="1">
                         </div>
                     </div>
                     <div class="form-check mt-3">
-                        <input class="form-check-input" type="checkbox" value="" id="useOptions" checked>
+                        <input class="form-check-input" type="checkbox" th:field="*{useOptions}" id="useOptions">
                         <label class="form-check-label" for="useOptions">
                             옵션(색상, 사이즈 등)을 사용하여 재고를 관리합니다.
                         </label>
@@ -141,8 +141,8 @@
                         <input class="form-control" type="file" id="detailImages" multiple>
                     </div>
                     <div class="mb-3">
-                        <label for="productDescription" class="form-label required">상품 상세 설명</label>
-                        <textarea class="form-control" id="productDescription" rows="8" required placeholder="상품의 특징, 사용법, 교환/환불 정책 등을 상세히 기재해주세요."></textarea>
+                        <label for="content" class="form-label required">상품 상세 설명</label>
+                        <textarea class="form-control" id="content" th:field="*{content}" rows="8" required placeholder="상품의 특징, 사용법, 교환/환불 정책 등을 상세히 기재해주세요."></textarea>
                     </div>
                 </div>
             </div>
@@ -171,7 +171,7 @@
 
     function toggleOptionArea(checkbox) {
         const optionArea = document.getElementById('optionArea');
-        const stockInput = document.getElementById('stock');
+        const stockInput = document.getElementById('totalStock');
 
         if (checkbox.checked) {
             // 옵션 사용 시
@@ -197,28 +197,33 @@
     }
 
 
-
     function addOptionRow() {
         const optionList = document.getElementById('optionList');
+        // 현재 등록된 옵션 행의 개수를 인덱스로 사용
+        const index = optionList.getElementsByClassName('option-row').length;
 
-        // 새로운 옵션 행 생성을 위한 div
         const newRow = document.createElement('div');
         newRow.className = 'row g-2 mb-2 align-items-center border-bottom pb-2 option-row';
 
-        newRow.innerHTML = `
+        // name 속성에 addItemOptionDtoList[인덱스].필드명 형식을 사용합니다.
+        // 주의: addItemDto 내부의 필드명과 일치해야 합니다. (아래 Java 예시 참고)
+            newRow.innerHTML = `
         <div class="col-md-4">
-            <input type="text" class="form-control form-control-sm" name="optionNames" placeholder="예: 블랙 / XL" required>
+            <input type="text" class="form-control form-control-sm"
+                   name="addItemOptionDtoList[${index}].name" placeholder="예: 블랙 / XL" required>
         </div>
         <div class="col-md-3">
             <div class="input-group input-group-sm">
                 <span class="input-group-text">추가금</span>
-                <input type="number" class="form-control" name="optionPrices" value="0" min="0">
+                <input type="number" class="form-control"
+                       name="addItemOptionDtoList[${index}].additionalPrice" value="0" min="0">
             </div>
         </div>
         <div class="col-md-3">
             <div class="input-group input-group-sm">
                 <span class="input-group-text">재고</span>
-                <input type="number" class="form-control" name="optionStocks" value="0" min="0" required>
+                <input type="number" class="form-control"
+                       name="addItemOptionDtoList[${index}].optionStock" value="0" min="0" required>
             </div>
         </div>
         <div class="col-md-2 text-end">
@@ -226,16 +231,24 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-    `;
+        `;
 
         optionList.appendChild(newRow);
     }
-
+    // 행 삭제 시 인덱스를 재정렬하는 로직이 추가되면 더 완벽합니다.
     function removeOptionRow(btn) {
-        // 삭제 버튼의 부모 row를 찾아 삭제
         btn.closest('.option-row').remove();
+        reindexRows(); // 삭제 후 인덱스 다시 맞추기
     }
 
+    function reindexRows() {
+        const rows = document.querySelectorAll('.option-row');
+        rows.forEach((row, index) => {
+            row.querySelector('input[name$=".name"]').name = `addItemOptionDtoList[${index}].name`;
+            row.querySelector('input[name$=".additionalPrice"]').name = `addItemOptionDtoList[${index}].additionalPrice`;
+            row.querySelector('input[name$=".optionStock"]').name = `addItemOptionDtoList[${index}].optionStock`;
+        });
+    }
     // 초기 화면 로드 시 행 하나를 자동으로 추가하고 싶다면 주석 해제
     // window.onload = addOptionRow;
 

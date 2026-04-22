@@ -7,7 +7,7 @@ import lombok.Setter;
 import myshop.shop.entity.Seller;
 import org.springframework.ui.Model;
 
-import static myshop.shop.controller.MemberController.SessionConst.LOGIN_SELLER;
+import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_SELLER;
 
 @Getter @Setter
 public class LoginCheckSellerDto {

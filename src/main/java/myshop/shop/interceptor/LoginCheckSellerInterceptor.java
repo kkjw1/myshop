@@ -6,8 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import static myshop.shop.controller.MemberController.SessionConst.LOGIN_MEMBER;
-import static myshop.shop.controller.MemberController.SessionConst.LOGIN_SELLER;
+import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_SELLER;
 
 public class LoginCheckSellerInterceptor implements HandlerInterceptor {
     @Override

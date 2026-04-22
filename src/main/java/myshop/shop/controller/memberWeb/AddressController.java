@@ -1,4 +1,4 @@
-package myshop.shop.controller;
+package myshop.shop.controller.memberWeb;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static myshop.shop.controller.MemberController.SessionConst.LOGIN_MEMBER;
+import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
 import static org.springframework.util.StringUtils.hasText;
 
 @Controller

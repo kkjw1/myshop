@@ -1,4 +1,4 @@
-package myshop.shop.controller;
+package myshop.shop.controller.memberWeb;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -25,7 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Objects;
 
-import static myshop.shop.controller.MemberController.SessionConst.LOGIN_MEMBER;
+import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
 import static org.springframework.util.StringUtils.hasText;
 
 @Controller
