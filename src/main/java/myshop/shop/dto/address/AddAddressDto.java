@@ -20,13 +20,13 @@ public class AddAddressDto {
     private String detailAddress;
     private String deliveryRequest;
 
-    private Boolean mainAddress;        // 기본 배송지 여부
+    private Boolean isMain;        // 기본 배송지 여부
 
     public AddAddressDto() {
     }
 
     public AddAddressDto(String addressName, String recipientName, String phoneNumber, String postcode, String roadAddress, String detailAddress,
-                         String deliveryRequest, Boolean mainAddress) {
+                         String deliveryRequest, Boolean isMain) {
         this.addressName = addressName;
         this.recipientName = recipientName;
         this.phoneNumber = phoneNumber;
@@ -34,7 +34,7 @@ public class AddAddressDto {
         this.roadAddress = roadAddress;
         this.detailAddress = detailAddress;
         this.deliveryRequest = deliveryRequest;
-        this.mainAddress = mainAddress;
+        this.isMain = isMain;
     }
 
     public AddAddressDto(Address address) {
@@ -45,7 +45,7 @@ public class AddAddressDto {
         this.roadAddress = address.getRoadAddress();
         this.detailAddress = address.getDetailAddress();
         this.deliveryRequest = address.getDeliveryRequest();
-        this.mainAddress = address.getMainAddress();
+        this.isMain = address.getIsMain();
     }
 
 }

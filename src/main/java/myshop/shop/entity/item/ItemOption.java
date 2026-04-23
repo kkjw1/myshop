@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@SequenceGenerator(name = "ITEM_OPTION_SEQ", sequenceName = "ITEM_SEQ", initialValue = 1, allocationSize = 1)
+@SequenceGenerator(name = "ITEM_OPTION_SEQ", sequenceName = "ITEM_OPTION_SEQ", initialValue = 1, allocationSize = 1)
 public class ItemOption {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ITEM_OPTION_SEQ")
     @Column(name = "ITEM_OPTION_NO")

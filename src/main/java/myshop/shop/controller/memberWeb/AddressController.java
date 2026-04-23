@@ -46,7 +46,7 @@ public class AddressController {
 
         if(manageAddressDtoList.isEmpty()) {
             model.addAttribute("manageAddressDtoList", Collections.emptyList());
-        } else if (manageAddressDtoList.get(0).getMainAddress() != true) {
+        } else if (manageAddressDtoList.get(0).getIsMain() != true) {
             model.addAttribute("manageAddressDtoList", manageAddressDtoList);
         } else {
             ManageAddressDto mainAddress = manageAddressDtoList.get(0);

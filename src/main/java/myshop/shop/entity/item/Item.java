@@ -10,7 +10,7 @@ import myshop.shop.entity.Seller;
 @SequenceGenerator(name = "ITEM_SEQ", sequenceName = "ITEM_SEQ", initialValue = 1, allocationSize = 1)
 public class Item extends BaseDateEntity {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ITEM_SEQ")
-    @Column(name = "ITME_NO")
+    @Column(name = "ITEM_NO")
     private Long no;
 
     @ManyToOne(fetch = FetchType.LAZY)

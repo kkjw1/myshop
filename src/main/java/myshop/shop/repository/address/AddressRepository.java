@@ -13,15 +13,15 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     List<Address> findByMemberNo(Long memberNo);
 
     @Modifying(clearAutomatically = true)
-    @Query("update Address a set a.mainAddress = false where a.member.no=:memberNo and a.mainAddress=true")
-    int updateMainAddressToFalse(@Param("memberNo") Long memberNo);
+    @Query("update Address a set a.isMain = false where a.member.no=:memberNo and a.isMain=true")
+    int updateIsMainToFalse(@Param("memberNo") Long memberNo);
 
     @Modifying(clearAutomatically = true)
-    @Query("update Address a set a.mainAddress = true where a.no=:addressNo")
-    int updateMainAddressToTrue(@Param("addressNo") Long addressNo);
+    @Query("update Address a set a.isMain = true where a.no=:addressNo")
+    int updateIsMainToTrue(@Param("addressNo") Long addressNo);
 
 
-    List<Address> findByMemberNoOrderByMainAddressDesc(Long memberNo);
+    List<Address> findByMemberNoOrderByIsMainDesc(Long memberNo);
 
     @Modifying(clearAutomatically = true)
     @Query("delete Address a where a.no=:addressNo")

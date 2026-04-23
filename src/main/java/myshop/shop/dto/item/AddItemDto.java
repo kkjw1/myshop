@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import myshop.shop.entity.item.ItemCategory;
 import myshop.shop.entity.item.ItemStatus;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +21,10 @@ public class AddItemDto {
     private int discount;
     private List<AddItemOptionDto> addItemOptionDtoList = new ArrayList<>();
 
-    private String mainImage;
-    private String subImage;
+    private MultipartFile mainImage;
+    private String mainImagePath;
+    private List<MultipartFile> subImages = new ArrayList<>();
+    private List<String> subImagesPath = new ArrayList<>();
     private String content;
 
     private ItemStatus itemStatus;
@@ -29,15 +33,15 @@ public class AddItemDto {
     public AddItemDto() {
     }
 
-    public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discount, String mainImage, String subImage, String content, ItemStatus itemStatus) {
+    public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discount, String mainImagePath, String subImagesPath, String content, ItemStatus itemStatus) {
         this.sellerNo = sellerNo;
         this.name = name;
         this.itemCategory = itemCategory;
         this.price = price;
         this.totalStock = totalStock;
         this.discount = discount;
-        this.mainImage = mainImage;
-        this.subImage = subImage;
+        this.mainImagePath = mainImagePath;
+        this.subImagesPath.add(subImagesPath);
         this.content = content;
         this.itemStatus = itemStatus;
     }

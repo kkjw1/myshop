@@ -39,7 +39,7 @@ public class AddressService {
                 AddAddressDto.getRoadAddress(),
                 AddAddressDto.getDetailAddress(),
                 AddAddressDto.getDeliveryRequest(),
-                AddAddressDto.getMainAddress());
+                AddAddressDto.getIsMain());
         addressRepository.save(address);
     }
 
@@ -49,7 +49,7 @@ public class AddressService {
      * 주소리스트 반환(ManageAddressDto)
      */
     public List<ManageAddressDto> getAddressesByMemberNo(Long memberNo) {
-        List<Address> findAddresses = addressRepository.findByMemberNoOrderByMainAddressDesc(memberNo);
+        List<Address> findAddresses = addressRepository.findByMemberNoOrderByIsMainDesc(memberNo);
         return findAddresses.stream()
                 .map(ManageAddressDto::new)
                 .collect(toList());
@@ -61,8 +61,8 @@ public class AddressService {
      * 기본 배송지로 변경
      */
     public int mainUpdate(Long addressNo, Long memberNo) {
-        int result1 = addressRepository.updateMainAddressToFalse(memberNo);
-        int result2 = addressRepository.updateMainAddressToTrue(addressNo);
+        int result1 = addressRepository.updateIsMainToFalse(memberNo);
+        int result2 = addressRepository.updateIsMainToTrue(addressNo);
         return result1 + result2;
     }
 

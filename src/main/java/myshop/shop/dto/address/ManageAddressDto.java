@@ -6,7 +6,7 @@ import lombok.ToString;
 import myshop.shop.entity.Address;
 
 @Getter @Setter
-@ToString(of = {"addressName", "recipientName", "phoneNumber", "postcode", "roadAddress", "detailAddress", "deliveryRequest", "mainAddress"})
+@ToString(of = {"addressName", "recipientName", "phoneNumber", "postcode", "roadAddress", "detailAddress", "deliveryRequest", "isMain"})
 public class ManageAddressDto {
     private Long addressNo;
     private String addressName;
@@ -16,13 +16,13 @@ public class ManageAddressDto {
     private String roadAddress;
     private String detailAddress;
     private String deliveryRequest;
-    private Boolean mainAddress;
+    private Boolean isMain;
 
     public ManageAddressDto() {
     }
 
     public ManageAddressDto(Long addressNo, String addressName, String recipientName, String phoneNumber,
-                            String postcode, String roadAddress, String detailAddress, String deliveryRequest, Boolean mainAddress) {
+                            String postcode, String roadAddress, String detailAddress, String deliveryRequest, Boolean isMain) {
         this.addressNo = addressNo;
         this.addressName = addressName;
         this.recipientName = recipientName;
@@ -31,7 +31,7 @@ public class ManageAddressDto {
         this.roadAddress = roadAddress;
         this.detailAddress = detailAddress;
         this.deliveryRequest = deliveryRequest;
-        this.mainAddress = mainAddress;
+        this.isMain = isMain;
     }
 
     public ManageAddressDto(Address address) {
@@ -43,6 +43,6 @@ public class ManageAddressDto {
         this.roadAddress = address.getRoadAddress();
         this.detailAddress = address.getDetailAddress();
         this.deliveryRequest = address.getDeliveryRequest();
-        this.mainAddress = address.getMainAddress();
+        this.isMain = address.getIsMain();
     }
 }

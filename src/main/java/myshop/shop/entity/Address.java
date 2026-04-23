@@ -8,7 +8,7 @@ import myshop.shop.entity.member.Member;
 @Entity
 @Getter
 @SequenceGenerator(name = "ADDRESS_SEQ", sequenceName = "ADDRESS_SEQ", initialValue = 1, allocationSize = 1)
-@ToString(of = {"addressName", "recipientName", "phoneNumber", "postcode", "roadAddress", "detailAddress", "deliveryRequest", "mainAddress"})
+@ToString(of = {"addressName", "recipientName", "phoneNumber", "postcode", "roadAddress", "detailAddress", "deliveryRequest", "isMain"})
 public class Address extends BaseDateEntity{
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ADDRESS_SEQ")
     @Column(name = "address_no")
@@ -25,7 +25,7 @@ public class Address extends BaseDateEntity{
     private String roadAddress;
     private String detailAddress;
     private String deliveryRequest;
-    private Boolean mainAddress;
+    private Boolean isMain;
 
 
     public Address() {
@@ -43,7 +43,7 @@ public class Address extends BaseDateEntity{
     }
 
     public Address(Member member, String addressName, String recipientName, String phoneNumber, String postcode,
-                   String roadAddress, String detailAddress, String deliveryRequest, boolean mainAddress) {
+                   String roadAddress, String detailAddress, String deliveryRequest, boolean isMain) {
         this.member = member;
         this.addressName = addressName;
         this.recipientName = recipientName;
@@ -52,7 +52,7 @@ public class Address extends BaseDateEntity{
         this.roadAddress = roadAddress;
         this.detailAddress = detailAddress;
         this.deliveryRequest = deliveryRequest;
-        this.mainAddress = mainAddress;
+        this.isMain = isMain;
     }
 
     public void updateAddressName(String addressName) {
@@ -83,7 +83,7 @@ public class Address extends BaseDateEntity{
         this.deliveryRequest = deliveryRequest;
     }
 
-    public void updateMainAddress(Boolean mainAddress) {
-        this.mainAddress = mainAddress;
+    public void updateIsMain(Boolean isMain) {
+        this.isMain = isMain;
     }
 }
