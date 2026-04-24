@@ -86,4 +86,8 @@ public class Address extends BaseDateEntity{
     public void updateIsMain(Boolean isMain) {
         this.isMain = isMain;
     }
+
+    public void setMember(Member member) {
+        this.member = member;
+    }
 }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +32,13 @@ public class ItemService {
     public void saveItem(AddItemDto addItemDto) {
         Seller sellerProxy = sellerRepository.getReferenceById(addItemDto.getSellerNo());
         Item item = new Item(sellerProxy,
-                addItemDto.getName(), addItemDto.getItemCategory(), addItemDto.getPrice(),
-                addItemDto.getTotalStock(), addItemDto.getDiscount(), addItemDto.getMainImage(),
-                addItemDto.getSubImage(), addItemDto.getContent(), ItemStatus.판매중);
+                addItemDto.getName(),
+                addItemDto.getItemCategory(),
+                addItemDto.getPrice(),
+                addItemDto.getTotalStock(),
+                addItemDto.getDiscount(),
+                addItemDto.getContent(),
+                ItemStatus.판매중);
         itemRepository.save(item);
 
         List<AddItemOptionDto> addItemOptionDtoList = addItemDto.getAddItemOptionDtoList();
@@ -44,4 +49,7 @@ public class ItemService {
             }
         }
     }
+
+
+
 }

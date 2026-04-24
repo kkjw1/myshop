@@ -31,8 +31,7 @@ public class ItemImage {
         this.sortOrder = sortOrder;
     }
 
-
-    public void setItem(Item item) {
+    public void updateItem(Item item) {
         this.item = item;
     }
 }

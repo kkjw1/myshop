@@ -15,16 +15,16 @@ public class ItemOption {
     @JoinColumn(name = "ITEM_NO")
     private Item item;
     private String name;
-    private int additionalPrice;
+    private int addPrice;
     private int optionStock;
 
     public ItemOption() {
     }
 
-    public ItemOption(Item item, String name, int additionalPrice, int optionStock) {
+    public ItemOption(Item item, String name, int addPrice, int optionStock) {
         this.item = item;
         this.name = name;
-        this.additionalPrice = additionalPrice;
+        this.addPrice = addPrice;
         this.optionStock = optionStock;
     }
 }

@@ -82,7 +82,8 @@ public class Member extends BaseDateEntity {
         this.memberLevel = memberLevel;
     }
 
-    public int addressCount() {
-        return this.addresses.size();
+    public void addAddresses(Address address) {
+        addresses.add(address);
+        address.setMember(this);
     }
 }
