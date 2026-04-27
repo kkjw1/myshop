@@ -3,9 +3,9 @@ package myshop.shop.controller.sellerWeb;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import myshop.shop.controller.memberWeb.MemberController;
 import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
+import myshop.shop.dto.item.ManageItemDto;
 import myshop.shop.dto.seller.LoginCheckSellerDto;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.service.FileService;
@@ -16,7 +16,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,9 +37,11 @@ public class ItemController {
      * 상품 관리 폼
      */
     @GetMapping("/seller/item_manage")
-    public String itemManageForm(HttpServletRequest request) {
+    public String itemManageForm(HttpServletRequest request, Model model) {
         LoginCheckSellerDto loginCheckSellerDto = (LoginCheckSellerDto) request.getSession().getAttribute(LOGIN_SELLER);
-        itemService.getManageItemDto(loginCheckSellerDto.getNo());
+        List<ManageItemDto> manageItemDtoList = itemService.findAllByNo(loginCheckSellerDto.getNo());
+        model.addAttribute("manageItemDtoList", manageItemDtoList);
+        model.addAttribute("totalManageItemDto", manageItemDtoList.size());
         return "seller/item/item_manage";
     }
 

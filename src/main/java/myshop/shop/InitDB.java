@@ -134,10 +134,11 @@ public class InitDB {
                     emptySubImageList, "상품옵션있음, 추가이미지없음", true));
 
 
-            itemService.saveItem(new AddItemDto(sellerNo, "상품테스트5(옵션X,추가이미지X)", ItemCategory.신발, 100000, 20, 0,
-                    emptyAddItemOptionDtoList, null, "C:/project/shop_image/c9cf742d-c0b0-4b8d-9253-cc32823d36db.png", null,
-                    emptySubImageList, "상품옵션없음, 추가이미지없음", true));
-
+            for (int i=0; i<50; i++) {
+                itemService.saveItem(new AddItemDto(sellerNo, "페이징테스트" + i, ItemCategory.신발, i*1000, i, i,
+                        emptyAddItemOptionDtoList, null, "C:/project/shop_image/c9cf742d-c0b0-4b8d-9253-cc32823d36db.png", null,
+                        emptySubImageList, "상품옵션없음, 추가이미지없음", true));
+            }
 
         }
     }

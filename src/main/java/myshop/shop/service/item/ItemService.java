@@ -2,7 +2,6 @@ package myshop.shop.service.item;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import myshop.shop.dto.address.ManageAddressDto;
 import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
 import myshop.shop.dto.item.ManageItemDto;
@@ -68,7 +67,7 @@ public class ItemService {
     /**
      * 상품 전체 조회
      */
-    public List<ManageItemDto> getManageItemDto(Long sellerNo) {
+    public List<ManageItemDto> findAllByNo(Long sellerNo) {
         Seller sellerProxy = sellerRepository.getReferenceById(sellerNo);
         List<Item> itemList = itemRepository.findBySeller(sellerProxy);
         return itemList.stream()
@@ -76,5 +75,8 @@ public class ItemService {
                 .collect(Collectors.toList());
 
     }
+
+
+
 
 }
