@@ -2,8 +2,10 @@ package myshop.shop.service.item;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import myshop.shop.dto.address.ManageAddressDto;
 import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
+import myshop.shop.dto.item.ManageItemDto;
 import myshop.shop.entity.Seller;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.item.ItemImage;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,5 +64,17 @@ public class ItemService {
     }
 
 
+
+    /**
+     * 상품 전체 조회
+     */
+    public List<ManageItemDto> getManageItemDto(Long sellerNo) {
+        Seller sellerProxy = sellerRepository.getReferenceById(sellerNo);
+        List<Item> itemList = itemRepository.findBySeller(sellerProxy);
+        return itemList.stream()
+                .map(ManageItemDto::new)
+                .collect(Collectors.toList());
+
+    }
 
 }

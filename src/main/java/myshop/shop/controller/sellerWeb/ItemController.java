@@ -7,6 +7,7 @@ import myshop.shop.controller.memberWeb.MemberController;
 import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
 import myshop.shop.dto.seller.LoginCheckSellerDto;
+import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.service.FileService;
 import myshop.shop.service.SellerService;
 import myshop.shop.service.item.ItemService;
@@ -31,12 +32,15 @@ public class ItemController {
     private final SellerService sellerService;
     private final FileService fileService;
     private final ItemService itemService;
+    private final ItemRepository itemRepository;
 
     /**
      * 상품 관리 폼
      */
     @GetMapping("/seller/item_manage")
-    public String itemManageForm() {
+    public String itemManageForm(HttpServletRequest request) {
+        LoginCheckSellerDto loginCheckSellerDto = (LoginCheckSellerDto) request.getSession().getAttribute(LOGIN_SELLER);
+        itemService.getManageItemDto(loginCheckSellerDto.getNo());
         return "seller/item/item_manage";
     }
 

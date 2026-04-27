@@ -36,6 +36,39 @@ public class AddItemDto {
     public AddItemDto() {
     }
 
+    public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discount, List<AddItemOptionDto> addItemOptionDtoList, MultipartFile mainImage, String mainImagePath, List<MultipartFile> subImages, List<String> subImagesPath, String content, boolean useOptions) {
+        this.sellerNo = sellerNo;
+        this.name = name;
+        this.itemCategory = itemCategory;
+        this.price = price;
+        this.totalStock = totalStock;
+        this.discount = discount;
+        this.addItemOptionDtoList = addItemOptionDtoList;
+        this.mainImage = mainImage;
+        this.mainImagePath = mainImagePath;
+        this.subImages = subImages;
+        this.subImagesPath = subImagesPath;
+        this.content = content;
+        this.useOptions = useOptions;
+    }
+
+    public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discount, List<AddItemOptionDto> addItemOptionDtoList, MultipartFile mainImage, String mainImagePath, List<MultipartFile> subImages, List<String> subImagesPath, String content, ItemStatus itemStatus, boolean useOptions) {
+        this.sellerNo = sellerNo;
+        this.name = name;
+        this.itemCategory = itemCategory;
+        this.price = price;
+        this.totalStock = totalStock;
+        this.discount = discount;
+        this.addItemOptionDtoList = addItemOptionDtoList;
+        this.mainImage = mainImage;
+        this.mainImagePath = mainImagePath;
+        this.subImages = subImages;
+        this.subImagesPath = subImagesPath;
+        this.content = content;
+        this.itemStatus = itemStatus;
+        this.useOptions = useOptions;
+    }
+
     public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discount, String mainImagePath, String subImagesPath, String content, ItemStatus itemStatus) {
         this.sellerNo = sellerNo;
         this.name = name;
