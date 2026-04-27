@@ -2,6 +2,7 @@ package myshop.shop.dto.item;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import myshop.shop.entity.item.ItemCategory;
 import myshop.shop.entity.item.ItemStatus;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter @Setter
+@ToString(of = {"sellerNo", "name", "itemCategory", "price", "totalStock", "discount", "addItemOptionDtoList", "mainImage", "mainImagePath",
+"subImages", "subImagesPath", "content", "itemStatus", "useOptions"})
 public class AddItemDto {
     private Long sellerNo;
 
@@ -27,7 +30,7 @@ public class AddItemDto {
     private List<String> subImagesPath = new ArrayList<>();
     private String content;
 
-    private ItemStatus itemStatus;
+    private ItemStatus itemStatus = ItemStatus.판매중;
     private boolean useOptions;     //옵션 사용 체크박스
 
     public AddItemDto() {
@@ -48,5 +51,9 @@ public class AddItemDto {
 
     public void updateAddItemOptionDtoList(AddItemOptionDto addItemOptionDto) {
         this.addItemOptionDtoList.add(addItemOptionDto);
+    }
+
+    public void addTotalStock(int optionStock) {
+        this.totalStock += optionStock;
     }
 }

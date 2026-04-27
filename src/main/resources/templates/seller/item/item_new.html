@@ -60,7 +60,7 @@
             <h1 class="h3 mb-0 text-dark"><i class="fas fa-plus me-2"></i> 새 상품 등록</h1>
         </header>
 
-        <form th:action="@{/seller/item_new}" method="post" th:object="${addItemDto}">
+        <form th:action="@{/seller/item_new}" method="post" th:object="${addItemDto}" enctype="multipart/form-data">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5><i class="fas fa-info-circle me-2"></i> 1. 기본 상품 정보</h5>
@@ -124,9 +124,6 @@
             </div>
 
 
-
-
-
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-warning text-dark">
                     <h5><i class="fas fa-image me-2"></i> 3. 이미지 및 상세 설명</h5>
@@ -134,11 +131,11 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <label for="mainImage" class="form-label required">대표 이미지 (썸네일)</label>
-                        <input class="form-control" type="file" id="mainImage" required>
+                        <input class="form-control" type="file" id="mainImage"  th:field="*{mainImage}" required>
                     </div>
                     <div class="mb-3">
-                        <label for="detailImages" class="form-label">추가 이미지</label>
-                        <input class="form-control" type="file" id="detailImages" multiple="multiple">
+                        <label for="subImages" class="form-label">추가 이미지</label>
+                        <input class="form-control" type="file" id="subImages" th:field="*{subImages}" multiple="multiple">
                     </div>
                     <div class="mb-3">
                         <label for="content" class="form-label required">상품 상세 설명</label>
@@ -148,8 +145,8 @@
             </div>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-5">
-                <button type="button" class="btn btn-secondary btn-lg" onclick="window.history.back();" th:onclick="|location.href='@{/item_manage}'|">취소</button>
-                <button type="submit" class="btn btn-success btn-lg" th:onclick="|location.href='@{/item_manage}'|"><i class="fas fa-check-circle me-2"></i> 상품 등록 완료</button>
+                <button type="button" class="btn btn-secondary btn-lg" onclick="window.history.back();" th:onclick="|location.href='@{/seller/item_manage}'|">취소</button>
+                <button type="submit" class="btn btn-success btn-lg"><i class="fas fa-check-circle me-2"></i> 상품 등록 완료</button>
             </div>
         </form>
     </div>

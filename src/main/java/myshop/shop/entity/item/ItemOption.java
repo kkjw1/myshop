@@ -2,11 +2,12 @@ package myshop.shop.entity.item;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import myshop.shop.entity.BaseDateEntity;
 
 @Entity
 @Getter
 @SequenceGenerator(name = "ITEM_OPTION_SEQ", sequenceName = "ITEM_OPTION_SEQ", initialValue = 1, allocationSize = 1)
-public class ItemOption {
+public class ItemOption extends BaseDateEntity {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ITEM_OPTION_SEQ")
     @Column(name = "ITEM_OPTION_NO")
     private Long no;

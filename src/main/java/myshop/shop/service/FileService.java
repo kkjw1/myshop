@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,28 +26,40 @@ public class FileService {
         int pos = fileName.lastIndexOf(".");
         String ext = fileName.substring(pos);
         String uuid = UUID.randomUUID().toString();
-        return uuid + "." + ext;
+        return uuid + ext;
     }
+
 
 
     /**
      * 파일 저장
+     * @return storeFileName
      */
-    public void storeFile(MultipartFile multipartFile) throws IOException {
-        if (multipartFile.isEmpty()) {
-            return;
+    public String storeFile(MultipartFile multipartFile) throws IOException {
+        String storeFileName = null;
+        if (!multipartFile.isEmpty()) {
+            String storeName = createStoreName(multipartFile.getOriginalFilename());
+            storeFileName = fileDir + storeName;
+            multipartFile.transferTo(new File(storeFileName));
         }
-        String storeName = createStoreName(multipartFile.getOriginalFilename());
 
-        multipartFile.transferTo(new File(fileDir+storeName));
+        return storeFileName;
     }
 
 
 
     /**
      * 파일 여러개 저장
+     * @return List<storeFileName>
      */
-    public void storeFiles(List<MultipartFile> multipartFileList) {
+    public List<String> storeFiles(List<MultipartFile> multipartFileList) throws IOException {
+        List<String> storeFileNameList = new ArrayList<>();
 
+        for (MultipartFile multipartFile : multipartFileList) {
+            if (!multipartFile.isEmpty()) {
+                storeFileNameList.add(storeFile(multipartFile));
+            }
+        }
+        return storeFileNameList;
     }
 }

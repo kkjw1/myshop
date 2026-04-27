@@ -10,25 +10,24 @@ import myshop.shop.entity.item.ItemStatus;
 import myshop.shop.repository.Item.ItemOptionRepository;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.repository.seller.SellerRepository;
-import org.assertj.core.api.Assertions;
+import myshop.shop.service.item.ItemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
 class ItemServiceTest {
 
-    @Autowired ItemService itemService;
+    @Autowired
+    ItemService itemService;
     @Autowired ItemRepository itemRepository;
     @Autowired SellerRepository sellerRepository;
     @Autowired ItemOptionRepository itemOptionRepository;

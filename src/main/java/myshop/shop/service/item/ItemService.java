@@ -1,4 +1,4 @@
-package myshop.shop.service;
+package myshop.shop.service.item;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -6,8 +6,10 @@ import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
 import myshop.shop.entity.Seller;
 import myshop.shop.entity.item.Item;
+import myshop.shop.entity.item.ItemImage;
 import myshop.shop.entity.item.ItemOption;
 import myshop.shop.entity.item.ItemStatus;
+import myshop.shop.repository.Item.ItemImageRepository;
 import myshop.shop.repository.Item.ItemOptionRepository;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.repository.seller.SellerRepository;
@@ -15,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class ItemService {
     private final ItemOptionRepository itemOptionRepository;
     private final SellerRepository sellerRepository;
     private final EntityManager em;
+    private final ItemImageRepository itemImageRepository;
 
     /**
      * 상품 등록
@@ -41,12 +43,20 @@ public class ItemService {
                 ItemStatus.판매중);
         itemRepository.save(item);
 
+        //상품 옵션 저장
         List<AddItemOptionDto> addItemOptionDtoList = addItemDto.getAddItemOptionDtoList();
-        if (addItemOptionDtoList != null) {
-            for (AddItemOptionDto addItemOptionDto : addItemOptionDtoList) {
-                ItemOption itemOption = new ItemOption(item, addItemOptionDto.getName(), addItemOptionDto.getAdditionalPrice(), addItemOptionDto.getOptionStock());
-                itemOptionRepository.save(itemOption);
-            }
+        for (AddItemOptionDto addItemOptionDto : addItemOptionDtoList) {
+            itemOptionRepository.save(new ItemOption(item, addItemOptionDto.getName(), addItemOptionDto.getAdditionalPrice(), addItemOptionDto.getOptionStock()));
+        }
+
+        //상품 이미지 저장
+        int sortOrder = 1;
+        String mainImagePath = addItemDto.getMainImagePath();
+        itemImageRepository.save(new ItemImage(item, mainImagePath, true, sortOrder++));
+
+        List<String> subImagePathList = addItemDto.getSubImagesPath();
+        for (String subImagePath : subImagePathList) {
+            itemImageRepository.save(new ItemImage(item, subImagePath, false, sortOrder++));
         }
     }
 

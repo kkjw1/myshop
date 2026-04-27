@@ -2,8 +2,10 @@ package myshop.shop.dto.item;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter @Setter
+@ToString(of = {"name", "additionalPrice", "optionStock"})
 public class AddItemOptionDto {
     private String name;
     private int additionalPrice;

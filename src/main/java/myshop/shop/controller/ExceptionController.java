@@ -190,7 +190,8 @@ public class ExceptionController {
      */
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String runtimeException(Model model) {
+    public String runtimeException(RuntimeException e, Model model) {
+        log.error("RuntimeException 발생: {}", e.getMessage(), e);
         setExceptionModel(model, "500", "서버 내부 오류가 발생했습니다.", "시스템에 일시적인 문제가 생겼습니다. 잠시 후 다시 시도해 주세요.");
         return "error/generic_error";
     }

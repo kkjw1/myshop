@@ -2,11 +2,12 @@ package myshop.shop.entity.item;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import myshop.shop.entity.BaseDateEntity;
 
 @Entity
 @Getter
 @SequenceGenerator(name = "ITEM_IMAGE_SEQ", sequenceName = "ITEM_IMAGE_SEQ", initialValue = 1, allocationSize = 1)
-public class ItemImage {
+public class ItemImage extends BaseDateEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ITEM_IMAGE_SEQ")
@@ -25,7 +26,8 @@ public class ItemImage {
 
     public ItemImage() {}
 
-    public ItemImage(String imageUrl, boolean isMain, int sortOrder) {
+    public ItemImage(Item item, String imageUrl, boolean isMain, int sortOrder) {
+        this.item = item;
         this.imageUrl = imageUrl;
         this.isMain = isMain;
         this.sortOrder = sortOrder;
