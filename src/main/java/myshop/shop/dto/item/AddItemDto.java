@@ -30,7 +30,7 @@ public class AddItemDto {
     private List<String> subImagesPath = new ArrayList<>();
     private String content;
 
-    private ItemStatus itemStatus = ItemStatus.판매중;
+    private ItemStatus itemStatus;
     private boolean useOptions;     //옵션 사용 체크박스
 
     public AddItemDto() {
@@ -49,6 +49,7 @@ public class AddItemDto {
         this.subImages = subImages;
         this.subImagesPath = subImagesPath;
         this.content = content;
+        this.itemStatus = ItemStatus.판매중;
         this.useOptions = useOptions;
     }
 

@@ -11,13 +11,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+
+import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
+
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import tools.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -30,7 +35,10 @@ public class MyShopConfig implements WebMvcConfigurer {
      */
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory("localhost", 6379);
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("localhost", 6379);
+//        config.setPassword(password);   // 인증
+//        config.setDatabase(database);   // DB 인덱스 (0~15)
+        return new LettuceConnectionFactory(config);
     }
 
     @Bean
@@ -38,11 +46,26 @@ public class MyShopConfig implements WebMvcConfigurer {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
 
-        // Java 객체를 Redis에 저장할 때 직렬화(Serialization) 방식을 설정합니다.
-        // 아래 설정을 해야 Redis Desktop Manager 등에서 데이터를 읽기 편합니다.
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        GenericJacksonJsonRedisSerializer serializer = GenericJacksonJsonRedisSerializer
+                .builder()
+                .enableDefaultTyping(new DefaultBaseTypeLimitingValidator()) // PolymorphicTypeValidator
+                .typePropertyName("@class")   // 타입 정보 프로퍼티명
+                .build();
+/*        GenericJacksonJsonRedisSerializer serializer = GenericJacksonJsonRedisSerializer
+                .builder()
+                .enableDefaultTyping(new DefaultBaseTypeLimitingValidator())
+                .objectMapperCustomizer(mapper -> {
+                    mapper.registerModule(new JavaTimeModule());
+                    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                })
+                .build();*/
 
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(serializer);
+
+        redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
 

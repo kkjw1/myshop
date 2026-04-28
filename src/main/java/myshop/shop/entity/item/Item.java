@@ -31,7 +31,7 @@ public class Item extends BaseDateEntity {
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("sortOrder ASC")
-    private List<ItemImage> images = new ArrayList<>();
+    private List<ItemImage> itemImages = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private ItemStatus itemStatus;
@@ -56,12 +56,12 @@ public class Item extends BaseDateEntity {
     //===================편의 메서드===================
 
     public void addImage(ItemImage image) {
-        images.add(image);
+        itemImages.add(image);
         image.updateItem(this);
     }
 
     public Optional<ItemImage> getMainImage() {
-        return images.stream()
+        return itemImages.stream()
                 .filter(ItemImage::isMain)
                 .findFirst();
     }
