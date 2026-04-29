@@ -49,7 +49,7 @@ public class AddItemDto {
         this.subImages = subImages;
         this.subImagesPath = subImagesPath;
         this.content = content;
-        this.itemStatus = ItemStatus.판매중;
+        this.itemStatus = ItemStatus.승인대기;
         this.useOptions = useOptions;
     }
 

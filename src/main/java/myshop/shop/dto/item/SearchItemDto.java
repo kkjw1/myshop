@@ -19,4 +19,8 @@ public class SearchItemDto {
         this.name = name;
         this.itemStatus = itemStatus;
     }
+
+    public SearchItemDto(Long sellerNo) {
+        this.sellerNo = sellerNo;
+    }
 }

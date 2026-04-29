@@ -21,6 +21,7 @@ import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import tools.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator;
 
@@ -100,6 +101,7 @@ public class MyShopConfig implements WebMvcConfigurer {
         return filter;
     }
 
+
     /**
      * 인터셉터 설정
      */
@@ -113,5 +115,16 @@ public class MyShopConfig implements WebMvcConfigurer {
                 .order(2)
                 .addPathPatterns("/seller/**")
                 .excludePathPatterns("/seller/login");
+    }
+
+
+    /**
+     * 파일 접근 설정
+     */
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 브라우저에서 /shop_image/** 로 요청하면 실제 로컬 폴더에서 찾음
+        registry.addResourceHandler("/shop_image/**")
+                .addResourceLocations("file:///C:/project/shop_image/");
     }
 }

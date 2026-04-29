@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
 import myshop.shop.dto.item.ManageItemDto;
+import myshop.shop.dto.item.SearchItemDto;
 import myshop.shop.entity.Seller;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.item.ItemImage;
@@ -14,6 +15,8 @@ import myshop.shop.repository.Item.ItemImageRepository;
 import myshop.shop.repository.Item.ItemOptionRepository;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.repository.seller.SellerRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +45,7 @@ public class ItemService {
                 addItemDto.getTotalStock(),
                 addItemDto.getDiscount(),
                 addItemDto.getContent(),
-                ItemStatus.판매중);
+                addItemDto.getItemStatus());
         itemRepository.save(item);
 
         //상품 옵션 저장
@@ -76,6 +79,13 @@ public class ItemService {
 
     }
 
+
+    /**
+     * 상품 조회(페이징)
+     */
+    public Page<ManageItemDto> findBySearchItemDto(Pageable pageable, SearchItemDto searchItemDto) {
+        return itemRepository.searchItemPage(pageable, searchItemDto);
+    }
 
 
 

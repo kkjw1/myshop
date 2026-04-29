@@ -70,27 +70,29 @@
 
         <div class="card shadow-sm mb-4">
             <div class="card-body">
-                <form class="row g-3 align-items-center">
+                <form class="row g-3 align-items-center" th:action="@{/seller/item_manage}" method="get" th:object="${searchItemDto}">
+
                     <div class="col-md-3">
-                        <label for="searchType" class="form-label visually-hidden">검색 구분</label>
                         <select id="searchType" class="form-select">
-                            <option selected>상품명</option>
-                            <option>상품코드</option>
+                            <option value="name" selected>상품명</option>
+                            <option value="itemNo">상품번호</option>
                         </select>
                     </div>
+
                     <div class="col-md-4">
-                        <label for="searchInput" class="form-label visually-hidden">검색어</label>
-                        <input type="text" class="form-control" id="searchInput" placeholder="검색어를 입력하세요">
+                        <input type="text" class="form-control" id="searchInput"
+                               name="name" placeholder="검색어를 입력하세요" th:value="*{name}">
                     </div>
+
                     <div class="col-md-3">
-                        <label for="statusFilter" class="form-label visually-hidden">판매 상태</label>
-                        <select id="statusFilter" class="form-select">
-                            <option selected>전체 판매 상태</option>
-                            <option>판매중</option>
-                            <option>판매 중지</option>
-                            <option>품절</option>
+                        <select th:field="*{itemStatus}" class="form-select">
+                            <option value="">전체 판매 상태</option>
+                            <option th:each="status : ${T(myshop.shop.entity.item.ItemStatus).values()}"
+                                    th:value="${status}"
+                                    th:text="${status}">판매중</option>
                         </select>
                     </div>
+
                     <div class="col-md-2">
                         <button type="submit" class="btn btn-dark w-100"><i class="fas fa-search me-1"></i> 검색</button>
                     </div>
@@ -100,7 +102,7 @@
 
         <div class="card shadow-sm">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">총 등록 상품: 50개</h5>
+                <h5 class="mb-0" th:text="|총 등록 상품: ${manageItemDtoList.getTotalElements()}개|">총 등록 상품: 50개</h5>
                 <button class="btn btn-sm btn-outline-secondary" type="button"
                         id="bulkEditBtn"
                         data-bs-toggle="modal"
@@ -125,17 +127,18 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
+                        <tr th:each="manageItemDto:${manageItemDtoList}">
                             <td><input class="form-check-input" type="checkbox"></td>
-                            <td><img src="placeholder-image-1.jpg" alt="상품 썸네일" class="product-thumb border"></td>
+                            <td><img src="/static/no_image.png" th:src="${manageItemDto.getMainImagePath()}" alt="상품 썸네일" class="product-thumb border"></td>
                             <td>
-                                <strong class="d-block">프리미엄 와이드 팬츠</strong>
-                                <small class="text-muted">CODE: PT1001</small>
+                                <strong class="d-block" th:text="${manageItemDto.getName()}">프리미엄 와이드 팬츠</strong>
+                                <small class="text-muted" th:text="|NO:${manageItemDto.getItemNo()}|">NO:PT1001</small>
                             </td>
-                            <td>39,000원</td>
-                            <td><span class="badge bg-warning text-dark">5개</span></td>
-                            <td><span class="badge bg-success">판매 중</span></td>
-                            <td>2024-05-01</td>
+                            <td th:text="|${#numbers.formatDecimal(manageItemDto.price, 0, 'COMMA', 0, 'POINT')}원|">39,000원</td>
+                            <td><span class="badge bg-warning text-dark" th:text="|${manageItemDto.getTotalStock()}개|">5개</span></td>
+                            <td><span class="badge" th:classappend="${manageItemDto.getItemStatus().getClassAppend()}"
+                            th:text="${manageItemDto.getItemStatus()}">판매 중</span></td>
+                            <td th:text="${#temporals.format(manageItemDto.createdDate, 'yyyy-MM-dd')}">2024-05-01</td>
                             <td>
                                 <button class="btn btn-sm btn-outline-primary me-1"
                                         title="수정"
@@ -146,34 +149,51 @@
                                 <button class="btn btn-sm btn-outline-danger" title="삭제"><i class="fas fa-trash-alt"></i></button>
                             </td>
                         </tr>
-                        <tr>
-                            <td><input class="form-check-input" type="checkbox"></td>
-                            <td><img src="placeholder-image-2.jpg" alt="상품 썸네일" class="product-thumb border"></td>
-                            <td>
-                                <strong class="d-block">모던 심플 셔츠 (블랙)</strong>
-                                <small class="text-muted">CODE: SH2005</small>
-                            </td>
-                            <td>29,000원</td>
-                            <td><span class="badge bg-info text-dark">150개</span></td>
-                            <td><span class="badge bg-danger">품절</span></td>
-                            <td>2024-06-10</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash-alt"></i></button>
-                            </td>
-                        </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             <div class="card-footer bg-white">
-                <nav aria-label="Page navigation">
+                <nav aria-label="Page navigation" th:if="${!manageItemDtoList.isEmpty()}">
                     <ul class="pagination justify-content-center mb-0">
-                        <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">다음</a></li>
+
+                        <li class="page-item" th:classappend="${manageItemDtoList.first} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/seller/item_manage(
+                                   page=${manageItemDtoList.number - 1},
+                                   name=${searchItemDto.name},
+                                   itemStatus=${searchItemDto.itemStatus},
+                                   itemNo=${searchItemDto.itemNo})}"
+                               aria-label="Previous">
+                                <span aria-hidden="true">이전</span>
+                            </a>
+                        </li>
+
+                        <li class="page-item"
+                            th:each="page : ${#numbers.sequence(0, manageItemDtoList.totalPages - 1)}"
+                            th:if="${page >= manageItemDtoList.number - 2 and page <= manageItemDtoList.number + 2}"
+                            th:classappend="${page == manageItemDtoList.number} ? 'active'">
+                            <a class="page-link"
+                               th:href="@{/seller/item_manage(
+                                   page=${page},
+                                   name=${searchItemDto.name},
+                                   itemStatus=${searchItemDto.itemStatus},
+                                   itemNo=${searchItemDto.itemNo})}"
+                               th:text="${page + 1}">1</a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${manageItemDtoList.last} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/seller/item_manage(
+                                   page=${manageItemDtoList.number + 1},
+                                   name=${searchItemDto.name},
+                                   itemStatus=${searchItemDto.itemStatus},
+                                   itemNo=${searchItemDto.itemNo})}"
+                               aria-label="Next">
+                                <span aria-hidden="true">다음</span>
+                            </a>
+                        </li>
+
                     </ul>
                 </nav>
             </div>
@@ -322,6 +342,18 @@
 
 
 <script th:inline="javascript">
+
+    document.getElementById('searchType').addEventListener('change', function() {
+        const searchInput = document.getElementById('searchInput');
+        if (this.value === 'itemNo') {
+            searchInput.name = 'itemNo';
+            searchInput.placeholder = '상품번호를 숫자로 입력하세요';
+        } else {
+            searchInput.name = 'name';
+            searchInput.placeholder = '상품명을 입력하세요';
+        }
+    });
+
     // 1. 전체 선택 체크박스 기능
     const checkAll = document.getElementById('checkAll');
     const checkboxes = document.querySelectorAll('tbody .form-check-input');

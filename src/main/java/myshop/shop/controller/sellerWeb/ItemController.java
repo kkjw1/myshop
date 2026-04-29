@@ -6,11 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
 import myshop.shop.dto.item.ManageItemDto;
+import myshop.shop.dto.item.SearchItemDto;
 import myshop.shop.dto.seller.LoginCheckSellerDto;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.service.FileService;
 import myshop.shop.service.SellerService;
 import myshop.shop.service.item.ItemService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,14 +37,18 @@ public class ItemController {
     private final ItemRepository itemRepository;
 
     /**
-     * 상품 관리 폼
+     * 상품 관리 폼 (상품관리메뉴, 페이지, 검색)
      */
     @GetMapping("/seller/item_manage")
-    public String itemManageForm(HttpServletRequest request, Model model) {
+    public String itemManageForm(Pageable pageable, SearchItemDto searchItemDto,
+                                 HttpServletRequest request, Model model) {
         LoginCheckSellerDto loginCheckSellerDto = (LoginCheckSellerDto) request.getSession().getAttribute(LOGIN_SELLER);
-        List<ManageItemDto> manageItemDtoList = itemService.findAllByNo(loginCheckSellerDto.getNo());
+        searchItemDto.setSellerNo(loginCheckSellerDto.getNo());
+
+        Page<ManageItemDto> manageItemDtoList = itemService.findBySearchItemDto(pageable, searchItemDto);
+
+        model.addAttribute("searchItemDto", searchItemDto);
         model.addAttribute("manageItemDtoList", manageItemDtoList);
-        model.addAttribute("totalManageItemDto", manageItemDtoList.size());
         return "seller/item/item_manage";
     }
 

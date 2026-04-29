@@ -45,7 +45,8 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .join(itemImage.item, item)
                 .join(item.seller, seller)
                 .where(sellerNoEq(searchItemDto.getSellerNo()), itemNoEq(searchItemDto.getItemNo()),
-                        itemNameLike(searchItemDto.getName()), itemStatusEq(searchItemDto.getItemStatus()))
+                        itemNameLike(searchItemDto.getName()), itemStatusEq(searchItemDto.getItemStatus()),
+                        itemImage.isMain.eq(true))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -54,8 +55,10 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .select(item.count())
                 .from(item)
                 .leftJoin(item.seller, seller)
+                .leftJoin(item.itemImages, itemImage)
                 .where(sellerNoEq(searchItemDto.getSellerNo()), itemNoEq(searchItemDto.getItemNo()),
-                        itemNameLike(searchItemDto.getName()), itemStatusEq(searchItemDto.getItemStatus()));
+                        itemNameLike(searchItemDto.getName()), itemStatusEq(searchItemDto.getItemStatus()),
+                        itemImage.isMain.eq(true));
 
         return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
     }
