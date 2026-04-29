@@ -143,7 +143,9 @@
                                 <button class="btn btn-sm btn-outline-primary me-1"
                                         title="수정"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#editModal">
+                                        data-bs-target="#editModal"
+                                        th:item-no="${manageItemDto.getItemNo()}"
+                                        onclick="fillModifyModal(this)">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button class="btn btn-sm btn-outline-danger" title="삭제"><i class="fas fa-trash-alt"></i></button>
@@ -258,7 +260,7 @@
                     </div>
 
                     <div class="col-12 mt-4 border-top pt-4">
-                        <label class="form-label fw-bold"><i class="fas fa-images me-1"></i> 상품 이미지 수정</label>
+                        <label class="form-label fw-bold"><i class="fas fa-images me-1"></i> 상품 이미지 수정(변경 시에만 입력하세요)</label>
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <div class="card h-100">
@@ -425,7 +427,24 @@
     });
     let optionIndex = 0; // 옵션 인덱스 관리
 
-    // 3. 옵션 행 추가 함수 (기존 함수 수정: 클래스명 추가 및 이벤트 연결)
+    // 수정 모달 데이터 채우기
+    async function fillModifyModal(button) {
+        const itemNo = button.getAttribute('data-no');
+
+        const result = await fetch(`/seller/item_manage/modify?itemNo=${itemNo}`);
+        const itemInfo = await result.json();
+
+        document.getElementById('editProductName').value = name;
+        document.getElementById('editProductPrice').value = price;
+        document.getElementById('editProductStock').value = stock;
+        document.getElementById('editProductStatus').value = status;
+        document.getElementById('editProductDiscount').value = discount;
+
+        // 나중에 수정을 위해 ID값도 저장 (hidden input이나 전역변수)
+        document.getElementById('editForm').dataset.id = id;
+    }
+
+    // 3. 수정 팝업 -> 옵션 행 추가 함수 (기존 함수 수정: 클래스명 추가 및 이벤트 연결)
     function addOptionRow(data = {name: '', price: 0, stock: 0}) {
         const container = document.getElementById('editOptionContainer');
         const noMsg = document.getElementById('noOptionMsg');

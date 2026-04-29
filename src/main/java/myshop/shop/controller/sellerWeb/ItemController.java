@@ -16,9 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -89,8 +87,12 @@ public class ItemController {
     }
 
 
-
-
-    //todo: item_option 엔티티 만들기, 아이템 컨트롤러 만들기, 아이템 추가 기능 만들기
-
+    /**
+     * 상품 관리 폼 -> 수정
+     */
+    @GetMapping("/seller/item_manage/modify")
+    @ResponseBody
+    public void itemModify(@RequestParam("itemNo") Long itemNo) {
+        itemRepository.getReferenceByNo(itemNo);
+    }
 }
