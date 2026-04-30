@@ -15,9 +15,10 @@ import java.util.UUID;
 @Slf4j
 public class FileService {
 
-    @Value("${file.dir}")
+    @Value("${file.path}")
     private String fileDir;
-
+    @Value("${file.exteral-path}")
+    private String ExteralFileDir;
 
     /**
      * 파일명 생성
@@ -61,5 +62,26 @@ public class FileService {
             }
         }
         return storeFileNameList;
+    }
+
+
+
+    /**
+     * 파일 삭제
+     */
+    public void removeFile(String fileDir) {
+        String realPath = fileDir.replace(this.fileDir, ExteralFileDir);
+        System.out.println("realPath = " + realPath);
+        File file = new File(realPath);
+
+        if (file.exists()) {
+            if (file.delete()) {
+                log.info("파일 삭제 성공: {}", realPath);
+            } else {
+                log.info("파일 삭제 실패 (권한 문제 등)");
+            }
+        } else {
+            log.info("파일을 찾을 수 없습니다: {}", realPath);
+        }
     }
 }

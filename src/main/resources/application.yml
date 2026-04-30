@@ -64,4 +64,5 @@ solapi:
   sender: ${SOLAPI_SENDER}
 
 file:
-  dir: ${STORE_PATH}
+  path: ${FILE_STORE_PATH}
+  exteral-path: ${FILE_EXTERNAL_STORE_PATH}

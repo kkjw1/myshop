@@ -1,16 +1,12 @@
-package myshop.shop.service.item;
+package myshop.shop.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import myshop.shop.dto.item.AddItemDto;
-import myshop.shop.dto.item.AddItemOptionDto;
-import myshop.shop.dto.item.ManageItemDto;
-import myshop.shop.dto.item.SearchItemDto;
+import myshop.shop.dto.item.*;
 import myshop.shop.entity.Seller;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.item.ItemImage;
 import myshop.shop.entity.item.ItemOption;
-import myshop.shop.entity.item.ItemStatus;
 import myshop.shop.repository.Item.ItemImageRepository;
 import myshop.shop.repository.Item.ItemOptionRepository;
 import myshop.shop.repository.Item.ItemRepository;
@@ -88,5 +84,22 @@ public class ItemService {
     }
 
 
+    /**
+     * 상품 수정 데이터 불러오기
+     */
+    public ModifyItemDto getItemModifyData(Long itemNo) {
+        Item item = itemRepository.findById(itemNo).orElse(null);
+        List<ItemOption> itemOptionList = itemOptionRepository.findByItem(item);
+
+        return new ModifyItemDto(item, itemOptionList);
+    }
+
+
+    /**
+     * 수정 완료
+     */
+    public void itemModify(ModifyItemDto modifyItemDto) {
+
+    }
 
 }

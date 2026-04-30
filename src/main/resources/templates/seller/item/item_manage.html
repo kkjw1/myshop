@@ -214,35 +214,36 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="editForm">
+                <form id="editForm" th:action="@{/seller/item_manage/modify}" method="post" enctype="multipart/form-data">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">상품명</label>
-                            <input type="text" class="form-control" id="editProductName" value="프리미엄 와이드 팬츠">
+                            <input type="text" class="form-control" id="editProductName" name="name" value="프리미엄 와이드 팬츠">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">판매가</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" id="editProductPrice" value="39000">
+                                <input type="number" class="form-control" id="editProductPrice" name="price" value="39000">
                                 <span class="input-group-text">원</span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold">재고 수량</label>
-                            <input type="number" class="form-control" id="editProductStock" value="5">
+                            <input type="number" class="form-control" id="editProductStock" name="totalStock" value="5">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold">판매 상태</label>
-                            <select class="form-select" id="editProductStatus">
-                                <option value="ON_SALE" selected>판매 중</option>
-                                <option value="STOPPED">판매 중지</option>
-                                <option value="OUT_OF_STOCK">품절</option>
+                            <select class="form-select" id="editProductStatus" name="itemStatus">
+                                <option value="판매중">판매 중</option>
+                                <option value="판매중지">판매 중지</option>
+                                <option value="품절">품절</option>
+                                <option value="승인대기">승인 대기</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold">할인율</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" id="editProductDiscount" value="10" min="0" max="100">
+                                <input type="number" class="form-control" id="editProductDiscount" name="discount" value="10" min="0" max="100">
                                 <span class="input-group-text">%</span>
                             </div>
                         </div>
@@ -267,7 +268,7 @@
                                     <div class="card-header bg-light small fw-bold">대표 이미지</div>
                                     <div class="card-body text-center">
                                         <img id="mainPreview" src="" class="img-thumbnail mb-2 d-none" style="max-height: 150px;">
-                                        <input type="file" class="form-control form-control-sm" id="mainImageInput" accept="image/*" onchange="previewImg(this, 'mainPreview')">
+                                        <input type="file" class="form-control form-control-sm" id="mainImageInput" name="mainImage">
                                     </div>
                                 </div>
                             </div>
@@ -277,20 +278,24 @@
                                     <div class="card-body">
                                         <div id="subImagePreviewContainer" class="d-flex flex-wrap gap-2 mb-2">
                                         </div>
-                                        <input type="file" class="form-control form-control-sm" id="subImageInput"
-                                               accept="image/*" multiple="multiple" onchange="previewMultipleImgs(this, 'subImagePreviewContainer')">
+                                        <input type="file" class="form-control form-control-sm" id="subImageInput" name="subImages"
+                                                multiple="multiple">
                                         <div class="form-text small">Ctrl 또는 Shift를 누른 채로 여러 장을 선택할 수 있습니다.</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
+                    <div class="col-12 mt-4">
+                        <label class="form-label fw-bold"><i class="fas fa-align-left me-1"></i> 상품 상세설명</label>
+                        <textarea class="form-control" id="editProductDetail" name="content"
+                                  rows="5" placeholder="상품에 대한 상세한 설명을 입력하세요."></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="submit" class="btn btn-primary">수정 완료</button>
+                    </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                <button type="button" class="btn btn-primary" onclick="saveChanges()">수정 완료</button>
             </div>
         </div>
     </div>
@@ -362,18 +367,6 @@
     const bulkEditBtn = document.getElementById('bulkEditBtn');
     const selectedCountSpan = document.getElementById('selectedCount');
 
-    // 1. 이미지 미리보기 (새로 추가)
-    function previewImg(input, targetId) {
-        const preview = document.getElementById(targetId);
-        if (input.files && input.files) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.classList.remove('d-none');
-            };
-            reader.readAsDataURL(input.files);
-        }
-    }
 
     // 2. 총 재고 자동 계산 함수 (새로 추가)
     function updateSumStock() {
@@ -427,69 +420,153 @@
     });
     let optionIndex = 0; // 옵션 인덱스 관리
 
-    // 수정 모달 데이터 채우기
     async function fillModifyModal(button) {
-        const itemNo = button.getAttribute('data-no');
+        const itemNo = button.getAttribute('item-no');
 
-        const result = await fetch(`/seller/item_manage/modify?itemNo=${itemNo}`);
-        const itemInfo = await result.json();
+        console.log("itemNo", itemNo);
 
-        document.getElementById('editProductName').value = name;
-        document.getElementById('editProductPrice').value = price;
-        document.getElementById('editProductStock').value = stock;
-        document.getElementById('editProductStatus').value = status;
-        document.getElementById('editProductDiscount').value = discount;
+        try {
+            const response = await fetch(`/seller/item_manage/modify?itemNo=${itemNo}`);
+            const data = await response.json();
 
-        // 나중에 수정을 위해 ID값도 저장 (hidden input이나 전역변수)
-        document.getElementById('editForm').dataset.id = id;
+            // 1. 기본 정보 필드 채우기
+            document.getElementById('editProductName').value = data.name;
+            document.getElementById('editProductPrice').value = data.price;
+            document.getElementById('editProductStock').value = data.totalStock;
+            document.getElementById('editProductStatus').value = data.itemStatus;
+            document.getElementById('editProductDiscount').value = data.discount;
+            document.getElementById('editProductDetail').value = data.content || '';
+
+            // 폼에 itemNo 저장 (수정 완료 클릭 시 서버에 보낼 용도)
+            // document.getElementById('editForm').dataset.id = itemNo;
+
+            // 2. 상품 옵션 목록 렌더링
+            const optionContainer = document.getElementById('editOptionContainer');
+
+            // 기존 내용(메시지 포함) 비우기
+            optionContainer.innerHTML = '';
+
+            if (data.modifyItemOptionDtoList && data.modifyItemOptionDtoList.length > 0) {
+                const container = document.getElementById('editOptionContainer');
+                container.innerHTML = ''; // 기존 내용 비우기
+
+                data.modifyItemOptionDtoList.forEach((option, index) => {
+                    const optionRow = `
+                        <div class="row g-2 mb-2 align-items-center option-row border-bottom pb-2">
+                            <!-- 기존 옵션 식별을 위한 ID (수정 시 필요) -->
+                            <input type="hidden" name="modifyItemOptionDtoList[${index}].id" value="${option.id || ''}">
+
+                            <div class="col-md-4">
+                                <input type="text" class="form-control form-control-sm opt-name-input"
+                                       name="modifyItemOptionDtoList[${index}].name" value="${option.name}"
+                                       placeholder="예: 블랙 / XL" required>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">추가금</span>
+                                    <input type="number" class="form-control opt-price-input"
+                                           name="modifyItemOptionDtoList[${index}].additionalPrice" value="${option.additionalPrice}" min="0">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">재고</span>
+                                    <input type="number" class="form-control opt-stock-input"
+                                           name="modifyItemOptionDtoList[${index}].optionStock" value="${option.optionStock}"
+                                           min="0" required oninput="updateSumStock()">
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeOptionRow(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>`;
+                    container.insertAdjacentHTML('beforeend', optionRow);
+                });
+                updateSumStock();
+
+            } else {
+                // 옵션이 없을 때 표시할 기본 UI
+                optionContainer.innerHTML = '<div id="noOptionMsg" class="text-center text-muted small py-2">등록된 옵션이 없습니다.</div>';
+            }
+
+        } catch (error) {
+            console.error("데이터 로딩 중 오류:", error);
+            alert("상품 데이터를 가져오지 못했습니다.");
+        }
     }
 
     // 3. 수정 팝업 -> 옵션 행 추가 함수 (기존 함수 수정: 클래스명 추가 및 이벤트 연결)
-    function addOptionRow(data = {name: '', price: 0, stock: 0}) {
+    function addOptionRow(data = {name: '', additionalPrice: 0, optionStock: 0}) {
         const container = document.getElementById('editOptionContainer');
         const noMsg = document.getElementById('noOptionMsg');
+
+        // 현재 존재하는 옵션 행의 개수를 파악하여 인덱스 결정
+        const index = container.getElementsByClassName('option-row').length;
 
         if (noMsg) noMsg.remove();
 
         const row = document.createElement('div');
-        row.className = 'row g-2 mb-2 align-items-center option-row';
+        row.className = 'row g-2 mb-2 align-items-center option-row border-bottom pb-2';
         row.innerHTML = `
-        <div class="col-md-4">
-            <input type="text" class="form-control form-control-sm opt-name-input"
-                   value="${data.name}" placeholder="예: 블랙 / XL" required>
-        </div>
-        <div class="col-md-3">
-            <div class="input-group input-group-sm">
-                <span class="input-group-text">추가금</span>
-                <input type="number" class="form-control opt-price-input"
-                       value="${data.price}" min="0">
+            <div class="col-md-4">
+                <input type="text" class="form-control form-control-sm opt-name-input"
+                       name="modifyItemOptionDtoList[${index}].name" value="${data.name}"
+                       placeholder="예: 블랙 / XL" required>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="input-group input-group-sm">
-                <span class="input-group-text">재고</span>
-                <input type="number" class="form-control opt-stock-input"
-                       value="${data.stock}" min="0" required oninput="updateSumStock()">
+            <div class="col-md-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">추가금</span>
+                    <input type="number" class="form-control opt-price-input"
+                           name="modifyItemOptionDtoList[${index}].additionalPrice" value="${data.additionalPrice}" min="0">
+                </div>
             </div>
-        </div>
-        <div class="col-md-2 text-end">
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeOptionRow(this)">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    `;
+            <div class="col-md-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">재고</span>
+                    <input type="number" class="form-control opt-stock-input"
+                           name="modifyItemOptionDtoList[${index}].optionStock" value="${data.optionStock}"
+                           min="0" required oninput="updateSumStock()">
+                </div>
+            </div>
+            <div class="col-md-2 text-end">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeOptionRow(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
         container.appendChild(row);
-        updateSumStock(); // 행 추가 시에도 전체 합계 갱신
+        updateSumStock();
     }
 
     // 2. 옵션 행 삭제 함수
-    function removeOptionRow(btn) {
-        btn.closest('.option-row').remove();
+    function removeOptionRow(button) {
         const container = document.getElementById('editOptionContainer');
-        if (container.querySelectorAll('.option-row').length === 0) {
+        // 1. 해당 행 삭제
+        button.closest('.option-row').remove();
+
+        // 2. 남은 모든 행을 찾아서 인덱스 번호를 다시 0부터 부여
+        const rows = container.getElementsByClassName('option-row');
+
+        Array.from(rows).forEach((row, index) => {
+            // 행 내부의 모든 input, select 태그들을 찾음
+            const inputs = row.querySelectorAll('input, select');
+
+            inputs.forEach(input => {
+                const name = input.name;
+                if (name && name.includes('modifyItemOptionDtoList')) {
+                    // 정규표현식을 사용하여 [숫자] 부분을 현재의 index로 교체
+                    // 예: modifyItemOptionDtoList[3].name -> modifyItemOptionDtoList[1].name
+                    input.name = name.replace(/\[\d+\]/, `[${index}]`);
+                }
+            });
+        });
+
+        // 3. 만약 다 지웠으면 메시지 표시
+        if (rows.length === 0) {
             container.innerHTML = '<div id="noOptionMsg" class="text-center text-muted small py-2">등록된 옵션이 없습니다.</div>';
         }
-        updateSumStock(); // 삭제 후 합계 갱신
     }
 
 

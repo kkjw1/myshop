@@ -10,7 +10,6 @@ import myshop.shop.entity.item.ItemStatus;
 import myshop.shop.repository.Item.ItemOptionRepository;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.repository.seller.SellerRepository;
-import myshop.shop.service.item.ItemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

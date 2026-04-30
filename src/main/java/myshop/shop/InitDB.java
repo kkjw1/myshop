@@ -14,7 +14,7 @@ import myshop.shop.entity.member.MemberLevel;
 import myshop.shop.repository.address.AddressRepository;
 import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.repository.seller.SellerRepository;
-import myshop.shop.service.item.ItemService;
+import myshop.shop.service.ItemService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

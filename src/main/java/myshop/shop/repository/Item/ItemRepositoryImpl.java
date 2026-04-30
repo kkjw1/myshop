@@ -6,6 +6,8 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import myshop.shop.dto.item.ManageItemDto;
+import myshop.shop.dto.item.ModifyItemDto;
+import myshop.shop.dto.item.ModifyItemOptionDto;
 import myshop.shop.dto.item.SearchItemDto;
 
 import myshop.shop.entity.item.ItemStatus;
@@ -16,7 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 
-
+import java.util.ArrayList;
 import java.util.List;
 
 import static myshop.shop.entity.QSeller.seller;
@@ -29,6 +31,10 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+
+    /**
+     * 상품 관리 데이터 불러오기
+     */
     @Override
     public Page<ManageItemDto> searchItemPage(Pageable pageable, SearchItemDto searchItemDto) {
 

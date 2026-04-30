@@ -3,20 +3,18 @@ package myshop.shop.controller.sellerWeb;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import myshop.shop.dto.item.AddItemDto;
-import myshop.shop.dto.item.AddItemOptionDto;
-import myshop.shop.dto.item.ManageItemDto;
-import myshop.shop.dto.item.SearchItemDto;
+import myshop.shop.dto.item.*;
 import myshop.shop.dto.seller.LoginCheckSellerDto;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.service.FileService;
 import myshop.shop.service.SellerService;
-import myshop.shop.service.item.ItemService;
+import myshop.shop.service.ItemService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -92,7 +90,37 @@ public class ItemController {
      */
     @GetMapping("/seller/item_manage/modify")
     @ResponseBody
-    public void itemModify(@RequestParam("itemNo") Long itemNo) {
-        itemRepository.getReferenceByNo(itemNo);
+    public ModifyItemDto itemModifyData(@RequestParam("itemNo") Long itemNo) {
+        ModifyItemDto itemModifyData = itemService.getItemModifyData(itemNo);
+        log.info("itemModifyData={}", itemModifyData);
+        return itemModifyData;
+    }
+
+
+    /**
+     * 상품 관리 폼 -> 수정 완료
+     */
+    @PostMapping("/seller/item_manage/modify")
+    public String ItemModify(@ModelAttribute("modifyItemDto") ModifyItemDto modifyItemDto) {
+        if (checkChangeImage(modifyItemDto.getMainImage(), modifyItemDto.getSubImages())) {
+            // 이미지 삭제 후, 저장
+            // todo:이미지 삭제, 저장 기능 추가(저장할 때 DB에도 저장하기)
+        }
+
+        //todo: 들어온 데이터로 수정하기
+        log.info("수정 완료!!!{}", modifyItemDto);
+
+
+        itemService.itemModify(modifyItemDto);
+
+
+        return null;
+    }
+
+    /**
+     * @return 변경O true, 변경X false
+     */
+    public boolean checkChangeImage(MultipartFile mainImage, List<MultipartFile> subImages) {
+        return !(mainImage.isEmpty() || (subImages != null && subImages.get(0).isEmpty()));
     }
 }

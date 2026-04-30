@@ -16,16 +16,16 @@ public class ItemOption extends BaseDateEntity {
     @JoinColumn(name = "ITEM_NO")
     private Item item;
     private String name;
-    private int addPrice;
+    private int additionalPrice;
     private int optionStock;
 
     public ItemOption() {
     }
 
-    public ItemOption(Item item, String name, int addPrice, int optionStock) {
+    public ItemOption(Item item, String name, int additionalPrice, int optionStock) {
         this.item = item;
         this.name = name;
-        this.addPrice = addPrice;
+        this.additionalPrice = additionalPrice;
         this.optionStock = optionStock;
     }
 }

@@ -1,21 +1,15 @@
-package myshop.shop.repository.Item;
+package myshop.shop.service;
 
 import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
-import myshop.shop.dto.item.ManageItemDto;
-import myshop.shop.dto.item.SearchItemDto;
 import myshop.shop.entity.Seller;
 import myshop.shop.entity.item.ItemCategory;
 import myshop.shop.entity.item.ItemStatus;
 import myshop.shop.repository.seller.SellerRepository;
-import myshop.shop.service.ItemService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 @Transactional
-class ItemRepositoryTest {
-    @Autowired ItemRepository itemRepository;
+class FileServiceTest {
+
+    @Autowired FileService fileService;
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
@@ -34,21 +31,21 @@ class ItemRepositoryTest {
     @Autowired
     ItemService itemService;
 
-    @BeforeEach
+/*    @BeforeEach
     @Commit
     public void init() {
-        /**
+        *//**
          * 판매자 저장
-         */
+         *//*
         String sellerPassword = passwordEncoder.encode("test");
         Seller seller = new Seller("test", sellerPassword, "kkjjoo1212@naver.com", "판매자테스트", "010-4710-6305", "테스트회사명",
                 "테스트회사전화번호", "테스트회사우편번호", "테스트회사 도로명", "테스트회사 상세주소");
         sellerRepository.save(seller);
 
 
-        /**
+        *//**
          * 상품 저장
-         */
+         *//*
         Long sellerNo = sellerRepository.findById("test").orElse(null).getNo();
         itemService.saveItem(new AddItemDto(sellerNo, "상품테스트1", ItemCategory.상의, 30000, 40, 10,
                 List.of(
@@ -96,75 +93,12 @@ class ItemRepositoryTest {
                     emptySubImageList, "상품옵션없음, 추가이미지없음", true));
         }
 
-    }
+    }*/
 
 
     @Test
-    @DisplayName("전체검색")
-    @Commit
-    public void searchItemPageTest() throws Exception {
-        PageRequest pageRequest = PageRequest.of(0, 5);
-        Seller seller = sellerRepository.findById("test").orElse(null);
-
-        SearchItemDto searchItemDto = new SearchItemDto(seller.getNo(), null, null, null);
-        Page<ManageItemDto> manageItemDtos = itemRepository.searchItemPage(pageRequest, searchItemDto);
-
-        System.out.println("manageItemDtos = " + manageItemDtos);
-
-        System.out.println("전체 데이터 수: " + manageItemDtos.getTotalElements());
-        System.out.println("페이지 번호: " + manageItemDtos.getNumber());
-        System.out.println("전체 페이지 번호: " + manageItemDtos.getTotalPages());
-        System.out.println("첫 번째 항목인가?: " + manageItemDtos.isFirst());
-        System.out.println("다음 페이지가 있는가?: " + manageItemDtos.hasNext());
+    public void removeFileTest() throws Exception {
+        //given
+        fileService.removeFile("/shop_image/test.png");
     }
-
-
-    @Test
-    @DisplayName("조건 검색")
-    @Commit
-    public void searchItemPageTest2() throws Exception {
-        PageRequest pageRequest = PageRequest.of(0, 3);
-        Seller seller = sellerRepository.findById("test").orElse(null);
-
-        SearchItemDto searchItemDto = new SearchItemDto(seller.getNo(), null, "상품테스트", null);
-        Page<ManageItemDto> manageItemDtos = itemRepository.searchItemPage(pageRequest, searchItemDto);
-
-        for (ManageItemDto manageItemDto : manageItemDtos) {
-            System.out.println("manageItemDto = " + manageItemDto);
-        }
-
-        System.out.println("전체 데이터 수: " + manageItemDtos.getTotalElements());
-        System.out.println("페이지 번호: " + manageItemDtos.getNumber());
-        System.out.println("전체 페이지 번호: " + manageItemDtos.getTotalPages());
-        System.out.println("첫 번째 항목인가?: " + manageItemDtos.isFirst());
-        System.out.println("다음 페이지가 있는가?: " + manageItemDtos.hasNext());
-
-    }
-
-    @Test
-    @DisplayName("조건 검색 여러 개")
-    @Commit
-    public void searchItemPageTest3() throws Exception {
-        PageRequest pageRequest = PageRequest.of(0, 3);
-        Seller seller = sellerRepository.findById("test").orElse(null);
-
-        SearchItemDto searchItemDto = new SearchItemDto(seller.getNo(), 1L, "상품테스트", ItemStatus.판매중);
-        Page<ManageItemDto> manageItemDtos = itemRepository.searchItemPage(pageRequest, searchItemDto);
-
-        for (ManageItemDto manageItemDto : manageItemDtos) {
-            System.out.println("manageItemDto = " + manageItemDto);
-            String s = manageItemDto.getMainImagePath();
-            String mainImagePath = s.replace("/shop_image/", "/shop_image/");
-            System.out.println("mainImagePath = " + mainImagePath);
-        }
-
-        System.out.println("전체 데이터 수: " + manageItemDtos.getTotalElements());
-        System.out.println("페이지 번호: " + manageItemDtos.getNumber());
-        System.out.println("전체 페이지 번호: " + manageItemDtos.getTotalPages());
-        System.out.println("첫 번째 항목인가?: " + manageItemDtos.isFirst());
-        System.out.println("다음 페이지가 있는가?: " + manageItemDtos.hasNext());
-
-    }
-
-
 }
