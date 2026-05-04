@@ -5,8 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.dto.item.*;
 import myshop.shop.dto.seller.LoginCheckSellerDto;
+import myshop.shop.entity.item.ItemImage;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.service.FileService;
+import myshop.shop.service.ItemImageService;
+import myshop.shop.service.ItemImageService.ImagePath;
 import myshop.shop.service.SellerService;
 import myshop.shop.service.ItemService;
 import org.springframework.data.domain.Page;
@@ -31,6 +34,7 @@ public class ItemController {
     private final FileService fileService;
     private final ItemService itemService;
     private final ItemRepository itemRepository;
+    private final ItemImageService itemImageService;
 
     /**
      * 상품 관리 폼 (상품관리메뉴, 페이지, 검색)
@@ -92,6 +96,7 @@ public class ItemController {
     @ResponseBody
     public ModifyItemDto itemModifyData(@RequestParam("itemNo") Long itemNo) {
         ModifyItemDto itemModifyData = itemService.getItemModifyData(itemNo);
+        itemModifyData.setItemNo(itemNo);
         log.info("itemModifyData={}", itemModifyData);
         return itemModifyData;
     }
@@ -101,26 +106,36 @@ public class ItemController {
      * 상품 관리 폼 -> 수정 완료
      */
     @PostMapping("/seller/item_manage/modify")
-    public String ItemModify(@ModelAttribute("modifyItemDto") ModifyItemDto modifyItemDto) {
+    public String ItemModify(@ModelAttribute("modifyItemDto") ModifyItemDto modifyItemDto) throws IOException {
+        log.info("ItemModify={}", modifyItemDto);
+
         if (checkChangeImage(modifyItemDto.getMainImage(), modifyItemDto.getSubImages())) {
-            // 이미지 삭제 후, 저장
-            // todo:이미지 삭제, 저장 기능 추가(저장할 때 DB에도 저장하기)
+            log.info("아이템 삭제, {} \n {}", modifyItemDto.getMainImage(), modifyItemDto.getSubImages());
+
+            // 이미지 삭제
+            ImagePath imagePath = itemImageService.getItemImageByIsMain(modifyItemDto);
+            if (imagePath.getMainPath() != null) {
+                fileService.removeFile(imagePath.getMainPath());
+            }
+            for (String s : imagePath.getSubPath()) {
+                fileService.removeFile(s);
+            }
+
+            // 이미지 저장
+            modifyItemDto.setMainImagePath(fileService.storeFile(modifyItemDto.getMainImage()));
+            modifyItemDto.setSubImagesPath(fileService.storeFiles(modifyItemDto.getSubImages()));
         }
 
         //todo: 들어온 데이터로 수정하기
-        log.info("수정 완료!!!{}", modifyItemDto);
-
-
         itemService.itemModify(modifyItemDto);
 
-
-        return null;
+        return "redirect:/seller/item_manage";
     }
 
     /**
      * @return 변경O true, 변경X false
      */
     public boolean checkChangeImage(MultipartFile mainImage, List<MultipartFile> subImages) {
-        return !(mainImage.isEmpty() || (subImages != null && subImages.get(0).isEmpty()));
+        return (mainImage != null && !mainImage.isEmpty()) || (subImages != null && !subImages.isEmpty() && !subImages.get(0).isEmpty());
     }
 }

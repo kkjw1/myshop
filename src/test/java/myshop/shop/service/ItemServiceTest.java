@@ -82,4 +82,10 @@ class ItemServiceTest {
             System.out.println("option = " + option.getName());
         }
     }
+    
+    @Test
+    public void itemModifyTest() throws Exception {
+        //given
+        
+    }
 }

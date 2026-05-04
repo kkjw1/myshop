@@ -53,6 +53,30 @@ public class Item extends BaseDateEntity {
         this.viewCount = 0L;
     }
 
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updatePrice(int price) {
+        this.price = price;
+    }
+
+    public void updateTotalStock(int totalStock) {
+        this.totalStock = totalStock;
+    }
+
+    public void updateDiscount(int discount) {
+        this.discount = discount;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void updateItemStatus(ItemStatus itemStatus) {
+        this.itemStatus = itemStatus;
+    }
+
     //===================편의 메서드===================
 
     public void addImage(ItemImage image) {

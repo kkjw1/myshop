@@ -13,8 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter @Setter
-@ToString(of = {"name", "price", "totatlStock", "itemStatus", "discount", "modifyItemOptionDtoList", "mainImage", "subImages"})
+@ToString(of = {"itemNo", "name", "price", "totalStock", "itemStatus", "discount", "modifyItemOptionDtoList", "mainImage", "subImages"})
 public class ModifyItemDto {
+    private Long itemNo;
     private String name;
     private int price;
 

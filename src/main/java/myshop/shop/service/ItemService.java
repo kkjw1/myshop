@@ -2,11 +2,13 @@ package myshop.shop.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import myshop.shop.dto.item.*;
 import myshop.shop.entity.Seller;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.item.ItemImage;
 import myshop.shop.entity.item.ItemOption;
+import myshop.shop.entity.item.ItemStatus;
 import myshop.shop.repository.Item.ItemImageRepository;
 import myshop.shop.repository.Item.ItemOptionRepository;
 import myshop.shop.repository.Item.ItemRepository;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ItemService {
     private final ItemRepository itemRepository;
     private final ItemOptionRepository itemOptionRepository;
@@ -33,6 +37,10 @@ public class ItemService {
      * 상품 등록
      */
     public void saveItem(AddItemDto addItemDto) {
+        if (addItemDto.getItemStatus() == null) {
+            addItemDto.setItemStatus(ItemStatus.승인대기);
+        }
+
         Seller sellerProxy = sellerRepository.getReferenceById(addItemDto.getSellerNo());
         Item item = new Item(sellerProxy,
                 addItemDto.getName(),
@@ -76,12 +84,14 @@ public class ItemService {
     }
 
 
+
     /**
      * 상품 조회(페이징)
      */
     public Page<ManageItemDto> findBySearchItemDto(Pageable pageable, SearchItemDto searchItemDto) {
         return itemRepository.searchItemPage(pageable, searchItemDto);
     }
+
 
 
     /**
@@ -95,11 +105,54 @@ public class ItemService {
     }
 
 
+
     /**
-     * 수정 완료
+     * 상품 수정
      */
     public void itemModify(ModifyItemDto modifyItemDto) {
+        Item item = em.createQuery("select i from Item i where i.no=:itemNo", Item.class)
+                .setParameter("itemNo", modifyItemDto.getItemNo())
+                .getSingleResult();
+        item.updateName(modifyItemDto.getName());
+        item.updatePrice(modifyItemDto.getPrice());
+        item.updateTotalStock(modifyItemDto.getTotalStock());
+        item.updateDiscount(modifyItemDto.getDiscount());
+        item.updateContent(modifyItemDto.getContent());
+        item.updateItemStatus(modifyItemDto.getItemStatus());
 
+        em.flush();
+        em.clear();
+
+        Item itemProxy = itemRepository.getReferenceById(modifyItemDto.getItemNo());
+
+
+        itemOptionRepository.deleteItemOptionByItem(itemProxy);
+        for (ModifyItemOptionDto modifyItemOptionDto : modifyItemDto.getModifyItemOptionDtoList()) {
+            itemOptionRepository.save(new ItemOption(itemProxy,
+                    modifyItemOptionDto.getName(),
+                    modifyItemOptionDto.getAdditionalPrice(),
+                    modifyItemOptionDto.getOptionStock()));
+        }
+
+        // 수정한 값 있으면 ItemImage 삭제 후, 데이터 넣기
+        if (checkChangeImage(modifyItemDto.getMainImage(), modifyItemDto.getSubImages())) {
+            itemImageRepository.deleteItemImageByItem(item);
+            int sort = 1;
+            itemImageRepository.save(new ItemImage(itemProxy,
+                    modifyItemDto.getMainImagePath(),
+                    true, sort++));
+            for (String subImagePath : modifyItemDto.getSubImagesPath()) {
+                itemImageRepository.save(new ItemImage(itemProxy,
+                        subImagePath, false, sort++));
+            }
+        }
+    }
+
+    /**
+     * @return 변경O true, 변경X false
+     */
+    public boolean checkChangeImage(MultipartFile mainImage, List<MultipartFile> subImages) {
+        return (mainImage != null && !mainImage.isEmpty()) || (subImages != null && !subImages.isEmpty() && !subImages.get(0).isEmpty());
     }
 
 }

@@ -215,6 +215,7 @@
             </div>
             <div class="modal-body">
                 <form id="editForm" th:action="@{/seller/item_manage/modify}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" id="editProductItemNo" name="itemNo" value="">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">상품명</label>
@@ -228,7 +229,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">재고 수량</label>
+                            <label class="form-label fw-bold">총 재고 수량</label>
                             <input type="number" class="form-control" id="editProductStock" name="totalStock" value="5">
                         </div>
                         <div class="col-md-4">
@@ -430,6 +431,7 @@
             const data = await response.json();
 
             // 1. 기본 정보 필드 채우기
+            document.getElementById('editProductItemNo').value = data.itemNo;
             document.getElementById('editProductName').value = data.name;
             document.getElementById('editProductPrice').value = data.price;
             document.getElementById('editProductStock').value = data.totalStock;
@@ -550,22 +552,22 @@
         const rows = container.getElementsByClassName('option-row');
 
         Array.from(rows).forEach((row, index) => {
-            // 행 내부의 모든 input, select 태그들을 찾음
             const inputs = row.querySelectorAll('input, select');
-
             inputs.forEach(input => {
                 const name = input.name;
                 if (name && name.includes('modifyItemOptionDtoList')) {
-                    // 정규표현식을 사용하여 [숫자] 부분을 현재의 index로 교체
-                    // 예: modifyItemOptionDtoList[3].name -> modifyItemOptionDtoList[1].name
                     input.name = name.replace(/\[\d+\]/, `[${index}]`);
                 }
             });
         });
 
-        // 3. 만약 다 지웠으면 메시지 표시
+        // --- 추가된 부분 ---
+        // 3. 만약 다 지웠으면 메시지 표시 및 재고를 0으로 초기화
         if (rows.length === 0) {
             container.innerHTML = '<div id="noOptionMsg" class="text-center text-muted small py-2">등록된 옵션이 없습니다.</div>';
+            document.getElementById('editProductStock').value = 0; // 옵션이 없으면 총재고 0
+        } else {
+            updateSumStock(); // 남은 옵션들의 재고 합계 다시 계산
         }
     }
 

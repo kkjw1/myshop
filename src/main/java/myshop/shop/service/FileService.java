@@ -18,7 +18,7 @@ public class FileService {
     @Value("${file.path}")
     private String fileDir;
     @Value("${file.exteral-path}")
-    private String ExteralFileDir;
+    private String exteralFileDir;
 
     /**
      * 파일명 생성
@@ -41,9 +41,9 @@ public class FileService {
         if (!multipartFile.isEmpty()) {
             String storeName = createStoreName(multipartFile.getOriginalFilename());
             storeFileName = fileDir + storeName;
-            multipartFile.transferTo(new File(storeFileName));
+            log.info("파일 저장: {}", exteralFileDir + storeName);
+            multipartFile.transferTo(new File(exteralFileDir + storeName));
         }
-
         return storeFileName;
     }
 
@@ -70,8 +70,8 @@ public class FileService {
      * 파일 삭제
      */
     public void removeFile(String fileDir) {
-        String realPath = fileDir.replace(this.fileDir, ExteralFileDir);
-        System.out.println("realPath = " + realPath);
+        String realPath = fileDir.replace(this.fileDir, exteralFileDir);
+        log.info("removeFile Path={}",realPath);
         File file = new File(realPath);
 
         if (file.exists()) {
