@@ -15,6 +15,7 @@ import myshop.shop.repository.Item.ItemImageRepository;
 import myshop.shop.repository.Item.ItemOptionRepository;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.repository.seller.SellerRepository;
+import myshop.shop.service.ItemImageService.ImagePath;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,8 @@ public class ItemService {
     private final SellerRepository sellerRepository;
     private final EntityManager em;
     private final ItemImageRepository itemImageRepository;
+    private final FileService fileService;
+    private final ItemImageService itemImageService;
 
     /**
      * 상품 등록
@@ -149,7 +152,6 @@ public class ItemService {
             }
         }
     }
-
     /**
      * @return 변경O true, 변경X false
      */
@@ -158,10 +160,42 @@ public class ItemService {
     }
 
 
+
     /**
      * 일괄 수정
      */
     public void bulkModify(BulkModifyItemDto bulkModifyItemDto) {
         itemRepository.bulkItemStatusDiscount(bulkModifyItemDto);
+    }
+
+
+
+    /**
+     * 상품 삭제
+     */
+    public int removeItem(Long itemNo) {
+        Item itemProxy = itemRepository.getReferenceById(itemNo);
+
+
+        int itemOption = itemOptionRepository.deleteItemOptionByItem(itemProxy);
+
+
+        ImagePath imagePath = itemImageService.getItemImageByIsMain(itemNo);
+        if (imagePath.getMainPath() != null) {
+            fileService.removeFile(imagePath.getMainPath());
+        }
+        for (String s : imagePath.getSubPath()) {
+            fileService.removeFile(s);
+        }
+        int itemImage = itemImageRepository.deleteItemImageByItem(itemProxy);
+
+
+        int item = itemRepository.deleteItemByNo(itemNo);
+
+
+        log.info("Item={}개 ,ItemOption={}개, ItemImage={}개 삭제되었습니다.", item, itemOption, itemImage);
+        em.flush();
+        em.clear();
+        return item;
     }
 }

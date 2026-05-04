@@ -148,7 +148,9 @@
                                         onclick="fillModifyModal(this)">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger" title="삭제"><i class="fas fa-trash-alt"></i></button>
+                                <button class="btn btn-sm btn-outline-danger"
+                                        th:item-no="${manageItemDto.getItemNo()}"
+                                        onclick="removeItem(this)" title="삭제"><i class="fas fa-trash-alt"></i></button>
                             </td>
                         </tr>
                         </tbody>
@@ -350,6 +352,33 @@
 
 <script th:inline="javascript">
 
+    async function removeItem(button) {
+        const itemNo = button.getAttribute('item-no');
+
+        if (!confirm("정말 이 상품을 삭제하시겠습니까?")) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`/seller/item_manage/remove?itemNo=${itemNo}`, {
+                method: 'POST'
+            });
+            const resText = await res.text();
+
+            if (resText === "ok") {
+                alert("상품이 삭제되었습니다.");
+                // 4. 삭제 후 목록 페이지로 이동 (리다이렉트 효과)
+                location.href = '/seller/item_manage';
+            } else {
+                alert("삭제 실패: 서버 오류가 발생했습니다.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("요청 중 오류가 발생했습니다.");
+        }
+
+    }
+
     document.getElementById('searchType').addEventListener('change', function() {
         const searchInput = document.getElementById('searchInput');
         if (this.value === 'itemNo') {
@@ -422,8 +451,6 @@
 
     async function fillModifyModal(button) {
         const itemNo = button.getAttribute('item-no');
-
-        console.log("itemNo", itemNo);
 
         try {
             const response = await fetch(`/seller/item_manage/modify?itemNo=${itemNo}`);

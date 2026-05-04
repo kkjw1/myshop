@@ -24,8 +24,8 @@ public class ItemImageService {
     /**
      * 이미지 주소 가져오기
      */
-    public ImagePath getItemImageByIsMain(ModifyItemDto modifyItemDto) {
-        Item itemProxy = itemRepository.getReferenceById(modifyItemDto.getItemNo());
+    public ImagePath getItemImageByIsMain(Long itemNo) {
+        Item itemProxy = itemRepository.getReferenceById(itemNo);
         ItemImage main = itemImageRepository.findItemImageByIsMain(itemProxy, true).orElse(null);
         List<ItemImage> sub = itemImageRepository.findItemImageListByIsMain(itemProxy, false);
         return new ImagePath(main, sub);

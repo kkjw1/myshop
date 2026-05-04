@@ -118,7 +118,7 @@ public class ItemController {
             log.info("아이템 삭제, {} \n {}", modifyItemDto.getMainImage(), modifyItemDto.getSubImages());
 
             // 이미지 삭제
-            ImagePath imagePath = itemImageService.getItemImageByIsMain(modifyItemDto);
+            ImagePath imagePath = itemImageService.getItemImageByIsMain(modifyItemDto.getItemNo());
             if (imagePath.getMainPath() != null) {
                 fileService.removeFile(imagePath.getMainPath());
             }
@@ -170,6 +170,20 @@ public class ItemController {
             this.itemStatus = itemStatus;
             this.discount = discount;
         }
+    }
+
+
+
+    /**
+     * 상품 1개 삭제
+     */
+    @PostMapping("/seller/item_manage/remove")
+    @ResponseBody
+    public String removeItem(@RequestParam("itemNo") Long itemNo) {
+        if (itemService.removeItem(itemNo) == 1) {
+            return "ok";
+        }
+        return "no";
     }
 
 }
