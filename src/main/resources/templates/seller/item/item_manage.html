@@ -128,7 +128,7 @@
                         </thead>
                         <tbody>
                         <tr th:each="manageItemDto:${manageItemDtoList}">
-                            <td><input class="form-check-input" type="checkbox"></td>
+                            <td><input class="form-check-input item-check" type="checkbox" th:value="${manageItemDto.getItemNo()}"></td>
                             <td><img src="/static/no_image.png" th:src="${manageItemDto.getMainImagePath()}" alt="상품 썸네일" class="product-thumb border"></td>
                             <td>
                                 <strong class="d-block" th:text="${manageItemDto.getName()}">프리미엄 와이드 팬츠</strong>
@@ -235,10 +235,9 @@
                         <div class="col-md-4">
                             <label class="form-label fw-bold">판매 상태</label>
                             <select class="form-select" id="editProductStatus" name="itemStatus">
-                                <option value="판매중">판매 중</option>
-                                <option value="판매중지">판매 중지</option>
-                                <option value="품절">품절</option>
-                                <option value="승인대기">승인 대기</option>
+                                <option th:each="status : ${T(myshop.shop.entity.item.ItemStatus).values()}"
+                                        th:value="${status}"
+                                        th:text="${status}">판매중</option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -318,16 +317,16 @@
                     <label class="form-label fw-bold"><i class="fas fa-tag me-1"></i> 판매 상태 변경</label>
                     <select class="form-select" id="bulkStatus">
                         <option value="" selected>-- 변경 안 함 --</option>
-                        <option value="ON_SALE">판매 중</option>
-                        <option value="STOPPED">판매 중지</option>
-                        <option value="OUT_OF_STOCK">품절</option>
+                        <option th:each="status : ${T(myshop.shop.entity.item.ItemStatus).values()}"
+                                th:value="${status}"
+                                th:text="${status}">판매중</option>
                     </select>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold"><i class="fas fa-percentage me-1"></i> 일괄 할인율 설정</label>
                     <div class="input-group">
-                        <input type="number" class="form-control" id="bulkDiscount" placeholder="0" min="0" max="100">
+                        <input type="number" class="form-control" id="bulkDiscount" placeholder="0" max="100">
                         <span class="input-group-text">%</span>
                     </div>
                     <div class="form-text text-danger">
@@ -613,44 +612,53 @@
         }
     }
 
-    // 4. 일괄 수정 실행
     function applyBulkEdit() {
         const statusValue = document.getElementById('bulkStatus').value;
         const discountValue = document.getElementById('bulkDiscount').value;
-        const selectedItems = document.querySelectorAll('tbody .form-check-input:checked').length;
 
-        // 아무것도 입력하지 않았을 경우
-        if (!statusValue && discountValue === "") {
-            alert("변경할 항목을 최소 하나 이상 입력하거나 선택해주세요.");
+        // --- 추가된 부분: 체크된 itemNo 수집 ---
+        const checkedBoxes = document.querySelectorAll('tbody .form-check-input:checked');
+        const selectedItemNos = Array.from(checkedBoxes).map(cb => cb.value);
+        const selectedItemsCount = selectedItemNos.length;
+        // ------------------------------------
+
+        if (selectedItemsCount === 0) {
+            alert("수정할 상품을 선택해주세요.");
             return;
         }
 
-        // 할인율 유효성 검사
-        if (discountValue !== "") {
-            const discount = parseInt(discountValue);
-            if (discount < 0 || discount > 100) {
-                alert("할인율은 0%에서 100% 사이로 입력해주세요.");
-                return;
-            }
+        if (!statusValue && discountValue === "") {
+            alert("변경할 항목을 최소 하나 이상 선택하거나 입력해주세요.");
+            return;
         }
 
-        if (confirm(`선택한 ${selectedItems}개의 상품 정보를 일괄 수정하시겠습니까?`)) {
-            // 전송할 데이터 객체 예시
-            const updateData = {
-                status: statusValue || "KEEP", // 변경 안함일 경우
-                discountRate: discountValue !== "" ? discountValue : "KEEP"
+        if (confirm(`선택한 ${selectedItemsCount}개의 상품 정보를 일괄 수정하시겠습니까?`)) {
+            // 전송할 최종 데이터 객체
+            const bulkModifyItemDto = {
+                itemNos: selectedItemNos, // 수집된 [101, 102, 103...] 형태의 배열
+                itemStatus: statusValue || null,
+                discount: discountValue !== "" ? discountValue : null
             };
 
-            console.log("전송 데이터:", updateData);
+            console.log("서버로 전송할 데이터:", bulkModifyItemDto);
 
-            // 여기에 API 호출(fetch) 로직이 들어갑니다.
-            alert("일괄 수정 요청이 완료되었습니다.");
 
-            const modal = bootstrap.Modal.getInstance(document.getElementById('bulkEditModal'));
-            modal.hide();
-
-            // 페이지 새로고침 (데이터 반영 확인용)
-            location.reload();
+            fetch('/seller/item_manage/bulk_modify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // JSON임을 명시
+                },
+                body: JSON.stringify(bulkModifyItemDto) // 객체를 JSON 문자열로 변환
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert("일괄 수정이 완료되었습니다.");
+                        location.reload();
+                    } else {
+                        alert("수정 중 오류가 발생했습니다.");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
     }
 

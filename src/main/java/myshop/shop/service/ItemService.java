@@ -3,6 +3,8 @@ package myshop.shop.service;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import myshop.shop.controller.sellerWeb.ItemController;
+import myshop.shop.controller.sellerWeb.ItemController.BulkModifyItemDto;
 import myshop.shop.dto.item.*;
 import myshop.shop.entity.Seller;
 import myshop.shop.entity.item.Item;
@@ -155,4 +157,11 @@ public class ItemService {
         return (mainImage != null && !mainImage.isEmpty()) || (subImages != null && !subImages.isEmpty() && !subImages.get(0).isEmpty());
     }
 
+
+    /**
+     * 일괄 수정
+     */
+    public void bulkModify(BulkModifyItemDto bulkModifyItemDto) {
+        itemRepository.bulkItemStatusDiscount(bulkModifyItemDto);
+    }
 }

@@ -4,7 +4,10 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAUpdateClause;
 import lombok.RequiredArgsConstructor;
+import myshop.shop.controller.sellerWeb.ItemController;
+import myshop.shop.controller.sellerWeb.ItemController.BulkModifyItemDto;
 import myshop.shop.dto.item.ManageItemDto;
 import myshop.shop.dto.item.ModifyItemDto;
 import myshop.shop.dto.item.ModifyItemOptionDto;
@@ -13,6 +16,7 @@ import myshop.shop.dto.item.SearchItemDto;
 import myshop.shop.entity.item.ItemStatus;
 
 
+import myshop.shop.entity.item.QItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -83,5 +87,24 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     private BooleanExpression itemStatusEq(ItemStatus itemStatus) {
         return itemStatus != null ? item.itemStatus.eq(itemStatus) : null;
+    }
+
+
+    /**
+     * 상품 일괄 수정
+     */
+    @Override
+    public long bulkItemStatusDiscount(BulkModifyItemDto bulkModifyItemDto) {
+        JPAUpdateClause query = queryFactory.update(item);
+
+        if(bulkModifyItemDto.getItemStatus() != null) {
+            query.set(item.itemStatus, bulkModifyItemDto.getItemStatus());
+        }
+        if(bulkModifyItemDto.getDiscount() != null) {
+            query.set(item.discount, bulkModifyItemDto.getDiscount());
+        }
+
+        return query.where(item.no.in(bulkModifyItemDto.getItemNos()))
+                .execute();
     }
 }

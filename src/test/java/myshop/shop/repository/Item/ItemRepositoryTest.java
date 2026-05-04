@@ -1,14 +1,19 @@
 package myshop.shop.repository.Item;
 
+import jakarta.persistence.EntityManager;
+import myshop.shop.controller.sellerWeb.ItemController;
+import myshop.shop.controller.sellerWeb.ItemController.BulkModifyItemDto;
 import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
 import myshop.shop.dto.item.ManageItemDto;
 import myshop.shop.dto.item.SearchItemDto;
 import myshop.shop.entity.Seller;
+import myshop.shop.entity.item.Item;
 import myshop.shop.entity.item.ItemCategory;
 import myshop.shop.entity.item.ItemStatus;
 import myshop.shop.repository.seller.SellerRepository;
 import myshop.shop.service.ItemService;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +38,8 @@ class ItemRepositoryTest {
     SellerRepository sellerRepository;
     @Autowired
     ItemService itemService;
+    @Autowired
+    EntityManager em;
 
     @BeforeEach
     @Commit
@@ -166,5 +173,55 @@ class ItemRepositoryTest {
 
     }
 
+    
+    @Test
+    @DisplayName("하나만 변화 된 경우")
+    public void bulkItemStatusDiscountTest() throws Exception {
+        //given
+        List<Long> itemNoList = new ArrayList<>();
+        itemNoList.add(1L);
+        itemNoList.add(2L);
+        itemNoList.add(3L);
+        itemNoList.add(4L);
+        BulkModifyItemDto bulkModifyItemDto = new BulkModifyItemDto(itemNoList, null, 30);
+
+        //when
+        itemRepository.bulkItemStatusDiscount(bulkModifyItemDto);
+        em.flush();
+        em.clear();
+
+        //then
+        Item item = itemRepository.findById(1L).orElse(null);
+        Assertions.assertThat(item.getDiscount()).isEqualTo(30);
+        Item item2 = itemRepository.findById(2L).orElse(null);
+        Assertions.assertThat(item2.getDiscount()).isEqualTo(30);
+        Item item3 = itemRepository.findById(1L).orElse(null);
+        Assertions.assertThat(item3.getDiscount()).isEqualTo(30);
+        Item item4 = itemRepository.findById(2L).orElse(null);
+        Assertions.assertThat(item4.getDiscount()).isEqualTo(30);
+    }
+
+    @Test
+    @DisplayName("두 개 변화")
+    public void bulkItemStatusDiscountTest2() throws Exception {
+        //given
+        List<Long> itemNoList = new ArrayList<>();
+        itemNoList.add(1L);
+        itemNoList.add(2L);
+        BulkModifyItemDto bulkModifyItemDto = new BulkModifyItemDto(itemNoList, ItemStatus.판매중지, 21);
+
+        //when
+        itemRepository.bulkItemStatusDiscount(bulkModifyItemDto);
+        em.flush();
+        em.clear();
+
+        //then
+        Item item = itemRepository.findById(1L).orElse(null);
+        Assertions.assertThat(item.getItemStatus()).isEqualTo(ItemStatus.판매중지);
+        Assertions.assertThat(item.getDiscount()).isEqualTo(21);
+        Item item2 = itemRepository.findById(2L).orElse(null);
+        Assertions.assertThat(item2.getItemStatus()).isEqualTo(ItemStatus.판매중지);
+        Assertions.assertThat(item2.getDiscount()).isEqualTo(21);
+    }
 
 }

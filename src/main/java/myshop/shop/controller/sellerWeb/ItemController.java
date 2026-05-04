@@ -1,11 +1,14 @@
 package myshop.shop.controller.sellerWeb;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.dto.item.*;
 import myshop.shop.dto.seller.LoginCheckSellerDto;
 import myshop.shop.entity.item.ItemImage;
+import myshop.shop.entity.item.ItemStatus;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.service.FileService;
 import myshop.shop.service.ItemImageService;
@@ -89,8 +92,9 @@ public class ItemController {
     }
 
 
+
     /**
-     * 상품 관리 폼 -> 수정
+     * 상품 관리 폼 -> 수정 데이터
      */
     @GetMapping("/seller/item_manage/modify")
     @ResponseBody
@@ -100,6 +104,7 @@ public class ItemController {
         log.info("itemModifyData={}", itemModifyData);
         return itemModifyData;
     }
+
 
 
     /**
@@ -132,10 +137,39 @@ public class ItemController {
         return "redirect:/seller/item_manage";
     }
 
-    /**
-     * @return 변경O true, 변경X false
-     */
+    // 변경O true, 변경X false
     public boolean checkChangeImage(MultipartFile mainImage, List<MultipartFile> subImages) {
         return (mainImage != null && !mainImage.isEmpty()) || (subImages != null && !subImages.isEmpty() && !subImages.get(0).isEmpty());
     }
+
+
+
+    /**
+     * 상품 관리 폼 -> 일괄 수정
+     */
+    @PostMapping("/seller/item_manage/bulk_modify")
+    public String bulkModify(@RequestBody BulkModifyItemDto bulkModifyItemDto) {
+        log.info("bulkModifyItemDto={}", bulkModifyItemDto);
+        itemService.bulkModify(bulkModifyItemDto);
+
+        return "redirect:/seller/item_manage";
+    }
+
+    @Getter
+    @ToString(of = {"itemNos", "itemStatus", "discount"})
+    public static class BulkModifyItemDto {
+        private List<Long> itemNos;
+        private ItemStatus itemStatus;
+        private Integer discount;
+
+        public BulkModifyItemDto() {
+        }
+
+        public BulkModifyItemDto(List<Long> itemNos, ItemStatus itemStatus, Integer discount) {
+            this.itemNos = itemNos;
+            this.itemStatus = itemStatus;
+            this.discount = discount;
+        }
+    }
+
 }
