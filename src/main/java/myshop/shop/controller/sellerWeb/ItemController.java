@@ -7,7 +7,6 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.dto.item.*;
 import myshop.shop.dto.seller.LoginCheckSellerDto;
-import myshop.shop.entity.item.ItemImage;
 import myshop.shop.entity.item.ItemStatus;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.service.FileService;

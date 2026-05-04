@@ -33,6 +33,8 @@ public class AddItemDto {
     private ItemStatus itemStatus;
     private boolean useOptions;     //옵션 사용 체크박스
 
+    private Long viewCount;     // 테스트 전용(완성 후 삭제)
+
     public AddItemDto() {
     }
 
@@ -69,6 +71,26 @@ public class AddItemDto {
         this.itemStatus = itemStatus;
         this.useOptions = useOptions;
     }
+
+    // 테스트 전용
+    public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discount, List<AddItemOptionDto> addItemOptionDtoList, MultipartFile mainImage, String mainImagePath, List<MultipartFile> subImages, List<String> subImagesPath, String content, ItemStatus itemStatus, boolean useOptions, Long viewCount) {
+        this.sellerNo = sellerNo;
+        this.name = name;
+        this.itemCategory = itemCategory;
+        this.price = price;
+        this.totalStock = totalStock;
+        this.discount = discount;
+        this.addItemOptionDtoList = addItemOptionDtoList;
+        this.mainImage = mainImage;
+        this.mainImagePath = mainImagePath;
+        this.subImages = subImages;
+        this.subImagesPath = subImagesPath;
+        this.content = content;
+        this.itemStatus = itemStatus;
+        this.useOptions = useOptions;
+        this.viewCount = viewCount;
+    }
+
 
     public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discount, String mainImagePath, String subImagesPath, String content, ItemStatus itemStatus) {
         this.sellerNo = sellerNo;

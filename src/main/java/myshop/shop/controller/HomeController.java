@@ -2,18 +2,29 @@ package myshop.shop.controller;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.dto.member.LoginMemberDto;
+import myshop.shop.service.ItemService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+@Slf4j
+@RequiredArgsConstructor
 public class HomeController {
+
+    private final ItemService itemService;
+
+
     @GetMapping({"/", "/home"})
     public String home(HttpServletRequest request, Model model) {
         new LoginCheckMemberDto().loginCheck(request, model);
+        // 상품들 가져오기
+        itemService.getAll();
         return "shop/home";
     }
 

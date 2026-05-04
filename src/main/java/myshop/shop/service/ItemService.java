@@ -75,9 +75,48 @@ public class ItemService {
     }
 
 
+    /**
+     * 상품 등록 테스트 전용
+     */
+    public void saveItemForTest(AddItemDto addItemDto) {
+        if (addItemDto.getItemStatus() == null) {
+            addItemDto.setItemStatus(ItemStatus.승인대기);
+        }
+
+        Seller sellerProxy = sellerRepository.getReferenceById(addItemDto.getSellerNo());
+        Item item = new Item(sellerProxy,
+                addItemDto.getName(),
+                addItemDto.getItemCategory(),
+                addItemDto.getPrice(),
+                addItemDto.getTotalStock(),
+                addItemDto.getDiscount(),
+                addItemDto.getContent(),
+                addItemDto.getItemStatus(),
+                addItemDto.getViewCount());
+        itemRepository.save(item);
+
+        //상품 옵션 저장
+        List<AddItemOptionDto> addItemOptionDtoList = addItemDto.getAddItemOptionDtoList();
+        for (AddItemOptionDto addItemOptionDto : addItemOptionDtoList) {
+            itemOptionRepository.save(new ItemOption(item, addItemOptionDto.getName(), addItemOptionDto.getAdditionalPrice(), addItemOptionDto.getOptionStock()));
+        }
+
+        //상품 이미지 저장
+        int sortOrder = 1;
+        String mainImagePath = addItemDto.getMainImagePath();
+        itemImageRepository.save(new ItemImage(item, mainImagePath, true, sortOrder++));
+
+        List<String> subImagePathList = addItemDto.getSubImagesPath();
+        for (String subImagePath : subImagePathList) {
+            itemImageRepository.save(new ItemImage(item, subImagePath, false, sortOrder++));
+        }
+    }
+
+
+
 
     /**
-     * 상품 전체 조회
+     * 판매자 상품 전체 조회
      */
     public List<ManageItemDto> findAllByNo(Long sellerNo) {
         Seller sellerProxy = sellerRepository.getReferenceById(sellerNo);
@@ -91,7 +130,7 @@ public class ItemService {
 
 
     /**
-     * 상품 조회(페이징)
+     * 판매자 상품 조회(페이징)
      */
     public Page<ManageItemDto> findBySearchItemDto(Pageable pageable, SearchItemDto searchItemDto) {
         return itemRepository.searchItemPage(pageable, searchItemDto);
@@ -197,5 +236,14 @@ public class ItemService {
         em.flush();
         em.clear();
         return item;
+    }
+
+
+    /**
+     * 모든 상품 가져오기
+     */
+    public void getAll() {
+        itemRepository.findMainItem(4);
+
     }
 }

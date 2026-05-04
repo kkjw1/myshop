@@ -53,6 +53,19 @@ public class Item extends BaseDateEntity {
         this.viewCount = 0L;
     }
 
+    // viewCount 주입, 테스트 전용
+    public Item(Seller seller, String name, ItemCategory itemCategory, int price, int totalStock, int discount,  String content, ItemStatus itemStatus, Long viewCount) {
+        this.seller = seller;
+        this.name = name;
+        this.itemCategory = itemCategory;
+        this.price = price;
+        this.totalStock = totalStock;
+        this.discount = discount;
+        this.content = content;
+        this.itemStatus = itemStatus;
+        this.viewCount = viewCount;
+    }
+
     public void updateName(String name) {
         this.name = name;
     }

@@ -3,10 +3,7 @@ package myshop.shop.repository.Item;
 import jakarta.persistence.EntityManager;
 import myshop.shop.controller.sellerWeb.ItemController;
 import myshop.shop.controller.sellerWeb.ItemController.BulkModifyItemDto;
-import myshop.shop.dto.item.AddItemDto;
-import myshop.shop.dto.item.AddItemOptionDto;
-import myshop.shop.dto.item.ManageItemDto;
-import myshop.shop.dto.item.SearchItemDto;
+import myshop.shop.dto.item.*;
 import myshop.shop.entity.Seller;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.item.ItemCategory;
@@ -57,7 +54,7 @@ class ItemRepositoryTest {
          * 상품 저장
          */
         Long sellerNo = sellerRepository.findById("test").orElse(null).getNo();
-        itemService.saveItem(new AddItemDto(sellerNo, "상품테스트1", ItemCategory.상의, 30000, 40, 10,
+        itemService.saveItemForTest(new AddItemDto(sellerNo, "상품테스트1", ItemCategory.상의, 30000, 40, 10,
                 List.of(
                         new AddItemOptionDto("검정색", 0, 10),
                         new AddItemOptionDto("나이키", 3000, 10),
@@ -68,37 +65,37 @@ class ItemRepositoryTest {
                         "/shop_image/0d57c72e-ad5c-463d-b404-93b58fc020e7.png",
                         "/shop_image/00e766c7-b5b7-46bb-8b9b-50bb5079668b.png",
                         "/shop_image/1c7e2d70-4ef2-4fd9-862e-40226846215c.png"
-                ), "상품옵션있음, 추가이미지있음", true));
+                ), "상품옵션있음, 추가이미지있음", ItemStatus.판매중, true, 10L));
 
-        itemService.saveItem(new AddItemDto(sellerNo, "상품테스트2(품절)", ItemCategory.바지, 50000, 0, 0,
+        itemService.saveItemForTest(new AddItemDto(sellerNo, "상품테스트2(품절)", ItemCategory.바지, 50000, 0, 0,
                 List.of(
                         new AddItemOptionDto("면바지", 0, 0),
                         new AddItemOptionDto("청바지", 10000, 0)
                 ), null, "/shop_image/1736f6e5-e78c-4f29-96d4-621fbfd034d0.png", null,
                 List.of(
                         "/shop_image/97297b82-81cd-4de7-ba70-bd4e467716df.png"
-                ), "판매완료", ItemStatus.품절,true));
+                ), "판매완료", ItemStatus.품절,true, 50L));
 
 
         List<AddItemOptionDto> emptyAddItemOptionDtoList = new ArrayList<>();
-        itemService.saveItem(new AddItemDto(sellerNo, "상품테스트3(옵션X)", ItemCategory.아우터, 250000, 20, 0,
+        itemService.saveItemForTest(new AddItemDto(sellerNo, "상품테스트3(옵션X)", ItemCategory.아우터, 250000, 20, 0,
                 emptyAddItemOptionDtoList, null, "/shop_image/30537136-0d60-450e-8544-2f9eda4e4800.png", null,
                 List.of(
                         "/shop_image/b3ba7699-d546-4075-84a9-9b6888049a0c.png"
-                ), "상품옵션없음, 추가이미지있음", true));
+                ), "상품옵션없음, 추가이미지있음", ItemStatus.판매중, true, 5L));
 
 
         List<String> emptySubImageList = new ArrayList<>();
-        itemService.saveItem(new AddItemDto(sellerNo, "상품테스트4(추가이미지X)", ItemCategory.신발, 150000, 20, 0,
+        itemService.saveItemForTest(new AddItemDto(sellerNo, "상품테스트4(추가이미지X)", ItemCategory.신발, 150000, 20, 0,
                 List.of(
                         new AddItemOptionDto("250", 0, 10),
                         new AddItemOptionDto("260", 10000, 10)
                 ), null, "/shop_image/b3ecf6ae-140e-4950-81bf-74adce043239.png", null,
-                emptySubImageList, "상품옵션있음, 추가이미지없음", true));
+                emptySubImageList, "상품옵션있음, 추가이미지없음",ItemStatus.판매중, true, 20L));
 
 
         for (int i=0; i<50; i++) {
-            itemService.saveItem(new AddItemDto(sellerNo, "페이징테스트" + i, ItemCategory.신발, i*1000, i, i,
+            itemService.saveItemForTest(new AddItemDto(sellerNo, "페이징테스트" + i, ItemCategory.신발, i*1000, i, i,
                     emptyAddItemOptionDtoList, null, "/shop_image/c9cf742d-c0b0-4b8d-9253-cc32823d36db.png", null,
                     emptySubImageList, "상품옵션없음, 추가이미지없음", true));
         }
@@ -222,6 +219,18 @@ class ItemRepositoryTest {
         Item item2 = itemRepository.findById(2L).orElse(null);
         Assertions.assertThat(item2.getItemStatus()).isEqualTo(ItemStatus.판매중지);
         Assertions.assertThat(item2.getDiscount()).isEqualTo(21);
+    }
+    
+    @Test
+    @Commit
+    public void findMainItemTest() throws Exception {
+        //when
+        List<MainItemDto> mainPageItem = itemRepository.findMainItem(3);
+        //4->1->3
+        for (MainItemDto mainItemDto : mainPageItem) {
+            System.out.println("mainItemDto = " + mainItemDto);
+        }
+
     }
 
 }
