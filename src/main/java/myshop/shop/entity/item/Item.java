@@ -29,14 +29,17 @@ public class Item extends BaseDateEntity {
     private int discount;
     private String content;
 
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("sortOrder ASC")
-    private List<ItemImage> itemImages = new ArrayList<>();
-
     @Enumerated(EnumType.STRING)
     private ItemStatus itemStatus;
 
     private Long viewCount;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("sortOrder ASC")
+    private List<ItemImage> itemImages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemOption> itemOptions = new ArrayList<>();
 
     public Item() {
     }
@@ -90,16 +93,4 @@ public class Item extends BaseDateEntity {
         this.itemStatus = itemStatus;
     }
 
-    //===================편의 메서드===================
-
-    public void addImage(ItemImage image) {
-        itemImages.add(image);
-        image.updateItem(this);
-    }
-
-    public Optional<ItemImage> getMainImage() {
-        return itemImages.stream()
-                .filter(ItemImage::isMain)
-                .findFirst();
-    }
 }

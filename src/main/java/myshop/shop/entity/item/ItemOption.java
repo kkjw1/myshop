@@ -28,4 +28,10 @@ public class ItemOption extends BaseDateEntity {
         this.additionalPrice = additionalPrice;
         this.optionStock = optionStock;
     }
+
+    //==========연관관계 편의 메서드 ============
+    public void addItem(Item item) {
+        this.item = item;
+        item.getItemOptions().add(this);
+    }
 }

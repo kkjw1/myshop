@@ -170,6 +170,7 @@ public class MemberService {
 
     /**
      * 회원 삭제
+     * Address: cascade = CascadeType.REMOVE, orphanRemoval = true
      */
     public int withdraw(String id) {
         return memberRepository.deleteById(id);

@@ -213,14 +213,10 @@ public class ItemService {
 
     /**
      * 상품 삭제
+     * ItemOption, ItemImage : CascadeType.All, orphanRemoval=true
      */
     public int removeItem(Long itemNo) {
-        Item itemProxy = itemRepository.getReferenceById(itemNo);
-
-
-        int itemOption = itemOptionRepository.deleteItemOptionByItem(itemProxy);
-
-
+        // 저장된 이미지 삭제
         ImagePath imagePath = itemImageService.getItemImageByIsMain(itemNo);
         if (imagePath.getMainPath() != null) {
             fileService.removeFile(imagePath.getMainPath());
@@ -228,13 +224,10 @@ public class ItemService {
         for (String s : imagePath.getSubPath()) {
             fileService.removeFile(s);
         }
-        int itemImage = itemImageRepository.deleteItemImageByItem(itemProxy);
-
 
         int item = itemRepository.deleteItemByNo(itemNo);
+        log.info("Item={}개 삭제되었습니다.", item);
 
-
-        log.info("Item={}개 ,ItemOption={}개, ItemImage={}개 삭제되었습니다.", item, itemOption, itemImage);
         em.flush();
         em.clear();
         return item;
@@ -242,7 +235,7 @@ public class ItemService {
 
 
     /**
-     * 메인 페이지 상품 가져오기
+     * 메인 페이지 상품들 가져오기
      */
     public List<MainItemDto> getMainItem(Long limit) {
         List<MainItemDto> mainItemDtoList = itemRepository.findMainItem(limit);
@@ -252,7 +245,6 @@ public class ItemService {
         log.info("mainItemDtoList={}",mainItemDtoList);
         return mainItemDtoList;
     }
-
     /**
      * 할인된 가격 계산
      * 할인가 소수점 이하 올림, 예)100.23원 -> 101원 할인
@@ -260,5 +252,17 @@ public class ItemService {
     public static BigDecimal getDiscountedPrice(BigDecimal originPrice, BigDecimal discount) {
         BigDecimal discountPer = discount.divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
         return originPrice.subtract(originPrice.multiply(discountPer).setScale(0, RoundingMode.CEILING));
+    }
+
+
+    /**
+     * 상품 클릭 -> 상품 상세 가져오기
+     */
+    public DetailItemDto getDetailItem(Long itemNo) {
+        DetailItemDto detailItemDto = itemRepository.findDetailItem(itemNo);
+        List<String> imageUrls = itemRepository.getImageUrls(itemNo);
+        detailItemDto.setItemImageList(imageUrls);
+
+        return detailItemDto;
     }
 }

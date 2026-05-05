@@ -23,14 +23,29 @@ public class HomeController {
     private final ItemService itemService;
 
 
+    /**
+     * 홈 화면
+     */
     @GetMapping({"/", "/home"})
-    public String home(HttpServletRequest request, Model model) {
+    public String homeForm(HttpServletRequest request, Model model) {
         new LoginCheckMemberDto().loginCheck(request, model);
         // 상품들 가져오기
         List<MainItemDto> mainItemDtoList = itemService.getMainItem(4L);
 
         model.addAttribute("mainItemDtoList", mainItemDtoList);
         return "shop/home";
+    }
+
+
+    /**
+     * 상품 상세
+     */
+    @GetMapping("/item")
+    public String itemForm(HttpServletRequest request, Model model) {
+        new LoginCheckMemberDto().loginCheck(request, model);
+
+        itemService.getDetailItem(1L);
+        return "shop/item_detail";
     }
 
 

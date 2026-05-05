@@ -33,7 +33,7 @@ public class Member extends BaseDateEntity {
     @Enumerated(EnumType.STRING)
     private MemberLevel memberLevel;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Address> addresses = new ArrayList<>();
 
     public Member() {

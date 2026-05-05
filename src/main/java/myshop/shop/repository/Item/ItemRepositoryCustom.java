@@ -1,9 +1,11 @@
 package myshop.shop.repository.Item;
 
 import myshop.shop.controller.sellerWeb.ItemController;
+import myshop.shop.dto.item.DetailItemDto;
 import myshop.shop.dto.item.MainItemDto;
 import myshop.shop.dto.item.ManageItemDto;
 import myshop.shop.dto.item.SearchItemDto;
+import myshop.shop.entity.item.Item;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,6 +16,7 @@ import static myshop.shop.entity.item.QItem.item;
 public interface ItemRepositoryCustom {
     /**
      * 상품 관리 데이터 불러오기
+     * Item & ItemImage -> ManageItemDto
      */
     Page<ManageItemDto> searchItemPage(Pageable pageable, SearchItemDto searchItemDto);
 
@@ -24,6 +27,19 @@ public interface ItemRepositoryCustom {
 
     /**
      * 메인 화면 상품 출력
+     * viewCount desc
      */
     List<MainItemDto> findMainItem(Long limit);
+
+    /**
+     * 상품 클릭 -> 상품 상세 출력
+     * Item & ItemOption -> DetailItemDto
+     */
+    DetailItemDto findDetailItem(Long itemNo);
+
+    /**
+     * 이미지 주소들 가져오기
+     * sortOrder ASC
+     */
+    List<String> getImageUrls(Long itemNo);
 }

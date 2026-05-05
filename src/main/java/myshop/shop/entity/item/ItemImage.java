@@ -33,7 +33,10 @@ public class ItemImage extends BaseDateEntity {
         this.sortOrder = sortOrder;
     }
 
-    public void updateItem(Item item) {
+
+    //=============연관관계 편의 메서드=================
+    public void addItem(Item item) {
         this.item = item;
+        item.getItemImages().add(this);
     }
 }
