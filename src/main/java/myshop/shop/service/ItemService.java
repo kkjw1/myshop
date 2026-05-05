@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -240,10 +242,23 @@ public class ItemService {
 
 
     /**
-     * 모든 상품 가져오기
+     * 메인 페이지 상품 가져오기
      */
-    public void getAll() {
-        itemRepository.findMainItem(4);
+    public List<MainItemDto> getMainItem(Long limit) {
+        List<MainItemDto> mainItemDtoList = itemRepository.findMainItem(limit);
+        for (MainItemDto mainItemDto : mainItemDtoList) {
+            mainItemDto.setDiscountedPrice(getDiscountedPrice(BigDecimal.valueOf(mainItemDto.getPrice()), BigDecimal.valueOf(mainItemDto.getDiscount())));
+        }
+        log.info("mainItemDtoList={}",mainItemDtoList);
+        return mainItemDtoList;
+    }
 
+    /**
+     * 할인된 가격 계산
+     * 할인가 소수점 이하 올림, 예)100.23원 -> 101원 할인
+     */
+    public static BigDecimal getDiscountedPrice(BigDecimal originPrice, BigDecimal discount) {
+        BigDecimal discountPer = discount.divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+        return originPrice.subtract(originPrice.multiply(discountPer).setScale(0, RoundingMode.CEILING));
     }
 }

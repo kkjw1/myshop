@@ -225,7 +225,7 @@ class ItemRepositoryTest {
     @Commit
     public void findMainItemTest() throws Exception {
         //when
-        List<MainItemDto> mainPageItem = itemRepository.findMainItem(3);
+        List<MainItemDto> mainPageItem = itemRepository.findMainItem(3L);
         //4->1->3
         for (MainItemDto mainItemDto : mainPageItem) {
             System.out.println("mainItemDto = " + mainItemDto);

@@ -122,7 +122,7 @@ public class InitDB {
                     emptyAddItemOptionDtoList, null, "/shop_image/30537136-0d60-450e-8544-2f9eda4e4800.png", null,
                     List.of(
                             "/shop_image/b3ba7699-d546-4075-84a9-9b6888049a0c.png"
-                    ), "상품옵션없음, 추가이미지있음", ItemStatus.판매중지, true));
+                    ), "상품옵션없음, 추가이미지있음", ItemStatus.판매중, true));
 
 
             List<String> emptySubImageList = new ArrayList<>();
@@ -131,7 +131,7 @@ public class InitDB {
                             new AddItemOptionDto("250", 0, 10),
                             new AddItemOptionDto("260", 10000, 10)
                     ), null, "/shop_image/b3ecf6ae-140e-4950-81bf-74adce043239.png", null,
-                    emptySubImageList, "상품옵션있음, 추가이미지없음", true));
+                    emptySubImageList, "상품옵션있음, 추가이미지없음", ItemStatus.판매중,true));
 
 
             for (int i=0; i<50; i++) {

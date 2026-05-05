@@ -108,15 +108,10 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     /**
      * 메인 화면 상품 출력
+     * viewCount desc
      */
     @Override
-    public List<MainItemDto> findMainItem(long limit) {
-
-/*        this.mainImagePath = mainImagePath;
-        this.name = name;
-        this.price = price;
-        this.discount = discount;*/
-
+    public List<MainItemDto> findMainItem(Long limit) {
 
         return queryFactory
                 .select(Projections.fields(MainItemDto.class,

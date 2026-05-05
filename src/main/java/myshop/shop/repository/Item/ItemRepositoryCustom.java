@@ -25,5 +25,5 @@ public interface ItemRepositoryCustom {
     /**
      * 메인 화면 상품 출력
      */
-    List<MainItemDto> findMainItem(long limit);
+    List<MainItemDto> findMainItem(Long limit);
 }

@@ -69,7 +69,21 @@
 
 
         .category-nav { background: #f8f9fa; border-bottom: 1px solid #ddd; }
-        .product-card { transition: transform 0.2s; cursor: pointer; border: none; }
+        /* 상품 이미지 사이즈 조절 */
+        .product-card .card-img-top {
+            width: 100%;
+            height: 200px;         /* 이미지 높이를 200px로 고정 (취향에 따라 조절) */
+            object-fit: contain;   /* 이미지가 비율을 유지하면서 박스 안에 쏙 들어가게 함 */
+            background-color: #f8f9fa; /* 배경색을 살짝 넣으면 이미지가 작아져도 자연스러움 */
+            padding: 15px;         /* 안쪽 여백 */
+        }
+
+        /* 모바일에서는 조금 더 작게 보이게 조절 (선택 사항) */
+        @media (max-width: 576px) {
+            .product-card .card-img-top {
+                height: 150px;
+            }
+        }
         .product-card:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .product-price { color: #ae0000; font-weight: bold; font-size: 1.2rem; }
         .rocket-icon { color: #0089ff; font-style: italic; font-weight: bold; }
@@ -129,6 +143,19 @@
         .footer-icons img:hover {
             filter: grayscale(0%);
             opacity: 1;
+        }
+
+        /* 원래가, 할인가 */
+        .original-price {
+            color: #999;
+            text-decoration: line-through;
+            font-size: 0.9rem;
+            margin-right: 5px;
+        }
+        .discount-rate {
+            color: #ae0000;
+            font-weight: bold;
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -214,21 +241,29 @@
 <main class="container mt-5">
     <h4 class="mb-4">오늘의 추천 상품</h4>
     <div class="row">
-        <div class="col-6 col-md-4 col-lg-3 mb-4">
+        <div class="col-6 col-md-4 col-lg-3 mb-4" th:each="mainItemDto:${mainItemDtoList}">
             <div class="card product-card">
-                <img src="https://via.placeholder.com/250" class="card-img-top p-3" alt="상품이미지">
+                <img src="https://via.placeholder.com/250" th:src="${mainItemDto.getMainImagePath()}"  class="card-img-top p-3" alt="상품이미지">
                 <div class="card-body">
-                    <p class="card-text mb-1 text-truncate">맛있는 신선 사과 1box (3kg)</p>
-                    <p class="product-price mb-0">15,900원 <span class="rocket-icon">🚀로켓배송</span></p>
+                    <p class="card-text mb-1 text-truncate" th:text="${mainItemDto.getName()}">맛있는 신선 사과 1box (3kg)</p>
+
+                    <div th:if="${mainItemDto.discount gt 0}">
+                        <span class="original-price mb-0" th:text="|${#numbers.formatDecimal(mainItemDto.price, 0, 'COMMA', 0, 'POINT')}원|">15,900원</span>
+                        <span class="product-price mb-0">
+                            <span th:text="|${#numbers.formatDecimal(mainItemDto.discountedPrice, 0, 'COMMA', 0, 'POINT')}원|">18,000원</span>
+                        </span>
+                    </div>
+                    <div th:if="${mainItemDto.discount eq 0}">
+                        <span class="product-price mb-0" th:text="|${#numbers.formatDecimal(mainItemDto.price, 0, 'COMMA', 0, 'POINT')}원|">15,900원</span>
+                    </div>
+
                     <small class="text-muted">⭐ 4.5 (1,240)</small>
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-4 col-lg-3 mb-4"><div class="card product-card"><img src="https://via.placeholder.com/250" class="card-img-top p-3"><div class="card-body"><p class="card-text mb-1 text-truncate">무선 블루투스 이어폰 5.0</p><p class="product-price mb-0">49,000원</p><small class="text-muted">⭐ 5.0 (520)</small></div></div></div>
-        <div class="col-6 col-md-4 col-lg-3 mb-4"><div class="card product-card"><img src="https://via.placeholder.com/250" class="card-img-top p-3"><div class="card-body"><p class="card-text mb-1 text-truncate">초고속 충전 케이블 C타입</p><p class="product-price mb-0">9,800원 <span class="rocket-icon">🚀로켓배송</span></p><small class="text-muted">⭐ 4.0 (2,100)</small></div></div></div>
-        <div class="col-6 col-md-4 col-lg-3 mb-4"><div class="card product-card"><img src="https://via.placeholder.com/250" class="card-img-top p-3"><div class="card-body"><p class="card-text mb-1 text-truncate">편안한 사무용 의자</p><p class="product-price mb-0">125,000원</p><small class="text-muted">⭐ 4.8 (88)</small></div></div></div>
     </div>
 </main>
+<!-- <span class="rocket-icon" th:if="${mainItemDto.price > 10000}">🚀로켓배송</span>-->
 
 
 <footer class="shop-footer" th:replace="~{shop/common :: footer}">
