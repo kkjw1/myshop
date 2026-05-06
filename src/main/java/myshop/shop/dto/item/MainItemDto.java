@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @Getter @Setter
 @ToString(of = {"mainImagePath", "name", "price", "discount", "viewCount"})
 public class MainItemDto {
+    private Long itemNo;
     private String mainImagePath;
     private String name;
     private int price;
@@ -21,7 +22,8 @@ public class MainItemDto {
     public MainItemDto() {
     }
 
-    public MainItemDto(String mainImagePath, String name, int price, int discount, Long viewCount) {
+    public MainItemDto(Long itemNo, String mainImagePath, String name, int price, int discount, Long viewCount) {
+        this.itemNo = itemNo;
         this.mainImagePath = mainImagePath;
         this.name = name;
         this.price = price;

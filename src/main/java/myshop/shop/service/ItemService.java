@@ -265,6 +265,15 @@ public class ItemService {
         List<String> imageUrls = itemRepository.getImageUrls(itemNo);
         detailItemDto.setItemImageList(imageUrls);
 
+        detailItemDto.setDiscountedPrice(getDiscountedPrice(BigDecimal.valueOf(detailItemDto.getPrice()), BigDecimal.valueOf(detailItemDto.getDiscount())));
         return detailItemDto;
+    }
+
+
+    /**
+     * 상품 조회수 증가
+     */
+    public void addViewCount(Long itemNo) {
+        itemRepository.updateViewCountByNo(itemNo);
     }
 }

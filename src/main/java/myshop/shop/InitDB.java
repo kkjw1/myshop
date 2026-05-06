@@ -94,12 +94,12 @@ public class InitDB {
              * 상품 저장
              */
             Long sellerNo = sellerRepository.findById("test").orElse(null).getNo();
-            itemService.saveItem(new AddItemDto(sellerNo, "상품테스트1", ItemCategory.상의, 30000, 40, 10,
+            itemService.saveItem(new AddItemDto(sellerNo, "상품테스트1", ItemCategory.상의, 30000, 49, 10,
                     List.of(
-                            new AddItemOptionDto("검정색", 0, 10),
-                            new AddItemOptionDto("나이키", 3000, 10),
-                            new AddItemOptionDto("흰색", 1000, 10),
-                            new AddItemOptionDto("로고", 3000, 10)
+                            new AddItemOptionDto("검정색", 0, 5),
+                            new AddItemOptionDto("나이키", 3000, 9),
+                            new AddItemOptionDto("흰색", 1000, 15),
+                            new AddItemOptionDto("로고", 3000, 20)
                     ), null, "/shop_image/8ea0eafb-b1a7-492c-b574-654946184243.jpg", null,
                     List.of(
                             "/shop_image/0d57c72e-ad5c-463d-b404-93b58fc020e7.png",
@@ -139,6 +139,11 @@ public class InitDB {
                         emptyAddItemOptionDtoList, null, "/shop_image/c9cf742d-c0b0-4b8d-9253-cc32823d36db.png", null,
                         emptySubImageList, "상품옵션없음, 추가이미지없음", true));
             }
+
+
+
+            em.flush();
+            em.clear();
 
         }
     }

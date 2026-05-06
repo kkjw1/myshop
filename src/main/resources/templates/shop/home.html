@@ -200,7 +200,6 @@
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="mypageMenu">
                     <a class="dropdown-item" href="#" th:href="@{/myPage/orderList}">주문목록</a>
                     <a class="dropdown-item" href="#" th:href="@{/myPage/exchange}">취소/반품</a>
-                    <a class="dropdown-item" href="#" th:href="@{/myPage/wishlist}">찜한상품</a>
                     <!--                <div class="dropdown-divider"></div>-->
                 </div>
             </div>
@@ -242,24 +241,23 @@
     <h4 class="mb-4">오늘의 추천 상품</h4>
     <div class="row">
         <div class="col-6 col-md-4 col-lg-3 mb-4" th:each="mainItemDto:${mainItemDtoList}">
-            <div class="card product-card">
-                <img src="https://via.placeholder.com/250" th:src="${mainItemDto.getMainImagePath()}"  class="card-img-top p-3" alt="상품이미지">
-                <div class="card-body">
-                    <p class="card-text mb-1 text-truncate" th:text="${mainItemDto.getName()}">맛있는 신선 사과 1box (3kg)</p>
+            <a th:href="@{/item(itemNo=${mainItemDto.getItemNo()})}" style="text-decoration: none;">
+                <div class="card product-card">
+                    <img src="https://via.placeholder.com/250" th:src="${mainItemDto.getMainImagePath()}"  class="card-img-top p-3" alt="상품이미지">
+                    <div class="card-body">
+                        <p class="card-text mb-1 text-truncate" th:text="${mainItemDto.getName()}">맛있는 신선 사과 1box (3kg)</p>
+                        <div th:if="${mainItemDto.discount gt 0}">
+                            <span class="original-price mb-0" th:text="|${#numbers.formatDecimal(mainItemDto.price, 0, 'COMMA', 0, 'POINT')}원|">15,900원</span>
+                            <span class="product-price mb-0" th:text="|${#numbers.formatDecimal(mainItemDto.discountedPrice, 0, 'COMMA', 0, 'POINT')}원|">18,000원</span>
+                        </div>
+                        <div th:if="${mainItemDto.discount eq 0}">
+                            <span class="product-price mb-0" th:text="|${#numbers.formatDecimal(mainItemDto.price, 0, 'COMMA', 0, 'POINT')}원|">15,900원</span>
+                        </div>
 
-                    <div th:if="${mainItemDto.discount gt 0}">
-                        <span class="original-price mb-0" th:text="|${#numbers.formatDecimal(mainItemDto.price, 0, 'COMMA', 0, 'POINT')}원|">15,900원</span>
-                        <span class="product-price mb-0">
-                            <span th:text="|${#numbers.formatDecimal(mainItemDto.discountedPrice, 0, 'COMMA', 0, 'POINT')}원|">18,000원</span>
-                        </span>
+                        <small class="text-muted">⭐ 4.5 (1,240)</small>
                     </div>
-                    <div th:if="${mainItemDto.discount eq 0}">
-                        <span class="product-price mb-0" th:text="|${#numbers.formatDecimal(mainItemDto.price, 0, 'COMMA', 0, 'POINT')}원|">15,900원</span>
-                    </div>
-
-                    <small class="text-muted">⭐ 4.5 (1,240)</small>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 </main>

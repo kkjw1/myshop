@@ -5,8 +5,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import myshop.shop.controller.sellerWeb.ItemController;
 import myshop.shop.controller.sellerWeb.ItemController.BulkModifyItemDto;
 import myshop.shop.dto.item.*;
 
@@ -15,13 +15,11 @@ import myshop.shop.entity.item.ItemStatus;
 
 
 import myshop.shop.entity.item.QItem;
-import myshop.shop.entity.item.QItemOption;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static myshop.shop.entity.QSeller.seller;
@@ -34,6 +32,7 @@ import static myshop.shop.entity.item.QItemOption.itemOption;
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+    private final EntityManager em;
 
 
     /**
@@ -119,6 +118,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
         return queryFactory
                 .select(Projections.fields(MainItemDto.class,
+                        item.no.as("itemNo"),
                         itemImage.imageUrl.as("mainImagePath"),
                         item.name,
                         item.price,
@@ -140,22 +140,23 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      */
     @Override
     public DetailItemDto findDetailItem(Long itemNo) {
-        Item item = queryFactory
-                .select(QItem.item)
-                .from(QItem.item)
-                .leftJoin(QItem.item.itemOptions, itemOption).fetchJoin()
-                .where(QItem.item.no.eq(itemNo))
+
+        Item detailItem = queryFactory
+                .select(item)
+                .from(item)
+                .leftJoin(item.itemOptions, itemOption).fetchJoin()
+                .where(item.no.eq(itemNo))
                 .fetchOne();
 
-        if (item != null) {
+        if (detailItem != null) {
             return new DetailItemDto(
-                    item.getItemCategory(),
-                    item.getName(),
-                    item.getPrice(),
-                    item.getDiscount(),
-                    item.getTotalStock(),
-                    item.getItemOptions(),
-                    item.getContent()
+                    detailItem.getItemCategory(),
+                    detailItem.getName(),
+                    detailItem.getPrice(),
+                    detailItem.getDiscount(),
+                    detailItem.getTotalStock(),
+                    detailItem.getItemOptions(),
+                    detailItem.getContent()
             );
         }
         return null;

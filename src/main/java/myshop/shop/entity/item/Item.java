@@ -2,6 +2,7 @@ package myshop.shop.entity.item;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.ToString;
 import myshop.shop.entity.BaseDateEntity;
 import myshop.shop.entity.Seller;
 

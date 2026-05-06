@@ -31,7 +31,7 @@ class MemberRepositoryTest {
         em.clear();
 
         //when
-        Member mem = memberRepository.findById("id").orElse(null)
+        Member mem = memberRepository.findById("id").orElse(null);
         memberRepository.delete(mem);
         Member member = memberRepository.findById("id").orElse(null);
 

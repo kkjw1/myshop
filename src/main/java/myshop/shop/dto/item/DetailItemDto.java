@@ -6,6 +6,7 @@ import lombok.ToString;
 import myshop.shop.entity.item.ItemCategory;
 import myshop.shop.entity.item.ItemOption;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class DetailItemDto {
     private ItemCategory itemCategory;
     private String name;
     private int price;
+    private BigDecimal discountedPrice;
     private int discount;
     private int totalStock;
 

@@ -12,4 +12,8 @@ import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositoryCustom {
     List<Item> findBySeller(Seller seller);
+
+    @Modifying(clearAutomatically = true)
+    @Query("update Item i set i.viewCount = i.viewCount + 1 where i.no=:itemNo")
+    int updateViewCountByNo(@Param("itemNo") Long itemNo);
 }

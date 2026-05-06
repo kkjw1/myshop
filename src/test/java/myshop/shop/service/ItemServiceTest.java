@@ -1,5 +1,6 @@
 package myshop.shop.service;
 
+import jakarta.persistence.EntityManager;
 import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
 import myshop.shop.dto.item.DetailItemDto;
@@ -36,6 +37,8 @@ class ItemServiceTest {
     @Autowired SellerRepository sellerRepository;
     @Autowired ItemOptionRepository itemOptionRepository;
     @Autowired PasswordEncoder passwordEncoder;
+    @Autowired
+    EntityManager em;
 
 
     @BeforeEach
@@ -99,6 +102,9 @@ class ItemServiceTest {
                     emptyAddItemOptionDtoList, null, "/shop_image/c9cf742d-c0b0-4b8d-9253-cc32823d36db.png", null,
                     emptySubImageList, "상품옵션없음, 추가이미지없음", true));
         }
+
+        em.flush();
+        em.clear();
 
     }
 
