@@ -179,7 +179,7 @@ public class ItemController {
     @PostMapping("/seller/item_manage/remove")
     @ResponseBody
     public String removeItem(@RequestParam("itemNo") Long itemNo) {
-        if (itemService.removeItem(itemNo) == 1) {
+        if (itemService.removeItem(itemNo)) {
             return "ok";
         }
         return "no";

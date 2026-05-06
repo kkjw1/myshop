@@ -5,6 +5,7 @@ import com.solapi.sdk.message.exception.SolapiMessageNotReceivedException;
 import com.solapi.sdk.message.model.Message;
 import com.solapi.sdk.message.service.DefaultMessageService;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import myshop.shop.dto.member.LoginMemberDto;
 import myshop.shop.dto.member.ResetPasswordMemberDto;
@@ -172,8 +173,10 @@ public class MemberService {
      * 회원 삭제
      * Address: cascade = CascadeType.REMOVE, orphanRemoval = true
      */
-    public int withdraw(String id) {
-        return memberRepository.deleteById(id);
+    public boolean withdraw(String id) {
+        Member member = memberRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        memberRepository.delete(member);
+        return true;
     }
 
 

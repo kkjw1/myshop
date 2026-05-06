@@ -12,8 +12,4 @@ import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositoryCustom {
     List<Item> findBySeller(Seller seller);
-
-    @Modifying(clearAutomatically = true)
-    @Query("delete Item i where i.no=:itemNo")
-    int deleteItemByNo(@Param("itemNo") Long itemNo);
 }

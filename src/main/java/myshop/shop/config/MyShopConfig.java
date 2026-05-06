@@ -23,7 +23,9 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import tools.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator;
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -47,29 +49,17 @@ public class MyShopConfig implements WebMvcConfigurer {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
 
-        GenericJacksonJsonRedisSerializer serializer = GenericJacksonJsonRedisSerializer
-                .builder()
-                .enableDefaultTyping(new DefaultBaseTypeLimitingValidator()) // PolymorphicTypeValidator
-                .typePropertyName("@class")   // 타입 정보 프로퍼티명
-                .build();
-/*        GenericJacksonJsonRedisSerializer serializer = GenericJacksonJsonRedisSerializer
-                .builder()
-                .enableDefaultTyping(new DefaultBaseTypeLimitingValidator())
-                .objectMapperCustomizer(mapper -> {
-                    mapper.registerModule(new JavaTimeModule());
-                    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-                })
-                .build();*/
+        // 모든 Key와 Value를 String으로 처리
+        StringRedisSerializer stringSerializer = new StringRedisSerializer();
 
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(serializer);
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(serializer);
+        redisTemplate.setKeySerializer(stringSerializer);
+        redisTemplate.setValueSerializer(stringSerializer);
+        redisTemplate.setHashKeySerializer(stringSerializer);
+        redisTemplate.setHashValueSerializer(stringSerializer);
 
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
-
 
     /**
      * 등록자, 수정자

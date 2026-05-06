@@ -1,6 +1,7 @@
 package myshop.shop.service;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.controller.sellerWeb.ItemController;
@@ -215,7 +216,7 @@ public class ItemService {
      * 상품 삭제
      * ItemOption, ItemImage : CascadeType.All, orphanRemoval=true
      */
-    public int removeItem(Long itemNo) {
+    public boolean removeItem(Long itemNo) {
         // 저장된 이미지 삭제
         ImagePath imagePath = itemImageService.getItemImageByIsMain(itemNo);
         if (imagePath.getMainPath() != null) {
@@ -224,13 +225,14 @@ public class ItemService {
         for (String s : imagePath.getSubPath()) {
             fileService.removeFile(s);
         }
-
-        int item = itemRepository.deleteItemByNo(itemNo);
-        log.info("Item={}개 삭제되었습니다.", item);
-
+        Item item = itemRepository.findById(itemNo).orElse(null);
+        if (item == null) {
+            return false;
+        }
+        itemRepository.delete(item);
         em.flush();
         em.clear();
-        return item;
+        return true;
     }
 
 

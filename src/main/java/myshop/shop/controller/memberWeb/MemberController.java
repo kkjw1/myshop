@@ -1,5 +1,6 @@
 package myshop.shop.controller.memberWeb;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
@@ -497,16 +498,16 @@ public class MemberController {
      */
     @PostMapping("/delete")
     public String delete(@RequestParam("memberId") String memberId, HttpServletRequest request) {
-        int result = memberService.withdraw(memberId);
-
-        if (result == 1) {
-            log.info("delete member={}", memberId);
-            HttpSession session = request.getSession(false);
-            session.invalidate();
-            return "redirect:/";
+        try {
+            if (memberService.withdraw(memberId)) {
+                log.info("delete member={}", memberId);
+                HttpSession session = request.getSession(false);
+                session.invalidate();
+                return "redirect:/";
+            }
+        } catch (EntityNotFoundException e) {
+            log.info("삭제 실패, 회원을 찾을 수 없습니다. Id={}", memberId);
         }
-
-        log.info("delete fail memberId={}", memberId);
         return "redirect:/";
     }
 }

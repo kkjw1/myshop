@@ -31,11 +31,11 @@ class MemberRepositoryTest {
         em.clear();
 
         //when
-        int count = memberRepository.deleteById("id");
+        Member mem = memberRepository.findById("id").orElse(null)
+        memberRepository.delete(mem);
         Member member = memberRepository.findById("id").orElse(null);
 
         //then
-        assertThat(count).isEqualTo(1);
         assertThat(member).isNull();
     }
 

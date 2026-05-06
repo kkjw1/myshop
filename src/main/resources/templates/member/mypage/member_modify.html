@@ -308,7 +308,7 @@
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label">성별</label>
                         <div class="col-sm-9 d-flex align-items-center">
-                            <div th:each="gender : ${T(myshop.shop.entity.Gender).values()}" class="custom-control custom-radio custom-control-inline">
+                            <div th:each="gender : ${T(myshop.shop.entity.member.Gender).values()}" class="custom-control custom-radio custom-control-inline">
                                 <input type="radio" class="custom-control-input" th:field="*{gender}" th:value="${gender.name()}">
                                 <label class="custom-control-label" th:for="${#ids.prev('gender')}" th:text="${gender.getVal()}"></label>
                             </div>
