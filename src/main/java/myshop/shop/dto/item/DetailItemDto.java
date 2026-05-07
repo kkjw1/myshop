@@ -14,6 +14,8 @@ import java.util.List;
 @ToString(of = {"itemImageList", "itemCategory", "name", "price", "discount", "totalStock", "detailItemOptionDtoList", "content"})
 public class DetailItemDto {
 
+    private Long itemNo;
+
     private List<String> itemImageList = new ArrayList<>();
 
     private ItemCategory itemCategory;

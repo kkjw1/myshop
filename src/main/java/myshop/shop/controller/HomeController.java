@@ -48,9 +48,10 @@ public class HomeController {
         new LoginCheckMemberDto().loginCheck(request, model);
 
         DetailItemDto detailItemDto = itemService.getDetailItem(itemNo);
+        detailItemDto.setItemNo(itemNo);
         model.addAttribute("detailItemDto", detailItemDto);
 
-        //조회수 1증가
+        //조회수 증가
         itemService.addViewCount(itemNo);
         return "shop/item_detail";
     }
