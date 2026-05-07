@@ -398,8 +398,7 @@
                 <a class="nav-link active" id="detail-tab" data-toggle="tab" href="#detail" role="tab">상품상세</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="review-tab" data-toggle="tab" href="#review" role="tab"
-                   th:text="|상품리뷰(${#lists.size(detailItemDto.reviewList)})|">상품리뷰(0)</a>
+                <a class="nav-link" id="review-tab" data-toggle="tab" href="#review" role="tab">상품리뷰(0)</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" id="qna-tab" data-toggle="tab" href="#qna" role="tab">상품문의</a>
@@ -423,8 +422,8 @@
                 </div>
 
                 <!-- 리뷰 리스트 (반복문) -->
-                <div th:if="${not #lists.isEmpty(detailItemDto.reviewList)}">
-                    <div th:each="review : ${detailItemDto.reviewList}" class="border-bottom pb-3 mb-3">
+<!--                <div th:if="${not #lists.isEmpty(detailItemDto.detailItemOptionDtoList)}">
+                    <div th:each="detailItemOptionDto : ${detailItemDto.detailItemOptionDtoList}" class="border-bottom pb-3 mb-3">
                         <div class="text-warning mb-1">
                             <span th:each="i : ${#numbers.sequence(1, review.rating)}">⭐</span>
                         </div>
@@ -436,7 +435,7 @@
                 </div>
                 <div th:if="${#lists.isEmpty(detailItemDto.reviewList)}" class="text-center py-5 text-muted">
                     등록된 리뷰가 없습니다.
-                </div>
+                </div>-->
             </div>
 
             <!-- 3. 상품 문의 -->
@@ -456,7 +455,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="qna : ${detailItemDto.qnaList}">
+<!--                    <tr th:each="qna : ${detailItemDto.qnaList}">
                         <td>
                             <span th:if="${qna.answered}" class="badge badge-success">답변완료</span>
                             <span th:unless="${qna.answered}" class="badge badge-secondary">답변대기</span>
@@ -470,7 +469,7 @@
                     </tr>
                     <tr th:if="${#lists.isEmpty(detailItemDto.qnaList)}">
                         <td colspan="4" class="py-5 text-muted">등록된 문의가 없습니다.</td>
-                    </tr>
+                    </tr>-->
                     </tbody>
                 </table>
             </div>
@@ -592,11 +591,25 @@
 
     async function toggleCart(button) {
         const itemNo = button.getAttribute('item-no');
-        const stock = document.getElementById('stockInput')?.value || document.getElementById('stockInput2').value;
-        console.log("itemNo=", itemNo);
+        const count = document.getElementById('stockInput')?.value || document.getElementById('stockInput2').value;
+        console.log("itemNo=", itemNo, "count=", count);
         // Cart컨트롤러 만들기
-        showCartModal();
 
+        const res = await fetch('/cart/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({itemNo: itemNo, memberNo: null, count: count})
+        });
+
+        const resVal = await res.json();
+        if(resVal) {
+            showCartModal();
+        } else {
+            const path = location.pathname + location.search;
+            location.href = '/login?redirectURL=' + encodeURIComponent(path);
+        }
     }
 
     // 모달 열기
@@ -613,10 +626,10 @@
     window.onclick = function(event) {
         const modal = document.getElementById('cartModal');
         const qnaModal = document.getElementById('qnaModal');
-        if (event.target == modal) {
+        if (event.target === modal) {
             modal.style.display = 'none';
         }
-        if (event.target == qnaModal) {
+        if (event.target === qnaModal) {
             closeQnaModal();
         }
     }

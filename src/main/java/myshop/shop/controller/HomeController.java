@@ -13,6 +13,7 @@ import myshop.shop.service.ItemService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -41,7 +42,7 @@ public class HomeController {
 
 
     /**
-     * 상품 상세
+     * 상품 상세 폼
      */
     @GetMapping("/item")
     public String itemForm(@RequestParam("itemNo") Long itemNo, HttpServletRequest request, Model model) {

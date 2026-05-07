@@ -24,10 +24,13 @@ public class Cart extends BaseDateEntity {
     private Item item;
 
     private int count;
-    private int totalPrice;
 
     public Cart() {
     }
 
-
+    public Cart(Member member, Item item, int count) {
+        this.member = member;
+        this.item = item;
+        this.count = count;
+    }
 }
