@@ -1,16 +1,13 @@
-package myshop.shop.controller;
+package myshop.shop.controller.memberWeb;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import myshop.shop.controller.memberWeb.MemberController;
+import myshop.shop.dto.cart.SaveCartDto;
 import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.service.CartService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
@@ -37,11 +34,7 @@ public class CartController {
         return true;
     }
 
-    @Getter @Setter
-    public static class SaveCartDto {
-        private Long itemNo;
-        private Long memberNo;
-        private int count;
-    }
+
+
 
 }

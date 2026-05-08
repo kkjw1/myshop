@@ -126,10 +126,10 @@ public class InitDB {
 
 
             List<String> emptySubImageList = new ArrayList<>();
-            itemService.saveItem(new AddItemDto(sellerNo, "상품테스트4(추가이미지X)", ItemCategory.신발, 150000, 20, 0,
+            itemService.saveItem(new AddItemDto(sellerNo, "상품테스트4(추가이미지X)", ItemCategory.신발, 150000, 10, 0,
                     List.of(
                             new AddItemOptionDto("250", 0, 10),
-                            new AddItemOptionDto("260", 10000, 10)
+                            new AddItemOptionDto("260", 10000, 0)
                     ), null, "/shop_image/b3ecf6ae-140e-4950-81bf-74adce043239.png", null,
                     emptySubImageList, "상품옵션있음, 추가이미지없음", ItemStatus.판매중,true));
 

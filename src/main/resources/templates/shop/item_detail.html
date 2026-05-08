@@ -207,6 +207,11 @@
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        .input-danger {
+            border-color: #dc3545 !important;
+            color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -293,7 +298,7 @@
                         <span class="carousel-control-next-icon" style="filter: invert(100%);"></span>
                     </a>
                     <!-- 썸네일 공간 확보용 여백 -->
-                    <div style="height: 100px;"></div>
+<!--                    <div style="height: 0px;"></div>-->
                 </div>
             </div>
         </div>
@@ -337,7 +342,7 @@
                         <select class="form-control" id="optionSelect">
                             <option selected>옵션 선택</option>
                             <option th:each="detailItemOptionDto:${detailItemDto.detailItemOptionDtoList}"
-                                    th:value="detailItemOptionDto.name"
+                                    th:value="${detailItemOptionDto.itemOptionNo}"
                                     th:option-stock="${detailItemOptionDto.optionStock}"
                                     th:text="|${detailItemOptionDto.name} (+${detailItemOptionDto.additionalPrice})|">화이트 (본상품)</option>
                         </select>
@@ -352,6 +357,18 @@
                             <span class="ml-3 small text-muted" id="stockDisplay">옵션을 선택해주세요.</span>
                         </div>
                     </div>
+
+                    <div class="row no-gutters mt-4">
+                        <div class="col-6 pr-2">
+                            <button id="cartBtn" class="btn btn-cart btn-block"
+                                    th:item-no="${detailItemDto.itemNo}" disabled
+                                    onclick="toggleCart(this)">장바구니 담기</button>
+                        </div>
+                        <div class="col-6 pl-2">
+                            <button id="buyBtn" class="btn btn-buy btn-block" disabled>바로구매</button>
+                        </div>
+                    </div>
+
                 </div>
 
 
@@ -360,7 +377,7 @@
                     <div class="form-group">
                         <label class="small font-weight-bold">옵션 선택</label>
                         <select class="form-control" id="optionSelect2">
-                            <option selected>단일 상품 (옵션 없음)</option>
+                            <option selected value="">단일 상품 (옵션 없음)</option>
                         </select>
                     </div>
                     <div class="form-group mt-3">
@@ -371,22 +388,36 @@
                                    th:max="${detailItemDto.totalStock}"
                                    style="width: 100px;"
                                    oninput="validateStock(this)">
-                            <span class="ml-3 small text-muted" id="stockDisplay2" th:text="|(남은 재고: ${detailItemDto.totalStock}개)|">남은 재고</span>
+                            <span class="ml-3 small text-muted input-danger" th:if="${detailItemDto.totalStock eq 0}">품절된 상품입니다.</span>
+                            <span class="ml-3 small text-muted" th:if="${detailItemDto.totalStock gt 0}" id="stockDisplay2" th:text="|(남은 재고: ${detailItemDto.totalStock}개)|">남은 재고</span>
+                        </div>
+                    </div>
+
+                    <div th:if="${detailItemDto.totalStock eq 0}">
+                        <div class="row no-gutters mt-4">
+                            <div class="col-6 pr-2">
+                                <button class="btn btn-cart btn-block" disabled>장바구니 담기</button>
+                            </div>
+                            <div class="col-6 pl-2">
+                                <button class="btn btn-buy btn-block" disabled>바로구매</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${detailItemDto.totalStock gt 0}">
+                        <div class="row no-gutters mt-4">
+                            <div class="col-6 pr-2">
+                                <button id="cartBtn2" class="btn btn-cart btn-block"
+                                        th:item-no="${detailItemDto.itemNo}"
+                                        onclick="toggleCart(this)">장바구니 담기</button>
+                            </div>
+                            <div class="col-6 pl-2">
+                                <button id="buyBtn2" class="btn btn-buy btn-block">바로구매</button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-
-                <div class="row no-gutters mt-4">
-                    <div class="col-6 pr-2">
-                        <button id="cartBtn" class="btn btn-cart btn-block"
-                                th:item-no="${detailItemDto.itemNo}"
-                                onclick="toggleCart(this)">장바구니 담기</button>
-                    </div>
-                    <div class="col-6 pl-2">
-                        <button id="buyBtn" class="btn btn-buy btn-block">바로구매</button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -588,11 +619,65 @@
 
 <script th:inline="javascript">
 
+    //optionSelect가 변경될 때마다 실행
+    document.addEventListener('DOMContentLoaded', function() {
+        const optionSelect = document.getElementById('optionSelect');
+        const stockInput = document.getElementById('stockInput');
+        const stockDisplay = document.getElementById('stockDisplay');
+        const cartBtn = document.getElementById('cartBtn');
+        const buyBtn = document.getElementById('buyBtn');
+
+        if (optionSelect) {
+            optionSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+
+                // 1. "옵션 선택" 가이드 문구를 선택한 경우 (재고 속성이 없는 경우)
+                if (!selectedOption.getAttribute('option-stock')) {
+                    stockInput.value = 1;
+                    stockInput.max = 1;
+                    stockInput.disabled = true; // 입력창 비활성화
+                    stockDisplay.innerText = '옵션을 선택해주세요.';
+                    stockDisplay.classList.remove('input-danger');
+
+                    // 버튼 비활성화 (품절과 동일한 효과)
+                    cartBtn.disabled = true;
+                    buyBtn.disabled = true;
+                    return;
+                }
+
+                const stock = parseInt(selectedOption.getAttribute('option-stock'));
+
+                // 2. 실제 옵션을 선택했으나 재고가 0인 경우 (품절)
+                if (stock <= 0) {
+                    stockInput.value = 0;
+                    stockInput.max = 0;
+                    stockInput.disabled = true;
+                    stockDisplay.innerText = '품절된 상품입니다.';
+                    stockDisplay.classList.add('input-danger');
+                    cartBtn.disabled = true;
+                    buyBtn.disabled = true;
+                }
+                // 3. 재고가 있는 옵션을 선택한 경우
+                else {
+                    stockInput.disabled = false;
+                    stockInput.value = 1;
+                    stockInput.max = stock;
+                    stockDisplay.innerText = `(남은 재고: ${stock}개)`;
+                    stockDisplay.classList.remove('input-danger');
+                    cartBtn.disabled = false;
+                    buyBtn.disabled = false;
+                }
+            });
+        }
+    });
+
 
     async function toggleCart(button) {
         const itemNo = button.getAttribute('item-no');
         const count = document.getElementById('stockInput')?.value || document.getElementById('stockInput2').value;
-        console.log("itemNo=", itemNo, "count=", count);
+        const itemOptionNo = document.getElementById('optionSelect')?.value || document.getElementById('optionSelect2').value;
+
+        console.log("itemNo=", itemNo, "count=", count, "itemOptionNo=", itemOptionNo);
         // Cart컨트롤러 만들기
 
         const res = await fetch('/cart/save', {
@@ -600,7 +685,7 @@
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({itemNo: itemNo, memberNo: null, count: count})
+            body: JSON.stringify({itemNo: itemNo, memberNo: null, itemOptionNo: itemOptionNo, count: count})
         });
 
         const resVal = await res.json();
@@ -633,49 +718,6 @@
             closeQnaModal();
         }
     }
-
-    //optionSelect가 변경될 때마다 실행
-    document.addEventListener('DOMContentLoaded', function() {
-        const optionSelect = document.getElementById('optionSelect');
-        const stockInput = document.getElementById('stockInput');
-        const stockDisplay = document.getElementById('stockDisplay');
-        const cartBtn = document.getElementById('cartBtn');
-        const buyBtn = document.getElementById('buyBtn');
-
-        if (optionSelect) {
-            optionSelect.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-
-                // 옵션 선택 가이드 문구 처리
-                if (!selectedOption.getAttribute('option-stock')) {
-                    stockInput.value = 1;
-                    stockInput.max = 1;
-                    stockDisplay.innerText = '옵션을 선택해주세요.';
-                    return;
-                }
-
-                const stock = parseInt(selectedOption.getAttribute('option-stock'));
-
-                if (stock <= 0) {
-                    stockInput.value = 0;
-                    stockInput.max = 0;
-                    stockInput.disabled = true;
-                    stockDisplay.innerText = '품절된 상품입니다.';
-                    stockDisplay.classList.add('text-danger');
-                    cartBtn.disabled = true;
-                    buyBtn.disabled = true;
-                } else {
-                    stockInput.disabled = false;
-                    stockInput.value = 1; // 옵션 변경 시 1로 초기화
-                    stockInput.max = stock; // 최대 입력 가능 범위를 재고 수량으로 설정
-                    stockDisplay.innerText = `(남은 재고: ${stock}개)`;
-                    stockDisplay.classList.remove('text-danger');
-                    cartBtn.disabled = false;
-                    buyBtn.disabled = false;
-                }
-            });
-        }
-    });
 
     // 수량 체크, 재고를 넘지 못하게 체크
     function validateStock(input) {

@@ -8,6 +8,7 @@ import myshop.shop.entity.item.ItemOption;
 @Getter @Setter
 @ToString(of = {"name", "additionalPrice", "optionStock"})
 public class DetailItemOptionDto {
+    private Long itemOptionNo;
     private String name;
     private int additionalPrice;
     private int optionStock;
@@ -22,6 +23,7 @@ public class DetailItemOptionDto {
     }
 
     public DetailItemOptionDto(ItemOption itemOption) {
+        this.itemOptionNo = itemOption.getNo();
         this.name = itemOption.getName();
         this.additionalPrice = itemOption.getAdditionalPrice();
         this.optionStock = itemOption.getOptionStock();
