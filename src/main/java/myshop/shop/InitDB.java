@@ -74,13 +74,13 @@ public class InitDB {
             Member findMember = memberRepository.findById("test").orElse(null);
             Address mainAddress = new Address(findMember, "테스트 메인주소", "메인수령인",
                     "010-1234-1234", "12345", "인천광역시 서구",
-                    "A아파트", "메인 배송요청사항", true);
+                    "A아파트", true);
             addressRepository.save(mainAddress);
 
             for (int i=1; i<5; i++) {
                 addressRepository.save(new Address(findMember, "테스트 서브주소" + i, "수령인" + i,
                         "010-0000-000" + i, "0000" + i, "도로명" + i,
-                        "아파트" + i, "배송요청사항" + i, false));
+                        "아파트" + i, false));
             }
 
 
@@ -144,7 +144,7 @@ public class InitDB {
             }
 
 
-            cartService.saveCart(new SaveCartDto(1L, 5L, 1L, 1L, 3));
+            cartService.saveCart(new SaveCartDto(1L, 5L, 1L, 1L, 1));
             cartService.saveCart(new SaveCartDto(1L, 5L, 4L, 1L, 2));
             cartService.saveCart(new SaveCartDto(3L, 5L, null, 7L, 6));
             cartService.saveCart(new SaveCartDto(4L, 5L, 7L, 9L, 1));

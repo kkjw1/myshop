@@ -18,22 +18,19 @@ public class AddAddressDto {
     @NotBlank(message = "주소가 비어있습니다.")
     private String roadAddress;
     private String detailAddress;
-    private String deliveryRequest;
 
     private Boolean isMain;        // 기본 배송지 여부
 
     public AddAddressDto() {
     }
 
-    public AddAddressDto(String addressName, String recipientName, String phoneNumber, String postcode, String roadAddress, String detailAddress,
-                         String deliveryRequest, Boolean isMain) {
+    public AddAddressDto(String addressName, String recipientName, String phoneNumber, String postcode, String roadAddress, String detailAddress, Boolean isMain) {
         this.addressName = addressName;
         this.recipientName = recipientName;
         this.phoneNumber = phoneNumber;
         this.postcode = postcode;
         this.roadAddress = roadAddress;
         this.detailAddress = detailAddress;
-        this.deliveryRequest = deliveryRequest;
         this.isMain = isMain;
     }
 
@@ -44,7 +41,6 @@ public class AddAddressDto {
         this.postcode = address.getPostcode();
         this.roadAddress = address.getRoadAddress();
         this.detailAddress = address.getDetailAddress();
-        this.deliveryRequest = address.getDeliveryRequest();
         this.isMain = address.getIsMain();
     }
 

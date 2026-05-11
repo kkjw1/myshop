@@ -30,6 +30,9 @@ public class AddressService {
      * 주소 저장
      */
     public void saveAddress(Long memberNo, AddAddressDto AddAddressDto) {
+        if (AddAddressDto.getIsMain()) {
+            addressRepository.updateIsMainToFalse(memberNo);
+        }
         Member memberProxy = memberRepository.getReferenceById(memberNo);
         Address address = new Address(memberProxy,
                 AddAddressDto.getAddressName(),
@@ -38,7 +41,6 @@ public class AddressService {
                 AddAddressDto.getPostcode(),
                 AddAddressDto.getRoadAddress(),
                 AddAddressDto.getDetailAddress(),
-                AddAddressDto.getDeliveryRequest(),
                 AddAddressDto.getIsMain());
         addressRepository.save(address);
     }
@@ -89,7 +91,6 @@ public class AddressService {
         address.updatePostcode(updateAddressDto.getPostcode());
         address.updateRoadAddress(updateAddressDto.getRoadAddress());
         address.updateDetailAddress(updateAddressDto.getDetailAddress());
-        address.updateDeliveryRequest(updateAddressDto.getDeliveryRequest());
 
         return address;
     }

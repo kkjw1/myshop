@@ -24,7 +24,6 @@ public class Address extends BaseDateEntity{
     private String postcode;
     private String roadAddress;
     private String detailAddress;
-    private String deliveryRequest;
     private Boolean isMain;
 
 
@@ -43,7 +42,7 @@ public class Address extends BaseDateEntity{
     }
 
     public Address(Member member, String addressName, String recipientName, String phoneNumber, String postcode,
-                   String roadAddress, String detailAddress, String deliveryRequest, boolean isMain) {
+                   String roadAddress, String detailAddress, boolean isMain) {
         this.member = member;
         this.addressName = addressName;
         this.recipientName = recipientName;
@@ -51,7 +50,6 @@ public class Address extends BaseDateEntity{
         this.postcode = postcode;
         this.roadAddress = roadAddress;
         this.detailAddress = detailAddress;
-        this.deliveryRequest = deliveryRequest;
         this.isMain = isMain;
     }
 
@@ -77,10 +75,6 @@ public class Address extends BaseDateEntity{
 
     public void updateDetailAddress(String detailAddress) {
         this.detailAddress = detailAddress;
-    }
-
-    public void updateDeliveryRequest(String deliveryRequest) {
-        this.deliveryRequest = deliveryRequest;
     }
 
     public void updateIsMain(Boolean isMain) {

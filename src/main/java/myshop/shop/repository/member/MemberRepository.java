@@ -19,5 +19,4 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     @Query("update Member m set m.password=:password where m.id=:id")
     int updatePassword(@Param("id") String id, @Param("password") String password);
 
-    String id(String id);
 }

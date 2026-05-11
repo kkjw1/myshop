@@ -278,177 +278,180 @@
     </div>
 </div>
 
-<div class="container pb-5">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="side-menu shadow-sm mb-4">
-                <div class="px-3 mb-2"><h5 class="font-weight-bold small text-muted">MY 쇼핑</h5></div>
-                <a href="#" th:href="@{/myPage/orderList}">주문목록/배송조회</a>
-                <a href="#" th:href="@{/myPage/exchange}">취소/반품/교환 내역</a>
-                <a href="#" class="active" th:href="@{/myPage/cart}">장바구니 관리</a>
-                <hr>
-                <div class="px-3 mb-3"><h5 class="font-weight-bold">MY 정보</h5></div>
-                <a href="#" th:href="@{/myPage/memberModify}">개인정보 확인/수정</a>
-                <a href="#" th:href="@{/myPage/addressManage}">배송지 관리</a>
-            </div>
-        </div>
-
-        <!-- 메인 장바구니 영역 -->
-        <div class="col-md-6">
-            <div class="cart-container shadow-sm">
-
-
-                <div class="d-flex justify-content-between align-items-center mb-3 pb-2">
-                    <h4 class="mb-0 font-weight-bold">장바구니</h4>
-                    <span class="text-muted" style="font-size: 14px;" th:text="|전체 ${manageCartDtoList.size()}개|">전체 2개</span>
+<form th:action="@{/myPage/order}" method="get">
+    <div class="container pb-5">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="side-menu shadow-sm mb-4">
+                    <div class="px-3 mb-2"><h5 class="font-weight-bold small text-muted">MY 쇼핑</h5></div>
+                    <a href="#" th:href="@{/myPage/orderList}">주문목록/배송조회</a>
+                    <a href="#" th:href="@{/myPage/exchange}">취소/반품/교환 내역</a>
+                    <a href="#" class="active" th:href="@{/myPage/cart}">장바구니 관리</a>
+                    <hr>
+                    <div class="px-3 mb-3"><h5 class="font-weight-bold">MY 정보</h5></div>
+                    <a href="#" th:href="@{/myPage/memberModify}">개인정보 확인/수정</a>
+                    <a href="#" th:href="@{/myPage/addressManage}">배송지 관리</a>
                 </div>
+            </div>
 
-                <!-- 메인 장바구니 영역 내 상품 아이템 부분 수정 -->
-                <!-- 장바구니 상품 아이템 루프 시작 -->
-                <div class="cart-item d-flex align-items-start" th:each="manageCartDto : ${manageCartDtoList}">
-                    <div class="custom-control custom-checkbox mr-2">
-                        <input type="checkbox"
-                               th:id="'check-' + ${manageCartDto.cartNo}"
-                               th:value="${manageCartDto.cartNo}"
-                               class="custom-control-input item-checkbox">
-                        <label class="custom-control-label" th:for="'check-' + ${manageCartDto.cartNo}"></label>
+            <!-- 메인 장바구니 영역 -->
+            <div class="col-md-6">
+                <div class="cart-container shadow-sm">
+
+
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2">
+                        <h4 class="mb-0 font-weight-bold">장바구니</h4>
+                        <span class="text-muted" style="font-size: 14px;" th:text="|전체 ${manageCartDtoList.size()}개|">전체 2개</span>
                     </div>
 
-
-
-                    <!--이미지 -->
-                    <div class="product-img-wrapper">
-                        <img src="/static/no_image.png" th:src="${manageCartDto.imagePath}" alt="상품이미지" class="product-img">
-                    </div>
-
-                    <!-- 상품 상세 정보 -->
-                    <div class="product-info-detail ml-3">
-                        <div class="product-name text-truncate" th:text="${manageCartDto.name}">
-                            상품명이 아주아주 길어도 레이아웃이 무너지지 않고 말줄임표 처리가 됩니다.
+                    <!-- 메인 장바구니 영역 내 상품 아이템 부분 수정 -->
+                    <!-- 장바구니 상품 아이템 루프 시작 -->
+                    <div class="cart-item d-flex align-items-start" th:each="manageCartDto : ${manageCartDtoList}">
+                        <div class="custom-control custom-checkbox mr-2">
+                            <input type="checkbox"
+                                   th:id="'check-' + ${manageCartDto.cartNo}"
+                                   th:value="${manageCartDto.cartNo}"
+                                   name="cartNo"
+                                   class="custom-control-input item-checkbox">
+                            <label class="custom-control-label" th:for="'check-' + ${manageCartDto.cartNo}"></label>
                         </div>
 
-                        <!-- 옵션 있는 경우 -->
-                        <div th:if="${manageCartDto.itemOptionNo ne null}"
-                             class="product-info-detail"
-                             th:cart-no="${manageCartDto.cartNo}"
-                             th:cart-item-price="${manageCartDto.originPrice + manageCartDto.optionPrice}">
 
-                            <div class="product-option" th:text="|옵션: ${manageCartDto.optionName}|">
-                                옵션: 블랙
+
+                        <!--이미지 -->
+                        <div class="product-img-wrapper">
+                            <img src="/static/no_image.png" th:src="${manageCartDto.imagePath}" alt="상품이미지" class="product-img">
+                        </div>
+
+                        <!-- 상품 상세 정보 -->
+                        <div class="product-info-detail ml-3">
+                            <div class="product-name text-truncate" th:text="${manageCartDto.name}">
+                                상품명이 아주아주 길어도 레이아웃이 무너지지 않고 말줄임표 처리가 됩니다.
                             </div>
 
-                            <!-- 재고 및 배송 정보 -->
-                            <div class="mb-2">
-                                <!--5미만-->
-                                <span th:if="${manageCartDto.optionStock lt 5}" class="text-danger font-weight-bold" style="font-size: 12px;"
-                                      th:text="|재고: ${manageCartDto.optionStock}개|">재고: 3개</span>
-                                <span th:if="${manageCartDto.optionStock ge 5}" class="text-muted" style="font-size: 12px;"
-                                      th:text="|재고: ${manageCartDto.optionStock}개|">재고: 15개</span>
-                            </div>
+                            <!-- 옵션 있는 경우 -->
+                            <div th:if="${manageCartDto.itemOptionNo ne null}"
+                                 class="product-info-detail"
+                                 th:cart-no="${manageCartDto.cartNo}"
+                                 th:cart-item-price="${manageCartDto.originPrice + manageCartDto.optionPrice}">
 
-                            <div class="d-flex justify-content-between align-items-end">
-                                <!-- 수량 조절 -->
-                                <div class="quantity-control">
-                                    <input type="number" id="stockInput" class="form-control form-control-sm"
-                                           value="1" min="1" max="10"
-                                           th:value="${manageCartDto.count > manageCartDto.optionStock ? manageCartDto.optionStock : manageCartDto.count}"
-                                           th:max="${manageCartDto.optionStock}"
-                                           style="width: 100px;"
-                                           onchange="updateStock(this)">
+                                <div class="product-option" th:text="|옵션: ${manageCartDto.optionName}|">
+                                    옵션: 블랙
                                 </div>
-                                <div class="text-right">
-                                    <!-- 수량에 따라 변할 가격 표시 영역 -->
-                                    <div class="price-text"
-                                         th:text="${#numbers.formatInteger((manageCartDto.originPrice + manageCartDto.optionPrice) * manageCartDto.count, 3, 'COMMA') + '원'}">
-                                        14,000원
+
+                                <!-- 재고 및 배송 정보 -->
+                                <div class="mb-2">
+                                    <!--5미만-->
+                                    <span th:if="${manageCartDto.optionStock lt 5}" class="text-danger font-weight-bold" style="font-size: 12px;"
+                                          th:text="|재고: ${manageCartDto.optionStock}개|">재고: 3개</span>
+                                    <span th:if="${manageCartDto.optionStock ge 5}" class="text-muted" style="font-size: 12px;"
+                                          th:text="|재고: ${manageCartDto.optionStock}개|">재고: 15개</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <!-- 수량 조절 -->
+                                    <div class="quantity-control">
+                                        <input type="number" id="stockInput" class="form-control form-control-sm"
+                                               value="1" min="1" max="10"
+                                               th:value="${manageCartDto.count > manageCartDto.optionStock ? manageCartDto.optionStock : manageCartDto.count}"
+                                               th:max="${manageCartDto.optionStock}"
+                                               style="width: 100px;"
+                                               onchange="updateStock(this)">
                                     </div>
-                                    <a href="javascript:void(0)" class="text-muted small"
-                                       th:cart-no="${manageCartDto.cartNo}"
-                                       onclick="removeCart(this)">삭제</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 옵션 없는 경우 -->
-                        <div th:if="${manageCartDto.itemOptionNo eq null}"
-                             class="product-info-detail"
-                             th:cart-no="${manageCartDto.cartNo}"
-                             th:cart-item-price="${manageCartDto.originPrice}">
-
-                            <!-- 재고 및 배송 정보 -->
-                            <div class="mb-2">
-                                <!--5미만-->
-                                <span th:if="${manageCartDto.totalStock lt 5}" class="text-danger font-weight-bold" style="font-size: 12px;"
-                                      th:text="|재고: ${manageCartDto.totalStock}개|">재고: 3개</span>
-                                <span th:if="${manageCartDto.totalStock ge 5}" class="text-muted" style="font-size: 12px;"
-                                      th:text="|재고: ${manageCartDto.totalStock}개|">재고: 15개</span>
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-end">
-                                <!-- 수량 조절 -->
-                                <div class="quantity-control">
-                                    <input type="number" id="stockInput2" class="form-control form-control-sm"
-                                           value="1" min="1" max="10"
-                                           th:value="${manageCartDto.count > manageCartDto.totalStock ? manageCartDto.totalStock : manageCartDto.count}"
-                                           th:max="${manageCartDto.totalStock}"
-                                           style="width: 100px;"
-                                           onchange="updateStock(this)">
-                                </div>
-                                <div class="text-right">
-                                    <!-- 수량에 따라 변할 가격 표시 영역 -->
-                                    <div class="price-text"
-                                         th:text="${#numbers.formatInteger(manageCartDto.originPrice * manageCartDto.count, 3, 'COMMA') + '원'}">
-                                        14,000원
+                                    <div class="text-right">
+                                        <!-- 수량에 따라 변할 가격 표시 영역 -->
+                                        <div class="price-text"
+                                             th:text="${#numbers.formatInteger((manageCartDto.originPrice + manageCartDto.optionPrice) * manageCartDto.count, 3, 'COMMA') + '원'}">
+                                            14,000원
+                                        </div>
+                                        <a href="javascript:void(0)" class="text-muted small"
+                                           th:cart-no="${manageCartDto.cartNo}"
+                                           onclick="removeCart(this)">삭제</a>
                                     </div>
-                                    <a href="javascript:void(0)" class="text-muted small"
-                                       th:cart-no="${manageCartDto.cartNo}"
-                                       onclick="removeCart(this)">삭제</a>
+                                </div>
+                            </div>
+
+                            <!-- 옵션 없는 경우 -->
+                            <div th:if="${manageCartDto.itemOptionNo eq null}"
+                                 class="product-info-detail"
+                                 th:cart-no="${manageCartDto.cartNo}"
+                                 th:cart-item-price="${manageCartDto.originPrice}">
+
+                                <!-- 재고 및 배송 정보 -->
+                                <div class="mb-2">
+                                    <!--5미만-->
+                                    <span th:if="${manageCartDto.totalStock lt 5}" class="text-danger font-weight-bold" style="font-size: 12px;"
+                                          th:text="|재고: ${manageCartDto.totalStock}개|">재고: 3개</span>
+                                    <span th:if="${manageCartDto.totalStock ge 5}" class="text-muted" style="font-size: 12px;"
+                                          th:text="|재고: ${manageCartDto.totalStock}개|">재고: 15개</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <!-- 수량 조절 -->
+                                    <div class="quantity-control">
+                                        <input type="number" id="stockInput2" class="form-control form-control-sm"
+                                               value="1" min="1" max="10"
+                                               th:value="${manageCartDto.count > manageCartDto.totalStock ? manageCartDto.totalStock : manageCartDto.count}"
+                                               th:max="${manageCartDto.totalStock}"
+                                               style="width: 100px;"
+                                               onchange="updateStock(this)">
+                                    </div>
+                                    <div class="text-right">
+                                        <!-- 수량에 따라 변할 가격 표시 영역 -->
+                                        <div class="price-text"
+                                             th:text="${#numbers.formatInteger(manageCartDto.originPrice * manageCartDto.count, 3, 'COMMA') + '원'}">
+                                            14,000원
+                                        </div>
+                                        <a href="javascript:void(0)" class="text-muted small"
+                                           th:cart-no="${manageCartDto.cartNo}"
+                                           onclick="removeCart(this)">삭제</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
 
-                <div class="d-flex align-items-center justify-content-between py-2 px-1 mb-2">
-                    <!-- 전체 선택 체크박스 -->
-                    <div class="custom-control custom-checkbox ml-2">
-                        <input type="checkbox" class="custom-control-input" id="checkAll">
-                        <label class="custom-control-label font-weight-bold" for="checkAll">전체선택</label>
+                    <div class="d-flex align-items-center justify-content-between py-2 px-1 mb-2">
+                        <!-- 전체 선택 체크박스 -->
+                        <div class="custom-control custom-checkbox ml-2">
+                            <input type="checkbox" class="custom-control-input" id="checkAll">
+                            <label class="custom-control-label font-weight-bold" for="checkAll">전체선택</label>
+                        </div>
+
+                        <button class="btn btn-sm btn-outline-secondary mr-1" style="border: none; font-size: 13px;"
+                        onclick="removeCarts()">선택삭제</button>
                     </div>
 
-                    <button class="btn btn-sm btn-outline-secondary mr-1" style="border: none; font-size: 13px;"
-                    onclick="removeCarts()">선택삭제</button>
+
+
                 </div>
-
-
-
             </div>
-        </div>
-
-        <!-- 오른쪽 주문 요약 바 -->
-        <div class="col-md-3">
-            <div class="order-summary shadow-sm">
-                <h5 class="font-weight-bold mb-4">결제 정보</h5>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>총 상품가격</span>
-                    <span>144,900원</span>
+            <!-- 오른쪽 주문 요약 바 -->
+            <div class="col-md-3">
+                <div class="order-summary shadow-sm">
+                    <h5 class="font-weight-bold mb-4">결제 정보</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>총 상품가격</span>
+                        <span>144,900원</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>배송비</span>
+                        <span id="deliveryFee">0원</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="font-weight-bold">총 결제금액</span>
+                        <span class="total-price">144,900원</span>
+                    </div>
+                    <button type="submit" class="btn-order">구매하기 (2)</button>
+                    <p class="text-center mt-3 text-muted small">3만원 이상 구매 시 배송비 무료</p>
                 </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>배송비</span>
-                    <span id="deliveryFee">0원</span>
-                </div>
-                <hr>
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <span class="font-weight-bold">총 결제금액</span>
-                    <span class="total-price">144,900원</span>
-                </div>
-                <button class="btn-order">구매하기 (2)</button>
-                <p class="text-center mt-3 text-muted small">3만원 이상 구매 시 배송비 무료</p>
             </div>
+
         </div>
     </div>
-</div>
+</form>
 
 <footer class="shop-footer" th:replace="~{/shop/common::footer}">
     <div class="container">

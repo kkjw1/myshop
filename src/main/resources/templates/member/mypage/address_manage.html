@@ -261,7 +261,6 @@
                             <p class="mb-1 font-weight-bold" th:text="|*{recipientName} (*{phoneNumber})|">홍길동 (010-1234-5678)</p>
                             <p class="mb-0" th:text="*{roadAddress}" th:if="*{detailAddress == ''}">서울특별시 강남구 테헤란로 123 (역삼동, 쿠팡빌딩)</p>
                             <p class="mb-0" th:text="|*{roadAddress} (*{detailAddress})|" th:if="*{detailAddress != ''}">서울특별시 강남구 테헤란로 123 (역삼동, 쿠팡빌딩)</p>
-                            <p class="mb-0 text-muted small mt-2" th:text="*{deliveryRequest}">문 앞 / 공동현관 출입번호: 1234#</p>
                         </div>
                     </div>
                 </div>
@@ -283,7 +282,6 @@
                         <div class="address-detail">
                             <p class="mb-1 font-weight-bold" th:text="|${manageAddressDto.getRecipientName()} (${manageAddressDto.getPhoneNumber()})|">홍길동 (010-1234-5678)</p>
                             <p class="mb-0" th:text="${manageAddressDto.getDetailAddress() == ''} ? ${manageAddressDto.getRoadAddress()} : ${manageAddressDto.getRoadAddress()}+' ('+${manageAddressDto.getDetailAddress()}+')'">경기도 성남시 분당구 판교역로 231 (H스퀘어 S동)</p>
-                            <p class="mb-0 text-muted small mt-2" th:text="${manageAddressDto.getDeliveryRequest()}">경비실에 맡겨주세요</p>
                         </div>
                     </div>
                 </div>

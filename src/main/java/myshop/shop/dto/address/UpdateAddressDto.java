@@ -18,19 +18,17 @@ public class UpdateAddressDto {
     @NotBlank(message = "주소가 비어있습니다.")
     private String roadAddress;
     private String detailAddress;
-    private String deliveryRequest;
 
     public UpdateAddressDto() {
     }
 
-    public UpdateAddressDto(String addressName, String recipientName, String phoneNumber, String postcode, String roadAddress, String detailAddress, String deliveryRequest) {
+    public UpdateAddressDto(String addressName, String recipientName, String phoneNumber, String postcode, String roadAddress, String detailAddress) {
         this.addressName = addressName;
         this.recipientName = recipientName;
         this.phoneNumber = phoneNumber;
         this.postcode = postcode;
         this.roadAddress = roadAddress;
         this.detailAddress = detailAddress;
-        this.deliveryRequest = deliveryRequest;
     }
 
     public UpdateAddressDto(Address address) {
@@ -41,7 +39,6 @@ public class UpdateAddressDto {
         this.postcode = address.getPostcode();
         this.roadAddress = address.getRoadAddress();
         this.detailAddress = address.getDetailAddress();
-        this.deliveryRequest = address.getDeliveryRequest();
     }
 
 }
