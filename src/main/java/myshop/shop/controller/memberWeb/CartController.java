@@ -12,10 +12,7 @@ import myshop.shop.entity.Cart;
 import myshop.shop.service.CartService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -69,8 +66,6 @@ public class CartController {
         cartService.updateCount(updateCartCount.getCartNo(), updateCartCount.getCount());
         return true;
     }
-
-
     @Getter @Setter
     public static class UpdateCartCount {
         private Long cartNo;
@@ -84,6 +79,31 @@ public class CartController {
             this.count = count;
         }
     }
+
+
+    /**
+     * 장바구니 폼 -> 삭제
+     */
+    @PostMapping("/myPage/cart/removeCart")
+    @ResponseBody
+    public boolean cartRemove(@RequestParam("cartNo") Long cartNo) {
+         cartService.removeCart(cartNo);
+         return true;
+    }
+
+
+    /**
+     * 장바구니 폼 -> 선택 삭제
+     */
+    @PostMapping("/myPage/cart/removeCartList")
+    @ResponseBody
+    public boolean cartListRemove(@RequestBody List<Long> cartNoList) {
+        for (Long cartNo : cartNoList) {
+            cartService.removeCart(cartNo);
+        }
+        return true;
+    }
+
 
 
 

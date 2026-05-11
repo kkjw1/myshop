@@ -94,4 +94,12 @@ public class CartService {
         cart.updateCount(count);
 
     }
+
+
+    /**
+     * 장바구니 삭제
+     */
+    public void removeCart(Long cartNo) {
+        cartRepository.deleteByNo(cartNo);
+    }
 }

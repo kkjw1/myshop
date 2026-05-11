@@ -316,7 +316,6 @@
 
 
 
-
                     <!--이미지 -->
                     <div class="product-img-wrapper">
                         <img src="/static/no_image.png" th:src="${manageCartDto.imagePath}" alt="상품이미지" class="product-img">
@@ -401,7 +400,9 @@
                                          th:text="${#numbers.formatInteger(manageCartDto.originPrice * manageCartDto.count, 3, 'COMMA') + '원'}">
                                         14,000원
                                     </div>
-                                    <a href="javascript:void(0)" class="text-muted small">삭제</a>
+                                    <a href="javascript:void(0)" class="text-muted small"
+                                       th:cart-no="${manageCartDto.cartNo}"
+                                       onclick="removeCart(this)">삭제</a>
                                 </div>
                             </div>
                         </div>
@@ -409,16 +410,15 @@
                 </div>
 
 
-                <!-- 전체 선택 바: bg-light를 제거하고 border-bottom을 추가하여 일체감을 주었습니다. -->
                 <div class="d-flex align-items-center justify-content-between py-2 px-1 mb-2">
-                    <!-- 왼쪽: 전체 선택 체크박스 -->
+                    <!-- 전체 선택 체크박스 -->
                     <div class="custom-control custom-checkbox ml-2">
                         <input type="checkbox" class="custom-control-input" id="checkAll">
                         <label class="custom-control-label font-weight-bold" for="checkAll">전체선택</label>
                     </div>
 
-                    <!-- 오른쪽: 선택삭제 버튼 -->
-                    <button class="btn btn-sm btn-outline-secondary mr-1" style="border: none; font-size: 13px;">선택삭제</button>
+                    <button class="btn btn-sm btn-outline-secondary mr-1" style="border: none; font-size: 13px;"
+                    onclick="removeCarts()">선택삭제</button>
                 </div>
 
 
@@ -611,9 +611,68 @@
         }
 
     }
-    
+
+    async function removeCart(button) {
+        const cartNo = button.getAttribute('cart-no');
+
+        try {
+            const res = await fetch(`/myPage/cart/removeCart?cartNo=${cartNo}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            const resVal = await res.json();
+            if (resVal) {
+                alert("상품이 삭제되었습니다.");
+                location.href = '/myPage/cart';
+            } else {
+                alert("삭제 실패: 서버 오류가 발생했습니다.");
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            alert("요청 중 오류가 발생했습니다.");
+        }
+    }
 
 
+    async function removeCarts() {
+        const selectedChecks = document.querySelectorAll('.item-checkbox:checked');
+
+        if (selectedChecks.length === 0) {
+            alert("삭제할 상품을 선택해주세요.");
+            return;
+        }
+
+        if (!confirm(`선택한 ${selectedChecks.length}개의 상품을 삭제하시겠습니까?`)) {
+            return;
+        }
+
+        const cartNoList = Array.from(selectedChecks).map(cb => parseInt(cb.value));
+
+        try {
+            const res = await fetch('/myPage/cart/removeCartList', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(cartNoList)
+            });
+
+            const resVal = await res.json();
+
+            if (resVal) {
+                alert("선택한 상품이 삭제되었습니다.");
+                location.reload(); // 페이지 새로고침하여 리스트 갱신
+            } else {
+                alert("삭제에 실패했습니다.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("서버 통신 중 오류가 발생했습니다.");
+        }
+    }
 
 </script>
 
