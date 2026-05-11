@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 import static myshop.shop.entity.item.QItem.item;
 
@@ -41,5 +42,5 @@ public interface ItemRepositoryCustom {
      * 이미지 주소들 가져오기
      * sortOrder ASC
      */
-    List<String> getImageUrls(Long itemNo);
+    Map<Long, String> getImageUrls(Long itemNo);
 }

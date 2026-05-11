@@ -271,26 +271,26 @@
                 <div id="productImageCarousel" class="carousel slide border rounded" data-ride="carousel">
                     <!-- 썸네일 이미지 슬라이드 -->
                     <ol class="carousel-indicators" style="bottom: -80px; margin-bottom: 0;">
-                        <li th:each="itemImage, stat : ${detailItemDto.itemImageList}"
+                        <li th:each="itemImage, stat : ${detailItemDto.itemImageMap}"
                             data-target="#productImageCarousel"
                             th:data-slide-to="${stat.index}"
                             th:classappend="${stat.first} ? 'active' : ''"
                             class="border"
                             style="width: 60px; height: 60px; text-indent: 0; background: none; overflow: hidden; cursor: pointer;">
-                            <img th:src="${itemImage}" src="/static/no_image.png" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img th:src="${itemImage.value}" src="/static/no_image.png" style="width: 100%; height: 100%; object-fit: cover;">
                         </li>
                     </ol>
 
                     <!--메인 이미지 슬라이드-->
                     <div class="carousel-inner">
                         <!-- 0번째 이미지에만 active -->
-                        <div th:each="itemImage, stat : ${detailItemDto.itemImageList}"
+                        <div th:each="itemImage, stat : ${detailItemDto.itemImageMap}"
                              class="carousel-item"
                              th:classappend="${stat.first} ? 'active' : ''">
-                            <img th:src="${itemImage}" src="/static/no_image.png" class="d-block w-100" style="height: 450px; object-fit: contain;">
+                            <img th:src="${itemImage.value}" src="/static/no_image.png" class="d-block w-100" style="height: 450px; object-fit: contain;">
                         </div>
                     </div>
-
+                    <input type="hidden" id="mainImage" th:value="${detailItemDto.itemImageMap.keySet()[0]}">
                     <a class="carousel-control-prev" href="#productImageCarousel" role="button" data-slide="prev">
                         <span class="carousel-control-prev-icon" style="filter: invert(100%);"></span>
                     </a>
@@ -676,8 +676,10 @@
         const itemNo = button.getAttribute('item-no');
         const count = document.getElementById('stockInput')?.value || document.getElementById('stockInput2').value;
         const itemOptionNo = document.getElementById('optionSelect')?.value || document.getElementById('optionSelect2').value;
+        const itemImageNo = document.getElementById('mainImage').value;
 
-        console.log("itemNo=", itemNo, "count=", count, "itemOptionNo=", itemOptionNo);
+
+        console.log("itemNo=", itemNo, "count=", count, "itemOptionNo=", itemOptionNo, "itemImageNo=", itemImageNo);
         // Cart컨트롤러 만들기
 
         const res = await fetch('/cart/save', {
@@ -685,7 +687,7 @@
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({itemNo: itemNo, memberNo: null, itemOptionNo: itemOptionNo, count: count})
+            body: JSON.stringify({itemNo: itemNo, memberNo: null, itemOptionNo: itemOptionNo, itemImageNo: itemImageNo, count: count})
         });
 
         const resVal = await res.json();

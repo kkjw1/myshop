@@ -4,6 +4,7 @@ package myshop.shop.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import myshop.shop.entity.item.Item;
+import myshop.shop.entity.item.ItemImage;
 import myshop.shop.entity.item.ItemOption;
 import myshop.shop.entity.member.Member;
 
@@ -24,29 +25,41 @@ public class Cart extends BaseDateEntity {
     @JoinColumn(name = "ITEM_NO")
     private Item item;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM_OPTION_NO")
     private ItemOption itemOption;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM_IMAGE_NO")
+    private ItemImage itemImage;
+
 
     private int count;
 
     public Cart() {
     }
 
-    public Cart(Member member, Item item, int count, ItemOption itemOption) {
+    public Cart(Member member, Item item, int count, ItemOption itemOption, ItemImage itemImage) {
         this.member = member;
         this.item = item;
         this.count = count;
         this.itemOption = itemOption;
+        this.itemImage = itemImage;
     }
 
-    public Cart(Member member, Item item, int count) {
+    public Cart(Member member, Item item, int count, ItemImage itemImage) {
         this.member = member;
         this.item = item;
         this.count = count;
+        this.itemImage = itemImage;
     }
 
     public void updateCount(int count) {
+        this.count = count;
+    }
+
+    public void addCount(int count) {
         this.count += count;
     }
 }

@@ -3,6 +3,7 @@ package myshop.shop;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import myshop.shop.dto.cart.SaveCartDto;
 import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
 import myshop.shop.entity.*;
@@ -14,6 +15,7 @@ import myshop.shop.entity.member.MemberLevel;
 import myshop.shop.repository.address.AddressRepository;
 import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.repository.seller.SellerRepository;
+import myshop.shop.service.CartService;
 import myshop.shop.service.ItemService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,6 +48,7 @@ public class InitDB {
         private final EntityManager em;
         private final SellerRepository sellerRepository;
         private final ItemService itemService;
+        private final CartService cartService;
 
         public void dbInit() {
             /**
@@ -94,9 +97,9 @@ public class InitDB {
              * 상품 저장
              */
             Long sellerNo = sellerRepository.findById("test").orElse(null).getNo();
-            itemService.saveItem(new AddItemDto(sellerNo, "상품테스트1", ItemCategory.상의, 30000, 49, 10,
+            itemService.saveItem(new AddItemDto(sellerNo, "상품테스트1", ItemCategory.상의, 27000, 48, 10,
                     List.of(
-                            new AddItemOptionDto("검정색", 0, 5),
+                            new AddItemOptionDto("검정색", 0, 4),
                             new AddItemOptionDto("나이키", 3000, 9),
                             new AddItemOptionDto("흰색", 1000, 15),
                             new AddItemOptionDto("로고", 3000, 20)
@@ -141,6 +144,10 @@ public class InitDB {
             }
 
 
+            cartService.saveCart(new SaveCartDto(1L, 5L, 1L, 1L, 3));
+            cartService.saveCart(new SaveCartDto(1L, 5L, 4L, 1L, 2));
+            cartService.saveCart(new SaveCartDto(3L, 5L, null, 7L, 6));
+            cartService.saveCart(new SaveCartDto(4L, 5L, 7L, 9L, 1));
 
             em.flush();
             em.clear();

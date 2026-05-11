@@ -1,5 +1,6 @@
 package myshop.shop.repository.Item;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -21,6 +22,9 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static myshop.shop.entity.QSeller.seller;
 import static myshop.shop.entity.item.QItem.item;
@@ -169,12 +173,19 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      * sortOrder ASC
      */
     @Override
-    public List<String> getImageUrls(Long itemNo) {
-        return queryFactory
-                .select(itemImage.imageUrl)
+    public Map<Long, String> getImageUrls(Long itemNo) {
+        List<Tuple> fetch = queryFactory
+                .select(itemImage.no,
+                        itemImage.imageUrl)
                 .from(itemImage)
                 .where(itemImage.item.no.eq(itemNo))
                 .orderBy(itemImage.sortOrder.asc())
                 .fetch();
+
+        return fetch.stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(itemImage.no),
+                        tuple -> tuple.get(itemImage.imageUrl)
+                ));
     }
 }

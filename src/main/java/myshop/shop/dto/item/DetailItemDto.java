@@ -7,16 +7,15 @@ import myshop.shop.entity.item.ItemCategory;
 import myshop.shop.entity.item.ItemOption;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Getter @Setter
-@ToString(of = {"itemImageList", "itemCategory", "name", "price", "discount", "totalStock", "detailItemOptionDtoList", "content"})
+@ToString(of = {"itemNo", "itemImage", "itemCategory", "name", "price", "discount", "totalStock", "detailItemOptionDtoList", "content"})
 public class DetailItemDto {
 
     private Long itemNo;
 
-    private List<String> itemImageList = new ArrayList<>();
+    private Map<Long, String> itemImageMap = new LinkedHashMap<>();
 
     private ItemCategory itemCategory;
     private String name;

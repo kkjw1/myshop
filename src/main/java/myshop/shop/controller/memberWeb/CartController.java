@@ -1,14 +1,23 @@
 package myshop.shop.controller.memberWeb;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import myshop.shop.dto.cart.ManageCartDto;
 import myshop.shop.dto.cart.SaveCartDto;
 import myshop.shop.dto.member.LoginCheckMemberDto;
+import myshop.shop.entity.Cart;
 import myshop.shop.service.CartService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
 
@@ -34,6 +43,47 @@ public class CartController {
         return true;
     }
 
+
+    /**
+     * 장바구니 폼
+     */
+    @GetMapping("/myPage/cart")
+    public String cartForm(HttpServletRequest request, Model model) {
+        new LoginCheckMemberDto().loginCheck(request, model);
+        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+
+        Long memberNo = loginCheckMemberDto.getNo();
+        List<ManageCartDto> manageCartDtoList = cartService.findAllCart(memberNo);
+
+        model.addAttribute("manageCartDtoList", manageCartDtoList);
+        return "member/mypage/cart";
+    }
+
+
+    /**
+     * 장바구니 폼 -> 수량 변경
+     */
+    @PostMapping("/myPage/cart/updateCount")
+    @ResponseBody
+    public boolean cartUpdateCount(@RequestBody UpdateCartCount updateCartCount) {
+        cartService.updateCount(updateCartCount.getCartNo(), updateCartCount.getCount());
+        return true;
+    }
+
+
+    @Getter @Setter
+    public static class UpdateCartCount {
+        private Long cartNo;
+        private int count;
+
+        public UpdateCartCount() {
+        }
+
+        public UpdateCartCount(Long cartNo, int count) {
+            this.cartNo = cartNo;
+            this.count = count;
+        }
+    }
 
 
 

@@ -4,22 +4,27 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import myshop.shop.dto.cart.ManageCartDto;
 import myshop.shop.dto.cart.SaveCartDto;
 import myshop.shop.entity.Cart;
 import myshop.shop.entity.item.Item;
+import myshop.shop.entity.item.ItemImage;
 import myshop.shop.entity.item.ItemOption;
 import myshop.shop.entity.member.Member;
+import myshop.shop.repository.Item.ItemImageRepository;
 import myshop.shop.repository.Item.ItemOptionRepository;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.repository.cart.CartRepository;
 import myshop.shop.repository.member.MemberRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class CartService {
 
     private final CartRepository cartRepository;
@@ -27,6 +32,7 @@ public class CartService {
     private final ItemRepository itemRepository;
     private final ItemOptionRepository itemOptionRepository;
     private final EntityManager em;
+    private final ItemImageRepository itemImageRepository;
 
     /**
      * 장바구니 저장
@@ -35,32 +41,57 @@ public class CartService {
         log.info("saveCartDto={}", saveCartDto);
         Member memberProxy = memberRepository.getReferenceById(saveCartDto.getMemberNo());
         Item itemProxy = itemRepository.getReferenceById(saveCartDto.getItemNo());
+        ItemImage itemImageProxy = itemImageRepository.getReferenceById(saveCartDto.getItemImageNo());
         Long itemOptionNo = saveCartDto.getItemOptionNo();
         int count = saveCartDto.getCount();
 
-
-        List<Cart> findCart = em.createQuery("select c from Cart c where c.item=:item and c.member=:member", Cart.class)
+        List<Cart> findCart = em.createQuery("select c from Cart c where c.item=:item and c.member=:member and c.itemOption.no=:itemOptionNo", Cart.class)
                 .setParameter("item", itemProxy)
                 .setParameter("member", memberProxy)
+                .setParameter("itemOptionNo", itemOptionNo)
                 .getResultList();
+
+        log.info("findCart.isEmpty()={}", findCart.isEmpty());
         if (findCart.isEmpty()) {
-            if (itemOptionNo != null) {
+            if (itemOptionNo == null) {
+                Cart cart = new Cart(memberProxy,
+                        itemProxy,
+                        count,
+                        itemImageProxy);
+                cartRepository.save(cart);
+            }
+            else {
                 ItemOption itemOptionProxy = itemOptionRepository.getReferenceById(itemOptionNo);
                 Cart cart = new Cart(memberProxy,
                         itemProxy,
                         count,
-                        itemOptionProxy);
+                        itemOptionProxy,
+                        itemImageProxy);
                 cartRepository.save(cart);
             }
-            else {
-                Cart cart = new Cart(memberProxy,
-                        itemProxy,
-                        count);
-                cartRepository.save(cart);
-            }
-        } else {
-            findCart.get(0).updateCount(count);
+        }
+        else {
+            findCart.get(0).addCount(count);
         }
     }
 
+
+    /**
+     * 장바구니 불러오기
+     */
+    public List<ManageCartDto> findAllCart(Long memberNo) {
+        return cartRepository.getManageCartList(memberNo);
+    }
+
+
+    /**
+     * 장바구니 개수 수정
+     */
+    public void updateCount(Long cartNo, int count) {
+        Cart cart = em.createQuery("select c from Cart c where c.no=:cartNo", Cart.class)
+                .setParameter("cartNo", cartNo)
+                .getSingleResult();
+        cart.updateCount(count);
+
+    }
 }

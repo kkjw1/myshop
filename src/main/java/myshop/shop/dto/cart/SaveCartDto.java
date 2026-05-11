@@ -6,11 +6,12 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString(of = {"itemNo", "memberNo", "itemOptionNo", "count"})
+@ToString(of = {"itemNo", "memberNo", "itemOptionNo", "itemImageNo", "count"})
 public class SaveCartDto {
     private Long itemNo;
     private Long memberNo;
     private Long itemOptionNo;
+    private Long itemImageNo;
     private int count;
 
     public SaveCartDto() {
@@ -22,10 +23,11 @@ public class SaveCartDto {
         this.count = count;
     }
 
-    public SaveCartDto(Long itemNo, Long memberNo, Long itemOptionNo, int count) {
+    public SaveCartDto(Long itemNo, Long memberNo, Long itemOptionNo, Long itemImageNo, int count) {
         this.itemNo = itemNo;
         this.memberNo = memberNo;
         this.itemOptionNo = itemOptionNo;
+        this.itemImageNo = itemImageNo;
         this.count = count;
     }
 }

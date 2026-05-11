@@ -2,6 +2,7 @@ package myshop.shop.service;
 
 import jakarta.persistence.EntityManager;
 import myshop.shop.controller.memberWeb.CartController;
+import myshop.shop.dto.cart.ManageCartDto;
 import myshop.shop.dto.cart.SaveCartDto;
 import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
@@ -29,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
 
 
 @SpringBootTest
@@ -81,6 +84,13 @@ class CartServiceTest {
                         "/shop_image/1c7e2d70-4ef2-4fd9-862e-40226846215c.png"
                 ), "상품옵션있음, 추가이미지있음", ItemStatus.판매중, true, 10L));
 
+/*        List<AddItemOptionDto> emptyAddItemOptionDtoList = new ArrayList<>();
+        itemService.saveItem(new AddItemDto(sellerNo, "상품테스트3(옵션X)", ItemCategory.아우터, 250000, 20, 0,
+                emptyAddItemOptionDtoList, null, "/shop_image/30537136-0d60-450e-8544-2f9eda4e4800.png", null,
+                List.of(
+                        "/shop_image/b3ba7699-d546-4075-84a9-9b6888049a0c.png"
+                ), "상품옵션없음, 추가이미지있음", ItemStatus.판매중, true));*/
+
         em.flush();
         em.clear();
 
@@ -90,7 +100,7 @@ class CartServiceTest {
     @DisplayName("장바구니 처음 저장")
     public void saveCartTest() throws Exception {
         //given
-        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 5);
+        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 1L, 1L, 5);
 
         //when
         cartService.saveCart(saveCartDto);
@@ -99,26 +109,70 @@ class CartServiceTest {
 
         //then
         Cart cart = cartRepository.findById(1L).orElse(null);
-        Assertions.assertThat(cart.getCount()).isEqualTo(5);
+        assertThat(cart.getCount()).isEqualTo(5);
     }
 
     @Test
-    @DisplayName("장바구니 두 번째 저장")
+    @DisplayName("같은 물품 장바구니에 저장")
     public void saveCartTest2() throws Exception {
         //given
-        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 5);
+        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 1L, 1L,5);
         cartService.saveCart(saveCartDto);
         em.flush();
         em.clear();
 
         //when
-        SaveCartDto saveCartDto2 = new SaveCartDto(1L, 1L, 4);
+        SaveCartDto saveCartDto2 = new SaveCartDto(1L, 1L, 1L, 1L, 4);
         cartService.saveCart(saveCartDto2);
 
         //then
         Cart cart = cartRepository.findById(1L).orElse(null);
-        Assertions.assertThat(cart.getCount()).isEqualTo(9);
+        assertThat(cart.getCount()).isEqualTo(9);
     }
+    
+    @Test
+    @DisplayName("다른 물품 장바구니에 저장")
+    public void saveCartTest3() throws Exception {
+        //given
+        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 1L, 1L, 5);
+        cartService.saveCart(saveCartDto);
+        em.flush();
+        em.clear();
 
+        //when
+        SaveCartDto saveCartDto2 = new SaveCartDto(1L, 1L, 2L, 1L, 4);
+        cartService.saveCart(saveCartDto2);
+
+        //then
+        Member member = memberRepository.getReferenceById(1L);
+        List<Cart> cartList = cartRepository.findByMember(member);
+        assertThat(cartList.size()).isEqualTo(2);
+        assertThat(cartList.get(0).getCount()).isEqualTo(5);
+        assertThat(cartList.get(1).getCount()).isEqualTo(4);
+
+    }
+    
+
+    @Test
+    public void findAllCartTest() throws Exception {
+        //given
+        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 1L, 1L, 5);
+        cartService.saveCart(saveCartDto);
+        SaveCartDto saveCartDto2 = new SaveCartDto(1L, 1L, 2L, 1L, 4);
+        cartService.saveCart(saveCartDto2);
+        SaveCartDto saveCartDto3 = new SaveCartDto(1L, 1L, 1L, 1L, 2);
+        cartService.saveCart(saveCartDto3);
+        em.flush();
+        em.clear();
+
+
+        //when
+        List<ManageCartDto> allCart = cartService.findAllCart(1L);
+        for (ManageCartDto manageCartDto : allCart) {
+            System.out.println("manageCartDto = " + manageCartDto);
+        }
+
+
+    }
 
 }

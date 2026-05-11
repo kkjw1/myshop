@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -262,8 +263,8 @@ public class ItemService {
      */
     public DetailItemDto getDetailItem(Long itemNo) {
         DetailItemDto detailItemDto = itemRepository.findDetailItem(itemNo);
-        List<String> imageUrls = itemRepository.getImageUrls(itemNo);
-        detailItemDto.setItemImageList(imageUrls);
+        Map<Long, String> itemImageMap = itemRepository.getImageUrls(itemNo);
+        detailItemDto.setItemImageMap(itemImageMap);
 
         detailItemDto.setDiscountedPrice(getDiscountedPrice(BigDecimal.valueOf(detailItemDto.getPrice()), BigDecimal.valueOf(detailItemDto.getDiscount())));
         return detailItemDto;

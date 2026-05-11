@@ -1,0 +1,38 @@
+package myshop.shop.dto.cart;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter @Setter
+@ToString(of = {"cartNo", "itemNo", "itemOptionNo", "name", "imagePath", "count", "totalStock", "optionStock", "originPrice", "optionPrice", "optionName"})
+public class ManageCartDto {
+    private Long cartNo;            // Cart
+    private Long itemNo;            // Item
+    private Long itemOptionNo;      // ItemOption
+    private String name;            // Item
+    private String imagePath;       // ItemImage
+    private int count;              // Cart
+    private int totalStock;         // Item
+    private int optionStock;        // ItemOption
+    private int originPrice;        // Item
+    private int optionPrice;        // ItemOption
+    private String optionName;      // ItemOption
+
+    public ManageCartDto() {
+    }
+
+    public ManageCartDto(Long cartNo, Long itemNo, Long itemOptionNo, String name, String imagePath, int count, int totalStock, int optionStock, int originPrice, int optionPrice, String optionName) {
+        this.cartNo = cartNo;
+        this.itemNo = itemNo;
+        this.itemOptionNo = itemOptionNo;
+        this.name = name;
+        this.imagePath = imagePath;
+        this.count = count;
+        this.totalStock = totalStock;
+        this.optionStock = optionStock;
+        this.originPrice = originPrice;
+        this.optionPrice = optionPrice;
+        this.optionName = optionName;
+    }
+}
