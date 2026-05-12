@@ -34,6 +34,8 @@ public class CartService {
     private final EntityManager em;
     private final ItemImageRepository itemImageRepository;
 
+
+
     /**
      * 장바구니 저장
      */
@@ -76,12 +78,23 @@ public class CartService {
     }
 
 
+
     /**
-     * 장바구니 불러오기
+     * 모든 장바구니 불러오기
      */
     public List<ManageCartDto> findAllCart(Long memberNo) {
         return cartRepository.getManageCartList(memberNo);
     }
+
+
+
+    /**
+     * 장바구니 하나 불러오기
+     */
+    public ManageCartDto findCart(Long cartNo) {
+        return cartRepository.getManageCart(cartNo);
+    }
+
 
 
     /**
@@ -94,6 +107,7 @@ public class CartService {
         cart.updateCount(count);
 
     }
+
 
 
     /**

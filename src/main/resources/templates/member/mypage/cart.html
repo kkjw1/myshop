@@ -427,10 +427,18 @@
 
                 </div>
             </div>
+
+            <input type="hidden" name="totalProductPrice" id="hiddenProductPrice" value="0">
+            <input type="hidden" name="deliveryFee" id="hiddenDeliveryFee" value="0">
+            <input type="hidden" name="totalOrderPrice" id="hiddenTotalOrderPrice" value="0">
+
+
             <!-- 오른쪽 주문 요약 바 -->
             <div class="col-md-3">
                 <div class="order-summary shadow-sm">
                     <h5 class="font-weight-bold mb-4">결제 정보</h5>
+
+
                     <div class="d-flex justify-content-between mb-2">
                         <span>총 상품가격</span>
                         <span>144,900원</span>
@@ -557,17 +565,7 @@
         });
 
         // 배송비 계산
-        let deliveryFee = 0;
-        if (checkedCount > 0) {
-            if (productTotal >= 30000) {
-                deliveryFee = 0;
-            } else {
-                deliveryFee = 3000;
-            }
-        } else {
-            deliveryFee = 0;
-        }
-
+        let deliveryFee = (checkedCount > 0 && productTotal < 30000) ? 3000 : 0;
         // 최종 결제 금액 = 상품 총액 + 배송비
         const finalTotal = productTotal + deliveryFee;
 
@@ -586,6 +584,10 @@
 
         // 3. 총 결제금액 (상품 + 배송비)
         totalPriceElement.innerText = finalTotal.toLocaleString() + '원';
+
+        document.getElementById('hiddenProductPrice').value = productTotal;
+        document.getElementById('hiddenDeliveryFee').value = deliveryFee;
+        document.getElementById('hiddenTotalOrderPrice').value = finalTotal;
 
         // 4. 주문 버튼 업데이트
         orderBtn.innerText = `구매하기 (${checkedCount})`;

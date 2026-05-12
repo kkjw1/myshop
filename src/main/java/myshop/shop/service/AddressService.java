@@ -58,6 +58,18 @@ public class AddressService {
     }
 
 
+    /**
+     * 주소 반환
+     */
+    public ManageAddressDto getAddressByMemberNo(Long memberNo) {
+        Address address = addressRepository.findByMemberIsMain(memberNo).orElse(null);
+        if (address == null) {
+            return null;
+        }
+        return new ManageAddressDto(address);
+    }
+
+
 
     /**
      * 기본 배송지로 변경

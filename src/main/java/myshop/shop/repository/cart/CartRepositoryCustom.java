@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface CartRepositoryCustom {
     List<ManageCartDto> getManageCartList(Long memberNo);
+
+    ManageCartDto getManageCart(Long cartNo);
 }

@@ -28,4 +28,7 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     int deleteAddressByNo(@Param("addressNo") Long no);
 
     Optional<Address> findByNo(Long addressNo);
+
+    @Query("select a from Address a where a.isMain = true and a.member.no=:memberNo")
+    Optional<Address> findByMemberIsMain(@Param("memberNo") Long memberNo);
 }
