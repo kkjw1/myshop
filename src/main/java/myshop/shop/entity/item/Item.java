@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.ToString;
 import myshop.shop.entity.BaseDateEntity;
+import myshop.shop.entity.OrderItem;
 import myshop.shop.entity.Seller;
+import myshop.shop.entity.delivery.Delivery;
+import myshop.shop.entity.order.Order;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +44,9 @@ public class Item extends BaseDateEntity {
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemOption> itemOptions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item")
+    private List<OrderItem> orderItemList = new ArrayList<>();
 
     public Item() {
     }

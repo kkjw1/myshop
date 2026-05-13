@@ -230,6 +230,7 @@
         </nav>
     </div>
 </div>
+
 <div class="container pb-5 mt-4">
     <div class="row">
         <!-- 1. 왼쪽 사이드 메뉴 제거됨 -->
@@ -281,20 +282,32 @@
 
                 <div th:each="manageCartDto : ${manageCartDtoList}">
                     <div class="order-item">
-                        <img src="/static/no_image.png" th:src="${manageCartDto.imagePath}" alt="상품이미지">
+                        <!-- 서버 전송용 데이터 -->
+                        <input type="hidden" class="item-cartNo" th:value="${manageCartDto.cartNo}">
+                        <input type="hidden" class="item-optionNo" th:value="${manageCartDto.itemOptionNo}">
+                        <input type="hidden" class="item-itemNo" th:value="${manageCartDto.itemNo}">
+                        <input type="hidden" class="item-count" th:value="${manageCartDto.count}">
+                        <input type="hidden" class="item-price"
+                               th:value="${manageCartDto.itemOptionNo ne null ? (manageCartDto.originPrice + manageCartDto.optionPrice) : manageCartDto.originPrice}">
+                        <input type="hidden" class="item-imageUrl" th:value="${manageCartDto.imagePath}">
+                        <input type="hidden" class="item-optionName" th:value="${manageCartDto.optionName}">
 
+                        <!-- 보여지는 디자인 -->
+                        <img src="/static/no_image.png" th:src="${manageCartDto.imagePath}" alt="상품이미지">
                         <div class="order-item-detail">
                             <div class="order-item-name" th:text="${manageCartDto.name}">프리미엄 코튼 라운드 티셔츠</div>
 
                             <div th:if="${manageCartDto.itemOptionNo ne null}">
-                                <div class="order-item-opt" th:text="|옵션: ${manageCartDto.optionName} (${manageCartDto.optionStock}개)|">옵션: 화이트 / L (1개)</div>
+                                <div class="order-item-opt" th:text="|옵션: ${manageCartDto.optionName} (재고: ${manageCartDto.optionStock}개)|">옵션: 화이트 / L (재고: 1개)</div>
+                                <div class="small text-dark mt-1" th:text="|개수: ${manageCartDto.count}개|">개수: 1개</div>
+
                                 <div class="font-weight-bold mt-1"
-                                     th:text="${#numbers.formatInteger((manageCartDto.originPrice + manageCartDto.optionPrice) * manageCartDto.count, 3, 'COMMA') + '원'}">15,900원</div>
+                                th:text="${#numbers.formatInteger((manageCartDto.originPrice + manageCartDto.optionPrice) * manageCartDto.count, 3, 'COMMA') + '원'}">15,900원</div>
                             </div>
                             <div th:if="${manageCartDto.itemOptionNo eq null}">
                                 <div class="order-item-opt" th:text="|재고: ${manageCartDto.totalStock}개|"></div>
                                 <div class="font-weight-bold mt-1"
-                                     th:text="${#numbers.formatInteger(manageCartDto.originPrice * manageCartDto.count, 3, 'COMMA') + '원'}">15,900원</div>
+                                th:text="${#numbers.formatInteger(manageCartDto.originPrice * manageCartDto.count, 3, 'COMMA') + '원'}">15,900원</div>
                             </div>
                         </div>
                     </div>
@@ -342,11 +355,6 @@
                     <span class="total-pay-amount" th:text="${#numbers.formatInteger(totalOrderPrice, 3, 'COMMA') + '원'}">50,400원</span>
                 </div>
 
-                <div class="custom-control custom-checkbox mb-3">
-                    <input type="checkbox" class="custom-control-input" id="agreeTerm">
-                    <label class="custom-control-label small" for="agreeTerm">결제 진행 필수 사항 동의</label>
-                </div>
-
                 <button class="btn-pay" onclick="handlePayment()">결제하기</button>
             </div>
         </div>
@@ -377,17 +385,17 @@
                         <p class="small text-muted mb-1" id="modalAddress">서울특별시 강남구 삼성동 123-45</p>
                         <p class="small text-muted" id="modalAddressPhoneNumber">010-1234-5678</p>
                         <input type="hidden" class="addr-name" value="홍길동">
-                        <input type="hidden" class="addr-detail" value="[06159] 서울특별시 강남구 삼성동 123-45">
+                        <input type="hidden" class="addr-full" value="서울특별시 강남구 삼성동 123-45">
                         <input type="hidden" class="addr-phone" value="010-1234-5678">
                     </div>
 
                     <!-- 예시 배송지 2 -->
                     <div class="address-item border p-3 mb-2 rounded" style="cursor: pointer;" onclick="selectAddress(this)">
                         <span class="font-weight-bold">김철수 (회사)</span>
-                        <p class="small text-muted mb-1">[04524] 서울특별시 중구 세종대로 110</p>
+                        <p class="small text-muted mb-1">서울특별시 중구 세종대로 110</p>
                         <p class="small text-muted">010-9876-5432</p>
                         <input type="hidden" class="addr-name" value="김철수">
-                        <input type="hidden" class="addr-detail" value="[04524] 서울특별시 중구 세종대로 110">
+                        <input type="hidden" class="addr-detail" value="서울특별시 중구 세종대로 110">
                         <input type="hidden" class="addr-phone" value="010-9876-5432">
                     </div>
                 </div>
@@ -423,6 +431,20 @@
     </div>
 </div>
 
+
+<!-- 배송지 상세 정보를 담아둘 Hidden 필드들 -->
+<div id="hiddenAddressData">
+    <input type="hidden" id="orderAddressNo" th:value="${manageAddressDto?.addressNo}">
+    <input type="hidden" id="orderRecipientName" th:value="${manageAddressDto?.recipientName}">
+    <input type="hidden" id="orderPhoneNumber" th:value="${manageAddressDto?.phoneNumber}">
+    <input type="hidden" id="orderPostcode" th:value="${manageAddressDto?.postcode}">
+    <input type="hidden" id="orderRoadAddress" th:value="${manageAddressDto?.roadAddress}">
+    <input type="hidden" id="orderDetailAddress" th:value="${manageAddressDto?.detailAddress}">
+
+    <input type="hidden" id="orderTotalProductPrice" th:value="${totalProductPrice}">
+    <input type="hidden" id="orderDeliveryFee" th:value="${deliveryFee}">
+    <input type="hidden" id="orderTotalOrderPrice" th:value="${totalOrderPrice}">
+</div>
 
 
 
@@ -547,8 +569,12 @@
                         <p class="small text-muted mb-1">${addr.roadAddress} (${addr.detailAddress})</p>
                         <p class="small text-muted mb-0">${addr.phoneNumber}</p>
 
+                        <input type="hidden" class="addr-no" value="${addr.addressNo}">
                         <input type="hidden" class="addr-name" value="${addr.recipientName}">
-                        <input type="hidden" class="addr-detail" value="${addr.roadAddress} (${addr.detailAddress})">
+                        <input type="hidden" class="addr-postcode" value="${addr.postcode}">
+                        <input type="hidden" class="addr-road" value="${addr.roadAddress}">
+                        <input type="hidden" class="addr-detail" value="${addr.detailAddress}">
+                        <input type="hidden" class="addr-full" value="${addr.roadAddress} (${addr.detailAddress})">
                         <input type="hidden" class="addr-phone" value="${addr.phoneNumber}">
                     </div>
                 `;
@@ -592,9 +618,13 @@
 
     // 2. 기존 배송지 선택 시 메인 화면 정보 업데이트
     function selectAddress(element) {
-        // 1. 선택한 항목에서 데이터 추출 (hidden input 활용)
+        // 데이터 추출 (hidden input 활용)
+        const no = element.querySelector('.addr-no').value;
         const name = element.querySelector('.addr-name').value;
+        const postcode = element.querySelector('.addr-postcode').value;
+        const road = element.querySelector('.addr-road').value;
         const detail = element.querySelector('.addr-detail').value;
+        const full = element.querySelector('.addr-full').value;
         const phone = element.querySelector('.addr-phone').value;
 
         // 2. 선택한 항목이 '기본배송지'인지 확인
@@ -618,7 +648,16 @@
         infoSection.querySelectorAll('p')[1].innerText = phone;
 
         // 6. 세 번째 <p> 태그 업데이트 (주소)
-        infoSection.querySelectorAll('p')[2].innerText = detail;
+        infoSection.querySelectorAll('p')[2].innerText = full;
+
+
+        // Hidden 필드 업데이트
+        document.getElementById('orderAddressNo').value = no;
+        document.getElementById('orderRecipientName').value = name;
+        document.getElementById('orderPhoneNumber').value = phone;
+        document.getElementById('orderPostcode').value = postcode;
+        document.getElementById('orderRoadAddress').value = road;
+        document.getElementById('orderDetailAddress').value = detail;
 
         // 7. 모달 닫기
         $('#addressModal').modal('hide');
@@ -635,7 +674,7 @@
         const detailAddress = document.getElementById('newAddrDetail').value;
 
 
-        if(!recipientName || !roadAddress) {
+        if (!recipientName || !roadAddress) {
             alert("정보를 모두 입력해주세요.");
             return;
         }
@@ -652,28 +691,31 @@
                     postcode: postcode,
                     roadAddress: roadAddress,
                     detailAddress: detailAddress,
-                    isMain: false // 새 배송지는 기본적으로 false로 전송
+                    isMain: false
                 })
             });
 
             const resVal = await res.json();
 
             if (resVal === true) {
-                // 1. 메인 화면(주문서) 정보 업데이트
+                // 주문서 정보 업데이트
                 const infoSection = document.querySelector('.address-info');
-
-                // 첫 번째 p: 이름 (새 배송지는 isMain이 false이므로 배지는 제외)
                 infoSection.querySelectorAll('p')[0].innerHTML = `<strong>${recipientName}</strong>`;
-                // 두 번째 p: 전화번호
                 infoSection.querySelectorAll('p')[1].innerText = phoneNumber;
-                // 세 번째 p: 주소 (우편번호 포함 권장)
-                infoSection.querySelectorAll('p')[2].innerText = `(${postcode}) ${roadAddress} ${detailAddress}`;
+                infoSection.querySelectorAll('p')[2].innerText = `${roadAddress} (${detailAddress})`;
 
-                // 2. 모달 닫기
+                // hidden 필드 업데이트
+                document.getElementById('orderRecipientName').value = addressName;
+                document.getElementById('orderPhoneNumber').value = phoneNumber;
+                document.getElementById('orderPostcode').value = postcode;
+                document.getElementById('orderRoadAddress').value = roadAddress;
+                document.getElementById('orderDetailAddress').value = detailAddress;
+
+
+                // 모달 닫기
                 $('#addressModal').modal('hide');
 
-                // 3. (중요) 목록 다시 불러오기
-                // 다음에 모달을 다시 열었을 때 방금 추가한 주소가 목록에 나와야 하므로 재로드합니다.
+                // 목록 다시 불러오기
                 loadAddressList();
 
                 alert("새 배송지가 적용되었습니다.");
@@ -685,6 +727,7 @@
             alert("서버 통신 중 오류가 발생했습니다.");
         }
     }
+
     // 내정보 가져오기
     function getMyInfo() {
         const name = document.getElementById('newName');
@@ -700,15 +743,94 @@
     }
 
 
-    function handlePayment() {
-        const agreed = document.getElementById('agreeTerm').checked;
-        if(!agreed) {
-            alert("결제 진행 필수 사항에 동의해주세요.");
+    async function handlePayment() {
+        // 1. 배송 요청사항 (직접 입력 포함) 수집
+        const selectElement = document.getElementById('deliveryMsgSelect');
+        const selectVal = selectElement.value;
+        const directVal = document.getElementById('deliveryMsgDirect').value;
+        const finalMsg = (selectVal === 'direct') ? directVal : selectVal;
+
+        // <input type="hidden" id="orderTotalProductPrice" th:value="${totalProductPrice}"/>
+        // <input type="hidden" id="orderDeliveryFee" th:value="${deliveryFee}"/>
+        // <input type="hidden" id="orderTotalOrderPrice" th:value="${totalOrderPrice}"/>
+
+
+        // 2. 최종 데이터 객체 생성 (AddOrderDto 필드명 매핑)
+        // 화면상의 텍스트가 아닌, 미리 정의한 hidden 필드에서 정확한 값을 가져옵니다.
+        const addOrderDto = {
+            recipientName: document.getElementById('orderRecipientName').value,
+            phoneNumber: document.getElementById('orderPhoneNumber').value,
+            postcode: document.getElementById('orderPostcode').value,
+            roadAddress: document.getElementById('orderRoadAddress').value,
+            detailAddress: document.getElementById('orderDetailAddress').value,
+            deliveryRequest: finalMsg,
+            addOrderItemDtoList: [], // 상품 리스트
+            totalProductPrice: document.getElementById('orderTotalProductPrice').value,
+            deliveryFee: document.getElementById('orderDeliveryFee').value,
+            totalOrderPrice: document.getElementById('orderTotalOrderPrice').value
+        };
+
+        // 데이터 검증: 최소한의 필수 정보 확인
+        if (!addOrderDto.recipientName || !addOrderDto.roadAddress) {
+            alert("배송지 정보가 없습니다. 배송지를 선택하거나 등록해주세요.");
             return;
         }
 
-        // 결제 로직 호출 (예: 아임포트, 토스페이먼츠 등)
-        alert("결제창으로 이동합니다.");
+        // 3. 상품 정보 수집 (AddItemOrderDto 리스트 매핑)
+
+
+        <!-- 주문 상품 확인 반복문 안에도 데이터 매핑용 hidden 추가 -->
+
+        const orderItems = document.querySelectorAll('.order-item');
+        orderItems.forEach(item => {
+            const count = parseInt(item.querySelector('.item-count').value) || 0;
+            const price = parseInt(item.querySelector('.item-price').value) || 0;
+
+            addOrderDto.addOrderItemDtoList.push({
+                cartNo: item.querySelector('.item-cartNo').value,
+                optionNo: item.querySelector('.item-optionNo').value || null,
+                itemNo: item.querySelector('.item-itemNo').value,
+                count: count,
+                price: price,
+                totalPrice: count * price,
+                imageUrl: item.querySelector('.item-imageUrl').value,
+                itemName: item.querySelector('.order-item-name').innerText,
+                optionName: item.querySelector('.item-optionName').value || ""
+            });
+        });
+
+        // 상품 존재 여부 확인
+        if (addOrderDto.addOrderItemDtoList.length === 0) {
+            alert("주문할 상품이 없습니다.");
+            return;
+        }
+        console.log("addOrderDto", addOrderDto);
+        // 4. 서버 전송
+        try {
+            const response = await fetch('/myPage/order/payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(addOrderDto)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result === true) {
+                    alert("주문 및 결제가 완료되었습니다.");
+                    // location.href = "/myPage/orderList"; // 주문 내역 페이지로 이동
+                } else {
+                    alert("재고 부족 등 주문 처리 중 문제가 발생했습니다.");
+                }
+            } else {
+                const errorText = await response.text();
+                alert("서버 오류: " + errorText);
+            }
+        } catch (error) {
+            console.error("결제 전송 오류:", error);
+            alert("서버와 통신하는 도중 오류가 발생했습니다.");
+        }
     }
 </script>
 
