@@ -183,6 +183,27 @@ public class AddressController {
 
         return "redirect:/myPage/addressManage";
     }
+
+
+    /**
+     * 주문/결제 폼 -> 배송지 추가 -> 저장 및 선택
+     */
+    @PostMapping("/myPage/order/addressAdd")
+    @ResponseBody
+    public boolean orderAddressAdd(@RequestBody AddAddressDto addAddressDto, HttpServletRequest request) {
+        if (!hasText(addAddressDto.getAddressName())) {
+            addAddressDto.setAddressName(addAddressDto.getRoadAddress());
+        }
+
+        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+        try {
+            addressService.saveAddress(loginCheckMemberDto.getNo(), addAddressDto);
+        } catch (RuntimeException e) {
+            return false;
+        }
+        return true;
+    }
+
 }
 
 

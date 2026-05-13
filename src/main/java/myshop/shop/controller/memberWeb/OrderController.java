@@ -27,6 +27,10 @@ public class OrderController {
 
     private final AddressService addressService;
     private final CartService cartService;
+
+
+
+
     /**
      * 주문/결제 폼
      */
@@ -66,5 +70,18 @@ public class OrderController {
 
         public CartToOrderDto() {
         }
+    }
+
+
+    /**
+     * 주문/결제 폼 -> 배송지 변경
+     */
+    @GetMapping("/myPage/order/changeAddress")
+    @ResponseBody
+    public List<ManageAddressDto> changeAddress(HttpServletRequest request, Model model) {
+        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+        Long memberNo = loginCheckMemberDto.getNo();
+
+        return addressService.getAddressesByMemberNo(memberNo);
     }
 }
