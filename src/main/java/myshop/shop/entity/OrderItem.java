@@ -2,6 +2,8 @@ package myshop.shop.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.ToString;
+import myshop.shop.entity.delivery.Delivery;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.order.Order;
 
@@ -25,9 +27,12 @@ public class OrderItem extends BaseDateEntity{
     @JoinColumn(name = "ITEM_NO")
     private Item item;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DELIVERY_NO")
+    private Delivery delivery;
+
     private int count;
     private int price;              // 개당 가격
-    private int totalPrice;     // 주문한 상품 가격
     private String imageUrl;
     private String itemName;
     private String optionName;
@@ -35,12 +40,12 @@ public class OrderItem extends BaseDateEntity{
     public OrderItem() {
     }
 
-    public OrderItem(Order order, Item item, int count, int price, int totalPrice, String imageUrl, String itemName, String optionName) {
+    public OrderItem(Order order, Item item, Delivery delivery, int count, int price, String imageUrl, String itemName, String optionName) {
         this.order = order;
         this.item = item;
+        this.delivery = delivery;
         this.count = count;
         this.price = price;
-        this.totalPrice = totalPrice;
         this.imageUrl = imageUrl;
         this.itemName = itemName;
         this.optionName = optionName;

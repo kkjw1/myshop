@@ -2,6 +2,7 @@ package myshop.shop.entity.delivery;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.ToString;
 import myshop.shop.entity.BaseDateEntity;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.order.Order;
@@ -14,14 +15,6 @@ public class Delivery extends BaseDateEntity {
     @Column(name = "DELIVERY_NO")
     private Long no;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ORDER_NO")
-    private Order order;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ITEM_NO")
-    private Item item;
-
     private String courier;
     private String trackingNumber;
 
@@ -30,8 +23,27 @@ public class Delivery extends BaseDateEntity {
 
     private String recipientName;
     private String recipientPhone;
+    private String postcode;
+    private String roadAddress;
+    private String detailAddress;
 
     private int deliveryFee;
+    private String deliveryRequest;
 
+    public Delivery() {
+    }
 
+    public Delivery(String courier, String trackingNumber, DeliveryStatus deliveryStatus, String recipientName, String recipientPhone,
+                    String postcode, String roadAddress, String detailAddress, int deliveryFee, String deliveryRequest) {
+        this.courier = courier;
+        this.trackingNumber = trackingNumber;
+        this.deliveryStatus = deliveryStatus;
+        this.recipientName = recipientName;
+        this.recipientPhone = recipientPhone;
+        this.postcode = postcode;
+        this.roadAddress = roadAddress;
+        this.detailAddress = detailAddress;
+        this.deliveryFee = deliveryFee;
+        this.deliveryRequest = deliveryRequest;
+    }
 }

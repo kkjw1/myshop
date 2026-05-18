@@ -6,12 +6,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import myshop.shop.dto.order.AddOrderItemDto;
 import myshop.shop.dto.address.ManageAddressDto;
 import myshop.shop.dto.cart.ManageCartDto;
 import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.dto.order.AddOrderDto;
+import myshop.shop.dto.order.DetailOrderDto;
+import myshop.shop.entity.order.Order;
 import myshop.shop.service.AddressService;
 import myshop.shop.service.CartService;
+import myshop.shop.service.ItemService;
 import myshop.shop.service.OrderService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +34,7 @@ public class OrderController {
     private final AddressService addressService;
     private final CartService cartService;
     private final OrderService orderService;
+    private final ItemService itemService;
 
 
 
@@ -39,10 +44,12 @@ public class OrderController {
     @GetMapping("/myPage/order")
     public String orderForm(@ModelAttribute CartToOrderDto cartToOrderDto, HttpServletRequest request, Model model) {
         log.info("cartToOrderDto={}", cartToOrderDto);
-        // 구매하는 상품들 개수 먼저 줄이기
         new LoginCheckMemberDto().loginCheck(request, model);
         LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         Long memberNo = loginCheckMemberDto.getNo();
+
+        // 구매 상품 재고 선점
+        itemService.itemStockUpdate(cartToOrderDto.getCartNo());
 
         // 배송지
         ManageAddressDto manageAddressDto = addressService.getAddressByMemberNo(memberNo);
@@ -94,14 +101,47 @@ public class OrderController {
      */
     @PostMapping("/myPage/order/payment")
     @ResponseBody
-    public boolean payment(@RequestBody AddOrderDto addOrderDto, HttpServletRequest request) {
-        log.info("payment, addOrderDto={}", addOrderDto);
+    public Long payment(@RequestBody AddOrderDto addOrderDto, HttpServletRequest request) {
+        log.info("addOrderDto={}", addOrderDto);
         LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         Long memberNo = loginCheckMemberDto.getNo();
-        // 주문 엔티티에 추가하기
-        orderService.saveOrder(memberNo, addOrderDto);
-        // 배송 엔티티에 추가하기
+
+        // 주문, 배송, 상품 주문 추가
+        Order order = orderService.saveOrder(memberNo, addOrderDto);
+
         // 장바구니에서 제거하기
-        return true;
+        List<AddOrderItemDto> addOrderItemDtoList = addOrderDto.getAddOrderItemDtoList();
+        for (AddOrderItemDto addOrderItemDto : addOrderItemDtoList) {
+            cartService.removeCart(addOrderItemDto.getCartNo());
+        }
+        return order.getNo();
     }
+
+
+    /**
+     * 주문 상세 화면
+     * 결제하기
+     * 주문 목록 폼 -> 주문 상세 보기
+     */
+    @GetMapping("/order/complete")
+    public String orderComplete(@RequestParam("orderNo") Long orderNo, HttpServletRequest request, Model model) {
+        log.info("orderComplete, orderNo={}", orderNo);
+
+        DetailOrderDto detailOrderDto = orderService.getOrder(orderNo);
+
+        model.addAttribute("detailOrderDto", detailOrderDto);
+        return "member/mypage/order_complete";
+    }
+
+
+    /**
+     * 주문 내역 폼
+     */
+    @GetMapping("/myPage/orderList")
+    public String orderListForm(HttpServletRequest request, Model model) {
+        new LoginCheckMemberDto().loginCheck(request, model);
+        return "member/mypage/order_list";
+    }
+
+
 }

@@ -3,7 +3,6 @@ package myshop.shop.dto.order;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import myshop.shop.dto.AddOrderItemDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,4 +53,6 @@ public class AddOrderDto {
 
     public AddOrderDto() {
     }
+
+
 }

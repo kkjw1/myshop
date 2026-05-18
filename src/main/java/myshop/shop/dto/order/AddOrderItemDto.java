@@ -1,4 +1,4 @@
-package myshop.shop.dto;
+package myshop.shop.dto.order;
 
 import lombok.Getter;
 import lombok.Setter;

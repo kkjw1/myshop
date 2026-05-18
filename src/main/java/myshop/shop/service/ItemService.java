@@ -1,8 +1,11 @@
 package myshop.shop.service;
 
+import com.querydsl.core.types.dsl.Wildcard;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.controller.sellerWeb.ItemController;
 import myshop.shop.controller.sellerWeb.ItemController.BulkModifyItemDto;
@@ -15,6 +18,7 @@ import myshop.shop.entity.item.ItemStatus;
 import myshop.shop.repository.Item.ItemImageRepository;
 import myshop.shop.repository.Item.ItemOptionRepository;
 import myshop.shop.repository.Item.ItemRepository;
+import myshop.shop.repository.cart.CartRepository;
 import myshop.shop.repository.seller.SellerRepository;
 import myshop.shop.service.ItemImageService.ImagePath;
 import org.springframework.data.domain.Page;
@@ -25,9 +29,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.querydsl.core.types.dsl.Wildcard.count;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +48,7 @@ public class ItemService {
     private final ItemImageRepository itemImageRepository;
     private final FileService fileService;
     private final ItemImageService itemImageService;
+    private final CartRepository cartRepository;
 
     /**
      * 상품 등록
@@ -277,4 +285,52 @@ public class ItemService {
     public void addViewCount(Long itemNo) {
         itemRepository.updateViewCountByNo(itemNo);
     }
+
+
+    /**
+     * 상품 재고 선점
+     * 장바구니 폼 -> 구매하기
+     * 상품상세 폼 -> 바로구매
+     */
+    public void itemStockUpdate(List<Long> cartNoList) {
+        List<ItemStockUpdateDto> itemStockUpdateDtoList = new ArrayList<>();
+
+        for (Long cartNo : cartNoList) {
+            itemStockUpdateDtoList.add(cartRepository.getItemStockUpdate(cartNo));
+        }
+
+        for (ItemStockUpdateDto itemStockUpdateDto : itemStockUpdateDtoList) {
+            Long itemNo = itemStockUpdateDto.getItemNo();
+            Long optionNo = itemStockUpdateDto.getOptionNo();
+            int count = itemStockUpdateDto.getCount();
+
+
+            Item item = em.createQuery("select i from Item i where i.no=:itemNo", Item.class)
+                    .setParameter("itemNo", itemNo)
+                    .getSingleResult();
+            if (optionNo != null) {
+                ItemOption itemOption = em.createQuery("select io from ItemOption io where io.no=:optionNo", ItemOption.class)
+                        .setParameter("optionNo", optionNo)
+                        .getSingleResult();
+                itemOption.updateOptionStock(count);
+            }
+            item.updateTotalStock(count);
+
+
+            em.flush();
+            em.clear();
+        }
+    }
+
+    @Getter @Setter
+    public static class ItemStockUpdateDto {
+        private Long itemNo;
+        private Long optionNo;
+        private int count;
+
+        public ItemStockUpdateDto() {
+        }
+    }
+
+
 }

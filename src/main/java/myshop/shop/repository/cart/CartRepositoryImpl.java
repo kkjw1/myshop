@@ -5,6 +5,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import myshop.shop.dto.cart.ManageCartDto;
+import myshop.shop.service.ItemService;
+import myshop.shop.service.ItemService.ItemStockUpdateDto;
 
 import java.util.List;
 
@@ -61,6 +63,20 @@ public class CartRepositoryImpl implements CartRepositoryCustom {
                 .leftJoin(cart.item, item)
                 .leftJoin(cart.itemOption, itemOption)
                 .leftJoin(cart.itemImage, itemImage)
+                .where(cart.no.eq(cartNo))
+                .fetchOne();
+    }
+
+    @Override
+    public ItemStockUpdateDto getItemStockUpdate(Long cartNo) {
+        System.out.println("getItemStockUpdate!!!!!!!!");
+
+        return queryFactory
+                .select(Projections.fields(ItemStockUpdateDto.class,
+                        cart.item.no.as("itemNo"),
+                        cart.itemOption.no.as("optionNo"),
+                        cart.count))
+                .from(cart)
                 .where(cart.no.eq(cartNo))
                 .fetchOne();
     }

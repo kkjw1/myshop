@@ -2,6 +2,7 @@ package myshop.shop.entity.order;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.ToString;
 import myshop.shop.entity.BaseDateEntity;
 import myshop.shop.entity.OrderItem;
 import myshop.shop.entity.delivery.Delivery;
@@ -25,27 +26,17 @@ public class Order extends BaseDateEntity {
     private Member member;
 
     private OrderStatus orderStatus;
-    private int totalOrderPrice;        // 총 결제 금액
-    private String postcode;
-    private String roadAddress;
-    private String detailAddress;
-
+    private int totalPrice;        // 총 결제 금액
 
     @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItemList = new ArrayList<>();
 
-/*    @OneToOne(mappedBy = "order")
-    private Delivery delivery;*/
-
     public Order() {
     }
 
-    public Order(Member member, OrderStatus orderStatus, int totalOrderPrice, String postcode, String roadAddress, String detailAddress) {
+    public Order(Member member, OrderStatus orderStatus, int totalPrice) {
         this.member = member;
         this.orderStatus = orderStatus;
-        this.totalOrderPrice = totalOrderPrice;
-        this.postcode = postcode;
-        this.roadAddress = roadAddress;
-        this.detailAddress = detailAddress;
+        this.totalPrice = totalPrice;
     }
 }

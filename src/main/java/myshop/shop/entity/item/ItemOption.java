@@ -34,4 +34,8 @@ public class ItemOption extends BaseDateEntity {
         this.item = item;
         item.getItemOptions().add(this);
     }
+
+    public void updateOptionStock(int count) {
+        this.optionStock -= count;
+    }
 }

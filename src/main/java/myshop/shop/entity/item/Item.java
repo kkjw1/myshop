@@ -84,8 +84,8 @@ public class Item extends BaseDateEntity {
         this.price = price;
     }
 
-    public void updateTotalStock(int totalStock) {
-        this.totalStock = totalStock;
+    public void updateTotalStock(int count) {
+        this.totalStock -= count;
     }
 
     public void updateDiscount(int discount) {
