@@ -245,11 +245,11 @@
                     <img src="https://via.placeholder.com/250" th:src="${mainItemDto.getMainImagePath()}"  class="card-img-top p-3" alt="상품이미지">
                     <div class="card-body">
                         <p class="card-text mb-1 text-truncate" th:text="${mainItemDto.getName()}">맛있는 신선 사과 1box (3kg)</p>
-                        <div th:if="${mainItemDto.discount gt 0}">
+                        <div th:if="${mainItemDto.discountPer gt 0}">
                             <span class="original-price mb-0" th:text="|${#numbers.formatDecimal(mainItemDto.price, 0, 'COMMA', 0, 'POINT')}원|">15,900원</span>
                             <span class="product-price mb-0" th:text="|${#numbers.formatDecimal(mainItemDto.discountedPrice, 0, 'COMMA', 0, 'POINT')}원|">18,000원</span>
                         </div>
-                        <div th:if="${mainItemDto.discount eq 0}">
+                        <div th:if="${mainItemDto.discountPer eq 0}">
                             <span class="product-price mb-0" th:text="|${#numbers.formatDecimal(mainItemDto.price, 0, 'COMMA', 0, 'POINT')}원|">15,900원</span>
                         </div>
 

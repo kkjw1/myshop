@@ -10,10 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter @Setter
-@ToString(of = {"itemNo", "name", "price", "totalStock", "itemStatus", "discount", "modifyItemOptionDtoList", "mainImage", "subImages"})
+@ToString(of = {"itemNo", "name", "price", "totalStock", "itemStatus", "discountPer", "modifyItemOptionDtoList", "mainImage", "subImages"})
 public class ModifyItemDto {
     private Long itemNo;
     private String name;
@@ -21,7 +20,7 @@ public class ModifyItemDto {
 
     private int totalStock;
     private ItemStatus itemStatus;
-    private int discount;
+    private int discountPer;
 
     private List<ModifyItemOptionDto> modifyItemOptionDtoList = new ArrayList<>();
 
@@ -34,12 +33,12 @@ public class ModifyItemDto {
     public ModifyItemDto() {
     }
 
-    public ModifyItemDto(String name, int price, int totalStock, ItemStatus itemStatus, int discount, List<ModifyItemOptionDto> modifyItemOptionDtoList) {
+    public ModifyItemDto(String name, int price, int totalStock, ItemStatus itemStatus, int discountPer, List<ModifyItemOptionDto> modifyItemOptionDtoList) {
         this.name = name;
         this.price = price;
         this.totalStock = totalStock;
         this.itemStatus = itemStatus;
-        this.discount = discount;
+        this.discountPer = discountPer;
         this.modifyItemOptionDtoList = modifyItemOptionDtoList;
     }
 
@@ -48,7 +47,7 @@ public class ModifyItemDto {
         this.price = item.getPrice();
         this.totalStock = item.getTotalStock();
         this.itemStatus = item.getItemStatus();
-        this.discount = item.getDiscount();
+        this.discountPer = item.getDiscountPer();
         this.modifyItemOptionDtoList = itemOptionList.stream()
                 .map(ModifyItemOptionDto::new)
                 .toList();

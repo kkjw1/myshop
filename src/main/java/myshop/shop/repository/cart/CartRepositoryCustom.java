@@ -1,5 +1,7 @@
 package myshop.shop.repository.cart;
 
+import myshop.shop.controller.HomeController;
+import myshop.shop.controller.HomeController.DirectOrderDto;
 import myshop.shop.dto.cart.ManageCartDto;
 import myshop.shop.service.ItemService;
 import myshop.shop.service.ItemService.ItemStockUpdateDto;
@@ -12,4 +14,6 @@ public interface CartRepositoryCustom {
     ManageCartDto getManageCart(Long cartNo);
 
     ItemStockUpdateDto getItemStockUpdate(Long cartNo);
+
+    ManageCartDto getManageCart(DirectOrderDto directOrderDto);
 }

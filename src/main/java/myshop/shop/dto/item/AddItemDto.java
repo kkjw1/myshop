@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter @Setter
-@ToString(of = {"sellerNo", "name", "itemCategory", "price", "totalStock", "discount", "addItemOptionDtoList", "mainImage", "mainImagePath",
+@ToString(of = {"sellerNo", "name", "itemCategory", "price", "totalStock", "discountPer", "addItemOptionDtoList", "mainImage", "mainImagePath",
 "subImages", "subImagesPath", "content", "itemStatus", "useOptions"})
 public class AddItemDto {
     private Long sellerNo;
@@ -21,7 +21,7 @@ public class AddItemDto {
 
     private int price;
     private int totalStock;
-    private int discount;
+    private int discountPer;
     private List<AddItemOptionDto> addItemOptionDtoList = new ArrayList<>();
 
     private MultipartFile mainImage;
@@ -38,13 +38,13 @@ public class AddItemDto {
     public AddItemDto() {
     }
 
-    public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discount, List<AddItemOptionDto> addItemOptionDtoList, MultipartFile mainImage, String mainImagePath, List<MultipartFile> subImages, List<String> subImagesPath, String content, boolean useOptions) {
+    public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discountPer, List<AddItemOptionDto> addItemOptionDtoList, MultipartFile mainImage, String mainImagePath, List<MultipartFile> subImages, List<String> subImagesPath, String content, boolean useOptions) {
         this.sellerNo = sellerNo;
         this.name = name;
         this.itemCategory = itemCategory;
         this.price = price;
         this.totalStock = totalStock;
-        this.discount = discount;
+        this.discountPer = discountPer;
         this.addItemOptionDtoList = addItemOptionDtoList;
         this.mainImage = mainImage;
         this.mainImagePath = mainImagePath;
@@ -55,13 +55,13 @@ public class AddItemDto {
         this.useOptions = useOptions;
     }
 
-    public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discount, List<AddItemOptionDto> addItemOptionDtoList, MultipartFile mainImage, String mainImagePath, List<MultipartFile> subImages, List<String> subImagesPath, String content, ItemStatus itemStatus, boolean useOptions) {
+    public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discountPer, List<AddItemOptionDto> addItemOptionDtoList, MultipartFile mainImage, String mainImagePath, List<MultipartFile> subImages, List<String> subImagesPath, String content, ItemStatus itemStatus, boolean useOptions) {
         this.sellerNo = sellerNo;
         this.name = name;
         this.itemCategory = itemCategory;
         this.price = price;
         this.totalStock = totalStock;
-        this.discount = discount;
+        this.discountPer = discountPer;
         this.addItemOptionDtoList = addItemOptionDtoList;
         this.mainImage = mainImage;
         this.mainImagePath = mainImagePath;
@@ -73,13 +73,13 @@ public class AddItemDto {
     }
 
     // 테스트 전용
-    public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discount, List<AddItemOptionDto> addItemOptionDtoList, MultipartFile mainImage, String mainImagePath, List<MultipartFile> subImages, List<String> subImagesPath, String content, ItemStatus itemStatus, boolean useOptions, Long viewCount) {
+    public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discountPer, List<AddItemOptionDto> addItemOptionDtoList, MultipartFile mainImage, String mainImagePath, List<MultipartFile> subImages, List<String> subImagesPath, String content, ItemStatus itemStatus, boolean useOptions, Long viewCount) {
         this.sellerNo = sellerNo;
         this.name = name;
         this.itemCategory = itemCategory;
         this.price = price;
         this.totalStock = totalStock;
-        this.discount = discount;
+        this.discountPer = discountPer;
         this.addItemOptionDtoList = addItemOptionDtoList;
         this.mainImage = mainImage;
         this.mainImagePath = mainImagePath;
@@ -92,13 +92,13 @@ public class AddItemDto {
     }
 
 
-    public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discount, String mainImagePath, String subImagesPath, String content, ItemStatus itemStatus) {
+    public AddItemDto(Long sellerNo, String name, ItemCategory itemCategory, int price, int totalStock, int discountPer, String mainImagePath, String subImagesPath, String content, ItemStatus itemStatus) {
         this.sellerNo = sellerNo;
         this.name = name;
         this.itemCategory = itemCategory;
         this.price = price;
         this.totalStock = totalStock;
-        this.discount = discount;
+        this.discountPer = discountPer;
         this.mainImagePath = mainImagePath;
         this.subImagesPath.add(subImagesPath);
         this.content = content;

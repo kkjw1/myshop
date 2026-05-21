@@ -15,7 +15,6 @@ import myshop.shop.entity.item.Item;
 import myshop.shop.entity.item.ItemStatus;
 
 
-import myshop.shop.entity.item.QItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -23,7 +22,6 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static myshop.shop.entity.QSeller.seller;
@@ -104,8 +102,8 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         if(bulkModifyItemDto.getItemStatus() != null) {
             query.set(item.itemStatus, bulkModifyItemDto.getItemStatus());
         }
-        if(bulkModifyItemDto.getDiscount() != null) {
-            query.set(item.discount, bulkModifyItemDto.getDiscount());
+        if(bulkModifyItemDto.getDiscountPer() != null) {
+            query.set(item.discountPer, bulkModifyItemDto.getDiscountPer());
         }
 
         return query.where(item.no.in(bulkModifyItemDto.getItemNos()))
@@ -126,7 +124,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         itemImage.imageUrl.as("mainImagePath"),
                         item.name,
                         item.price,
-                        item.discount,
+                        item.discountPer,
                         item.viewCount))
                 .from(itemImage)
                 .join(itemImage.item, item)
@@ -157,7 +155,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                     detailItem.getItemCategory(),
                     detailItem.getName(),
                     detailItem.getPrice(),
-                    detailItem.getDiscount(),
+                    detailItem.getDiscountPer(),
                     detailItem.getTotalStock(),
                     detailItem.getItemOptions(),
                     detailItem.getContent()

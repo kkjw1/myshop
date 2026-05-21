@@ -2,22 +2,30 @@ package myshop.shop.controller;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import myshop.shop.controller.memberWeb.MemberController;
 import myshop.shop.dto.item.DetailItemDto;
 import myshop.shop.dto.item.MainItemDto;
 import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.dto.member.LoginMemberDto;
+import myshop.shop.entity.item.Item;
+import myshop.shop.entity.item.ItemOption;
+import myshop.shop.repository.Item.ItemOptionRepository;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.service.ItemService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+
+import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
 
 @Controller
 @Slf4j
@@ -26,6 +34,7 @@ public class HomeController {
 
     private final ItemService itemService;
     private final ItemRepository itemRepository;
+    private final ItemOptionRepository itemOptionRepository;
 
     /**
      * 홈 화면
@@ -56,6 +65,62 @@ public class HomeController {
         itemService.addViewCount(itemNo);
         return "shop/item_detail";
     }
+
+
+    /**
+     * 상품 상세 폼 -> 바로 구매
+     */
+    @PostMapping("/item/directOrder")
+    @ResponseBody
+    public String directOrder(@RequestBody DirectOrderDto directOrderDto, HttpServletRequest request, Model model) {
+        // 로그인 체크
+        HttpSession session = request.getSession();
+        if (session == null || session.getAttribute(LOGIN_MEMBER) == null) {
+            return "loginFail";
+        }
+
+        // 재고 확인
+        int stock;
+        if (directOrderDto.getItemOptionNo() == null) {
+            Item item = itemRepository.findById(directOrderDto.getItemNo()).orElse(null);
+            stock = item.getTotalStock();
+        } else {
+            ItemOption itemOption = itemOptionRepository.findById(directOrderDto.getItemOptionNo()).orElse(null);
+            stock = itemOption.getOptionStock();
+        }
+        if (stock < directOrderDto.count) {
+            return "soldOut";
+        }
+
+        // 구매 상품 재고 선점
+        itemService.itemStockUpdate(directOrderDto);
+
+        return "ok";
+    }
+
+    @Getter @Setter
+    @ToString(of = {"itemNo", "memberNo", "itemOptionNo", "itemImageNo", "count"})
+    public static class DirectOrderDto {
+        private Long itemNo;
+        private Long memberNo;
+        private Long itemOptionNo;
+        private Long itemImageNo;
+        private int count;
+
+
+        public DirectOrderDto() {
+        }
+
+        public DirectOrderDto(Long itemNo, Long memberNo, Long itemOptionNo, Long itemImageNo, int count) {
+            this.itemNo = itemNo;
+            this.memberNo = memberNo;
+            this.itemOptionNo = itemOptionNo;
+            this.itemImageNo = itemImageNo;
+            this.count = count;
+        }
+    }
+
+
 
 
     /**

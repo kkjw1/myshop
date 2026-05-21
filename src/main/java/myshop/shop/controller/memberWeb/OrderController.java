@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import myshop.shop.controller.HomeController;
+import myshop.shop.controller.HomeController.DirectOrderDto;
 import myshop.shop.dto.order.AddOrderItemDto;
 import myshop.shop.dto.address.ManageAddressDto;
 import myshop.shop.dto.cart.ManageCartDto;
@@ -39,7 +41,8 @@ public class OrderController {
 
 
     /**
-     * 주문/결제 폼 (장바구니 폼 -> 구매하기)
+     * 주문/결제 폼
+     * 장바구니 폼 -> 구매하기
      */
     @GetMapping("/myPage/order")
     public String orderForm(@ModelAttribute CartToOrderDto cartToOrderDto, HttpServletRequest request, Model model) {
@@ -83,6 +86,42 @@ public class OrderController {
     }
 
 
+
+    /**
+     * 주문/결제 폼
+     * 상품 상세 폼 -> 바로 구매
+     */
+    @GetMapping("/myPage/directOrder")
+    public String orderForm2(@ModelAttribute DirectOrderDto directOrderDto, HttpServletRequest request, Model model) {
+        new LoginCheckMemberDto().loginCheck(request, model);
+
+        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+        Long memberNo = loginCheckMemberDto.getNo();
+        directOrderDto.setMemberNo(memberNo);
+        log.info("주문/결제 폼, directOrderDto={}", directOrderDto);
+
+        // 배송지
+        ManageAddressDto manageAddressDto = addressService.getAddressByMemberNo(memberNo);
+        ManageCartDto manageCartDto = cartService.findCart(directOrderDto);
+        log.info("mangeCartDto={}", manageCartDto);
+
+
+
+        List<ManageCartDto> manageCartDtoList = new ArrayList<>();
+        manageCartDtoList.add(manageCartDto);
+        int totalProductPrice = (manageCartDto.getOriginPrice() + manageCartDto.getOptionPrice()) * manageCartDto.getCount();
+        int deliveryFee = totalProductPrice >= 30000 ? 0 : 3000;
+        model.addAttribute("totalProductPrice", totalProductPrice);
+        model.addAttribute("deliveryFee", deliveryFee);
+        model.addAttribute("totalOrderPrice", totalProductPrice + deliveryFee);
+        model.addAttribute("manageAddressDto", manageAddressDto);
+        model.addAttribute("manageCartDtoList", manageCartDtoList);
+
+        return "member/mypage/order";
+    }
+
+
+
     /**
      * 주문/결제 폼 -> 배송지 변경
      */
@@ -94,6 +133,7 @@ public class OrderController {
 
         return addressService.getAddressesByMemberNo(memberNo);
     }
+
 
 
     /**
@@ -118,6 +158,7 @@ public class OrderController {
     }
 
 
+
     /**
      * 주문 상세 화면
      * 결제하기
@@ -132,6 +173,7 @@ public class OrderController {
         model.addAttribute("detailOrderDto", detailOrderDto);
         return "member/mypage/order_complete";
     }
+
 
 
     /**

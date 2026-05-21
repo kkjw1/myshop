@@ -4,7 +4,11 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import myshop.shop.controller.HomeController;
+import myshop.shop.controller.HomeController.DirectOrderDto;
 import myshop.shop.dto.cart.ManageCartDto;
+import myshop.shop.entity.item.ItemOption;
+import myshop.shop.entity.item.QItemOption;
 import myshop.shop.service.ItemService;
 import myshop.shop.service.ItemService.ItemStockUpdateDto;
 
@@ -69,7 +73,6 @@ public class CartRepositoryImpl implements CartRepositoryCustom {
 
     @Override
     public ItemStockUpdateDto getItemStockUpdate(Long cartNo) {
-        System.out.println("getItemStockUpdate!!!!!!!!");
 
         return queryFactory
                 .select(Projections.fields(ItemStockUpdateDto.class,
@@ -79,6 +82,37 @@ public class CartRepositoryImpl implements CartRepositoryCustom {
                 .from(cart)
                 .where(cart.no.eq(cartNo))
                 .fetchOne();
+    }
+
+    @Override
+    public ManageCartDto getManageCart(DirectOrderDto directOrderDto) {
+        ManageCartDto manageCartDto = queryFactory
+                .select(Projections.fields(ManageCartDto.class,
+                        item.no.as("itemNo"),
+                        item.name,
+                        itemImage.imageUrl.as("imagePath"),
+                        item.totalStock,
+                        item.price.as("originPrice")))
+                .from(itemImage)
+                .leftJoin(itemImage.item, item)
+                .where(itemImage.no.eq(directOrderDto.getItemImageNo()), item.no.eq(directOrderDto.getItemNo()))
+                .fetchOne();
+
+        if (directOrderDto.getItemOptionNo() != null) {
+            ItemOption itemOption = queryFactory
+                    .selectFrom(QItemOption.itemOption)
+                    .where(QItemOption.itemOption.no.eq(directOrderDto.getItemOptionNo()))
+                    .fetchOne();
+
+            manageCartDto.setOptionStock(itemOption.getOptionStock());
+            manageCartDto.setOptionPrice(itemOption.getAdditionalPrice());
+            manageCartDto.setOptionName(itemOption.getName());
+        }
+
+        manageCartDto.setItemOptionNo(directOrderDto.getItemOptionNo());
+        manageCartDto.setCount(directOrderDto.getCount());
+
+        return manageCartDto;
     }
 
 }

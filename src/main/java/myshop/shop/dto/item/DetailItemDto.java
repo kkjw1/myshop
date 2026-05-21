@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Getter @Setter
-@ToString(of = {"itemNo", "itemImage", "itemCategory", "name", "price", "discount", "totalStock", "detailItemOptionDtoList", "content"})
+@ToString(of = {"itemNo", "itemImageMap", "itemCategory", "name", "price", "discountedPrice", "discount", "totalStock", "detailItemOptionDtoList", "content"})
 public class DetailItemDto {
 
     private Long itemNo;
@@ -20,8 +20,8 @@ public class DetailItemDto {
     private ItemCategory itemCategory;
     private String name;
     private int price;
-    private BigDecimal discountedPrice;
-    private int discount;
+    private BigDecimal discountedPrice;         // 할인된 가격
+    private int discountPer;
     private int totalStock;
 
     private List<DetailItemOptionDto> detailItemOptionDtoList = new ArrayList<>();
@@ -31,11 +31,11 @@ public class DetailItemDto {
     public DetailItemDto() {
     }
 
-    public DetailItemDto(ItemCategory itemCategory, String name, int price, int discount, int totalStock, List<ItemOption> itemOptionList, String content) {
+    public DetailItemDto(ItemCategory itemCategory, String name, int price, int discountPer, int totalStock, List<ItemOption> itemOptionList, String content) {
         this.itemCategory = itemCategory;
         this.name = name;
         this.price = price;
-        this.discount = discount;
+        this.discountPer = discountPer;
         this.totalStock = totalStock;
         this.detailItemOptionDtoList = itemOptionList.stream()
                                         .map(DetailItemOptionDto::new)

@@ -74,14 +74,16 @@
 
                     <div class="col-md-3">
                         <select id="searchType" class="form-select">
-                            <option value="name" selected>상품명</option>
-                            <option value="itemNo">상품번호</option>
+                            <option value="name" th:selected="${param.itemNo == null && (searchItemDto.itemNo == null)}">상품명</option>
+                            <option value="itemNo" th:selected="${param.itemNo != null || (searchItemDto.itemNo != null)}">상품번호</option>
                         </select>
                     </div>
 
                     <div class="col-md-4">
                         <input type="text" class="form-control" id="searchInput"
-                               name="name" placeholder="검색어를 입력하세요" th:value="*{name}">
+                               th:name="${param.itemNo != null || searchItemDto.itemNo != null} ? 'itemNo' : 'name'"
+                               th:placeholder="${param.itemNo != null || searchItemDto.itemNo != null} ? '상품번호를 숫자로 입력하세요' : '검색어를 입력하세요'"
+                               th:value="${param.itemNo != null || searchItemDto.itemNo != null} ? *{itemNo} : *{name}">
                     </div>
 
                     <div class="col-md-3">
@@ -462,7 +464,7 @@
             document.getElementById('editProductPrice').value = data.price;
             document.getElementById('editProductStock').value = data.totalStock;
             document.getElementById('editProductStatus').value = data.itemStatus;
-            document.getElementById('editProductDiscount').value = data.discount;
+            document.getElementById('editProductDiscount').value = data.discountPer;
             document.getElementById('editProductDetail').value = data.content || '';
 
             // 폼에 itemNo 저장 (수정 완료 클릭 시 서버에 보낼 용도)
@@ -664,7 +666,7 @@
             const bulkModifyItemDto = {
                 itemNos: selectedItemNos, // 수집된 [101, 102, 103...] 형태의 배열
                 itemStatus: statusValue || null,
-                discount: discountValue !== "" ? discountValue : null
+                discountPer: discountValue !== "" ? discountValue : null
             };
 
             console.log("서버로 전송할 데이터:", bulkModifyItemDto);

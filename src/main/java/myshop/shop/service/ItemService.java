@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import myshop.shop.controller.HomeController;
+import myshop.shop.controller.HomeController.DirectOrderDto;
 import myshop.shop.controller.sellerWeb.ItemController;
 import myshop.shop.controller.sellerWeb.ItemController.BulkModifyItemDto;
 import myshop.shop.dto.item.*;
@@ -64,7 +66,7 @@ public class ItemService {
                 addItemDto.getItemCategory(),
                 addItemDto.getPrice(),
                 addItemDto.getTotalStock(),
-                addItemDto.getDiscount(),
+                addItemDto.getDiscountPer(),
                 addItemDto.getContent(),
                 addItemDto.getItemStatus());
         itemRepository.save(item);
@@ -101,7 +103,7 @@ public class ItemService {
                 addItemDto.getItemCategory(),
                 addItemDto.getPrice(),
                 addItemDto.getTotalStock(),
-                addItemDto.getDiscount(),
+                addItemDto.getDiscountPer(),
                 addItemDto.getContent(),
                 addItemDto.getItemStatus(),
                 addItemDto.getViewCount());
@@ -172,7 +174,7 @@ public class ItemService {
         item.updateName(modifyItemDto.getName());
         item.updatePrice(modifyItemDto.getPrice());
         item.updateTotalStock(modifyItemDto.getTotalStock());
-        item.updateDiscount(modifyItemDto.getDiscount());
+        item.updateDiscount(modifyItemDto.getDiscountPer());
         item.updateContent(modifyItemDto.getContent());
         item.updateItemStatus(modifyItemDto.getItemStatus());
 
@@ -251,7 +253,7 @@ public class ItemService {
     public List<MainItemDto> getMainItem(Long limit) {
         List<MainItemDto> mainItemDtoList = itemRepository.findMainItem(limit);
         for (MainItemDto mainItemDto : mainItemDtoList) {
-            mainItemDto.setDiscountedPrice(getDiscountedPrice(BigDecimal.valueOf(mainItemDto.getPrice()), BigDecimal.valueOf(mainItemDto.getDiscount())));
+            mainItemDto.setDiscountedPrice(getDiscountedPrice(BigDecimal.valueOf(mainItemDto.getPrice()), BigDecimal.valueOf(mainItemDto.getDiscountPer())));
         }
         log.info("mainItemDtoList={}",mainItemDtoList);
         return mainItemDtoList;
@@ -274,7 +276,7 @@ public class ItemService {
         Map<Long, String> itemImageMap = itemRepository.getImageUrls(itemNo);
         detailItemDto.setItemImageMap(itemImageMap);
 
-        detailItemDto.setDiscountedPrice(getDiscountedPrice(BigDecimal.valueOf(detailItemDto.getPrice()), BigDecimal.valueOf(detailItemDto.getDiscount())));
+        detailItemDto.setDiscountedPrice(getDiscountedPrice(BigDecimal.valueOf(detailItemDto.getPrice()), BigDecimal.valueOf(detailItemDto.getDiscountPer())));
         return detailItemDto;
     }
 
@@ -290,7 +292,6 @@ public class ItemService {
     /**
      * 상품 재고 선점
      * 장바구니 폼 -> 구매하기
-     * 상품상세 폼 -> 바로구매
      */
     public void itemStockUpdate(List<Long> cartNoList) {
         List<ItemStockUpdateDto> itemStockUpdateDtoList = new ArrayList<>();
@@ -312,9 +313,9 @@ public class ItemService {
                 ItemOption itemOption = em.createQuery("select io from ItemOption io where io.no=:optionNo", ItemOption.class)
                         .setParameter("optionNo", optionNo)
                         .getSingleResult();
-                itemOption.updateOptionStock(count);
+                itemOption.subOptionStock(count);
             }
-            item.updateTotalStock(count);
+            item.subTotalStock(count);
 
 
             em.flush();
@@ -330,6 +331,34 @@ public class ItemService {
 
         public ItemStockUpdateDto() {
         }
+    }
+
+
+    /**
+     * 상품 제고 선점
+     * 상품상세 폼 -> 바로구매
+     * DirectOrderDto(itemNo=3, memberNo=5, itemOptionNo=null, itemImageNo=7, count=6)
+     * DirectOrderDto(itemNo=4, memberNo=5, itemOptionNo=7, itemImageNo=9, count=1)
+     */
+    public void itemStockUpdate(DirectOrderDto directOrderDto) {
+        Long optionNo = directOrderDto.getItemOptionNo();
+        Long itemNo = directOrderDto.getItemNo();
+        int count = directOrderDto.getCount();
+
+        Item item = em.createQuery("select i from Item i where i.no=:itemNo", Item.class)
+                .setParameter("itemNo", itemNo)
+                .getSingleResult();
+        if (optionNo != null) {
+            ItemOption itemOption = em.createQuery("select io from ItemOption io where io.no=:optionNo", ItemOption.class)
+                    .setParameter("optionNo", optionNo)
+                    .getSingleResult();
+            itemOption.subOptionStock(count);
+        }
+        item.subTotalStock(count);
+
+        em.flush();
+        em.clear();
+
     }
 
 

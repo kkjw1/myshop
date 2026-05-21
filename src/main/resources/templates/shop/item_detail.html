@@ -319,11 +319,11 @@
                     <a href="#" class="small ml-2">1,240개 상품평</a>
                 </div>
 
-                <div class="price-area mb-1" th:if="${detailItemDto.discount gt 0}">
+                <div class="price-area mb-1" th:if="${detailItemDto.discountPer gt 0}">
                     <span class="original-price" th:text="|${#numbers.formatDecimal(detailItemDto.price, 0, 'COMMA', 0, 'POINT')}원|">15,900원</span>
                     <span th:text="|${#numbers.formatDecimal(detailItemDto.discountedPrice, 0, 'COMMA', 0, 'POINT')}원|">15,900원</span>
                 </div>
-                <div class="price-area mb-1" th:if="${detailItemDto.discount eq 0}">
+                <div class="price-area mb-1" th:if="${detailItemDto.discountPer eq 0}">
                     <span th:text="|${#numbers.formatDecimal(detailItemDto.price, 0, 'COMMA', 0, 'POINT')}원|">15,900원</span>
                 </div>
 
@@ -365,7 +365,9 @@
                                     onclick="toggleCart(this)">장바구니 담기</button>
                         </div>
                         <div class="col-6 pl-2">
-                            <button id="buyBtn" class="btn btn-buy btn-block" disabled>바로구매</button>
+                            <button id="buyBtn" class="btn btn-buy btn-block"
+                                    th:item-no="${detailItemDto.itemNo}"
+                                    onclick="directOrder(this)" disabled>바로구매</button>
                         </div>
                     </div>
 
@@ -393,6 +395,7 @@
                         </div>
                     </div>
 
+                    <!--재고없음-->
                     <div th:if="${detailItemDto.totalStock eq 0}">
                         <div class="row no-gutters mt-4">
                             <div class="col-6 pr-2">
@@ -412,7 +415,9 @@
                                         onclick="toggleCart(this)">장바구니 담기</button>
                             </div>
                             <div class="col-6 pl-2">
-                                <button id="buyBtn2" class="btn btn-buy btn-block">바로구매</button>
+                                <button id="buyBtn2" class="btn btn-buy btn-block"
+                                        th:item-no="${detailItemDto.itemNo}"
+                                        onclick="directOrder(this)">바로구매</button>
                             </div>
                         </div>
                     </div>
@@ -671,7 +676,56 @@
         }
     });
 
+    // 바로 구매
+    async function directOrder(button) {
+        const itemNo = button.getAttribute('item-no');
+        const count = document.getElementById('stockInput')?.value || document.getElementById('stockInput2').value;
+        const itemOptionNo = document.getElementById('optionSelect')?.value || document.getElementById('optionSelect2').value;
+        const itemImageNo = document.getElementById('mainImage').value;
 
+        // Cart컨트롤러 만들기
+
+        const DirectOrderDto = {
+            itemNo: itemNo,
+            memberNo: null,
+            itemOptionNo: itemOptionNo,
+            itemImageNo: itemImageNo,
+            count: count
+        };
+
+        const res = await fetch('/item/directOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(DirectOrderDto)
+        });
+
+        const resVal = await res.text();
+        if(resVal === "soldOut") {
+            alert("재고가 부족합니다.");
+            location.href = '/item?itemNo='+ itemNo;
+        } else if (resVal === "loginFail") {
+            location.href = '/login?redirectURL=/item?itemNo=' + itemNo;
+        } else {
+            const orderData = { ...DirectOrderDto };
+
+            // 값이 없거나, 문자열 "null", 진짜 null인 속성들을 동적으로 제거
+            Object.keys(orderData).forEach(key => {
+                const val = orderData[key];
+                if (val === null || val === undefined || val === '' || val === 'null') {
+                    delete orderData[key];
+                }
+            });
+
+            // 결과 예시: ?itemNo=3&itemImageNo=7&count=3 (memberNo와 itemOptionNo는 깔끔히 제외됨)
+            const queryString = new URLSearchParams(orderData).toString();
+            location.href = '/myPage/directOrder?' + queryString;
+        }
+    }
+
+
+    // 장바구니 담기
     async function toggleCart(button) {
         const itemNo = button.getAttribute('item-no');
         const count = document.getElementById('stockInput')?.value || document.getElementById('stockInput2').value;

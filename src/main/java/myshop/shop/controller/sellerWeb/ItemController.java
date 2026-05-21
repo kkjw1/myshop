@@ -155,19 +155,19 @@ public class ItemController {
     }
 
     @Getter
-    @ToString(of = {"itemNos", "itemStatus", "discount"})
+    @ToString(of = {"itemNos", "itemStatus", "discountPer"})
     public static class BulkModifyItemDto {
         private List<Long> itemNos;
         private ItemStatus itemStatus;
-        private Integer discount;
+        private Integer discountPer;
 
         public BulkModifyItemDto() {
         }
 
-        public BulkModifyItemDto(List<Long> itemNos, ItemStatus itemStatus, Integer discount) {
+        public BulkModifyItemDto(List<Long> itemNos, ItemStatus itemStatus, Integer discountPer) {
             this.itemNos = itemNos;
             this.itemStatus = itemStatus;
-            this.discount = discount;
+            this.discountPer = discountPer;
         }
     }
 

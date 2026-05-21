@@ -1,7 +1,6 @@
 package myshop.shop.repository.Item;
 
 import jakarta.persistence.EntityManager;
-import myshop.shop.controller.sellerWeb.ItemController;
 import myshop.shop.controller.sellerWeb.ItemController.BulkModifyItemDto;
 import myshop.shop.dto.item.*;
 import myshop.shop.entity.Seller;
@@ -189,13 +188,13 @@ class ItemRepositoryTest {
 
         //then
         Item item = itemRepository.findById(1L).orElse(null);
-        Assertions.assertThat(item.getDiscount()).isEqualTo(30);
+        Assertions.assertThat(item.getDiscountPer()).isEqualTo(30);
         Item item2 = itemRepository.findById(2L).orElse(null);
-        Assertions.assertThat(item2.getDiscount()).isEqualTo(30);
+        Assertions.assertThat(item2.getDiscountPer()).isEqualTo(30);
         Item item3 = itemRepository.findById(1L).orElse(null);
-        Assertions.assertThat(item3.getDiscount()).isEqualTo(30);
+        Assertions.assertThat(item3.getDiscountPer()).isEqualTo(30);
         Item item4 = itemRepository.findById(2L).orElse(null);
-        Assertions.assertThat(item4.getDiscount()).isEqualTo(30);
+        Assertions.assertThat(item4.getDiscountPer()).isEqualTo(30);
     }
 
     @Test
@@ -215,10 +214,10 @@ class ItemRepositoryTest {
         //then
         Item item = itemRepository.findById(1L).orElse(null);
         Assertions.assertThat(item.getItemStatus()).isEqualTo(ItemStatus.판매중지);
-        Assertions.assertThat(item.getDiscount()).isEqualTo(21);
+        Assertions.assertThat(item.getDiscountPer()).isEqualTo(21);
         Item item2 = itemRepository.findById(2L).orElse(null);
         Assertions.assertThat(item2.getItemStatus()).isEqualTo(ItemStatus.판매중지);
-        Assertions.assertThat(item2.getDiscount()).isEqualTo(21);
+        Assertions.assertThat(item2.getDiscountPer()).isEqualTo(21);
     }
     
     @Test

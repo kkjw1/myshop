@@ -2,16 +2,12 @@ package myshop.shop.entity.item;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.ToString;
 import myshop.shop.entity.BaseDateEntity;
 import myshop.shop.entity.OrderItem;
 import myshop.shop.entity.Seller;
-import myshop.shop.entity.delivery.Delivery;
-import myshop.shop.entity.order.Order;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Getter
@@ -30,7 +26,7 @@ public class Item extends BaseDateEntity {
     private ItemCategory itemCategory;
     private int price;
     private int totalStock;
-    private int discount;
+    private int discountPer;
     private String content;
 
     @Enumerated(EnumType.STRING)
@@ -51,26 +47,26 @@ public class Item extends BaseDateEntity {
     public Item() {
     }
 
-    public Item(Seller seller, String name, ItemCategory itemCategory, int price, int totalStock, int discount,  String content, ItemStatus itemStatus) {
+    public Item(Seller seller, String name, ItemCategory itemCategory, int price, int totalStock, int discountPer, String content, ItemStatus itemStatus) {
         this.seller = seller;
         this.name = name;
         this.itemCategory = itemCategory;
         this.price = price;
         this.totalStock = totalStock;
-        this.discount = discount;
+        this.discountPer = discountPer;
         this.content = content;
         this.itemStatus = itemStatus;
         this.viewCount = 0L;
     }
 
     // viewCount 주입, 테스트 전용
-    public Item(Seller seller, String name, ItemCategory itemCategory, int price, int totalStock, int discount,  String content, ItemStatus itemStatus, Long viewCount) {
+    public Item(Seller seller, String name, ItemCategory itemCategory, int price, int totalStock, int discountPer, String content, ItemStatus itemStatus, Long viewCount) {
         this.seller = seller;
         this.name = name;
         this.itemCategory = itemCategory;
         this.price = price;
         this.totalStock = totalStock;
-        this.discount = discount;
+        this.discountPer = discountPer;
         this.content = content;
         this.itemStatus = itemStatus;
         this.viewCount = viewCount;
@@ -84,12 +80,17 @@ public class Item extends BaseDateEntity {
         this.price = price;
     }
 
-    public void updateTotalStock(int count) {
+
+    public void updateTotalStock(int totalStock) {
+        this.totalStock = totalStock;
+    }
+
+    public void subTotalStock(int count) {
         this.totalStock -= count;
     }
 
-    public void updateDiscount(int discount) {
-        this.discount = discount;
+    public void updateDiscount(int discountPer) {
+        this.discountPer = discountPer;
     }
 
     public void updateContent(String content) {

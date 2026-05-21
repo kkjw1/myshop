@@ -4,6 +4,8 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import myshop.shop.controller.HomeController;
+import myshop.shop.controller.HomeController.DirectOrderDto;
 import myshop.shop.dto.cart.ManageCartDto;
 import myshop.shop.dto.cart.SaveCartDto;
 import myshop.shop.entity.Cart;
@@ -89,10 +91,21 @@ public class CartService {
 
 
     /**
-     * 장바구니 하나 불러오기
+     * 주문 결제 데이터 불러오기
+     * 장바구니 폼 -> 구매하기
      */
     public ManageCartDto findCart(Long cartNo) {
         return cartRepository.getManageCart(cartNo);
+    }
+
+
+
+    /**
+     * 주문/결제 폼
+     * 상품 상세 폼 -> 바로 구매
+     */
+    public ManageCartDto findCart(DirectOrderDto directOrderDto) {
+        return cartRepository.getManageCart(directOrderDto);
     }
 
 
