@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.ToString;
 import myshop.shop.entity.Address;
 import myshop.shop.entity.BaseDateEntity;
+import myshop.shop.entity.Cart;
+import myshop.shop.entity.order.Order;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,12 @@ public class Member extends BaseDateEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Address> addresses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Order> orderList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Cart> cartList = new ArrayList<>();
 
     public Member() {
     }

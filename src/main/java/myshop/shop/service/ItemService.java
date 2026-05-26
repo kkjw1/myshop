@@ -166,6 +166,7 @@ public class ItemService {
 
     /**
      * 상품 수정
+     * Cart : CascadeType.REMOVE, orphanRemoval = true
      */
     public void itemModify(ModifyItemDto modifyItemDto) {
         Item item = em.createQuery("select i from Item i where i.no=:itemNo", Item.class)
@@ -184,7 +185,10 @@ public class ItemService {
         Item itemProxy = itemRepository.getReferenceById(modifyItemDto.getItemNo());
 
 
-        itemOptionRepository.deleteItemOptionByItem(itemProxy);
+        for (ItemOption itemOption : itemOptionRepository.findByItem(itemProxy)) {
+            itemOptionRepository.delete(itemOption);
+        }
+
         for (ModifyItemOptionDto modifyItemOptionDto : modifyItemDto.getModifyItemOptionDtoList()) {
             itemOptionRepository.save(new ItemOption(itemProxy,
                     modifyItemOptionDto.getName(),

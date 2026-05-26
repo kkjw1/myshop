@@ -794,7 +794,7 @@
                 itemNo: item.querySelector('.item-itemNo').value,
                 count: count,
                 price: price,
-                totalPrice: count * price,
+                totalPrice: String(count * price),
                 imageUrl: item.querySelector('.item-imageUrl').value,
                 itemName: item.querySelector('.order-item-name').innerText,
                 optionName: item.querySelector('.item-optionName').value || ""

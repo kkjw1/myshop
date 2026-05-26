@@ -3,6 +3,10 @@ package myshop.shop.entity.item;
 import jakarta.persistence.*;
 import lombok.Getter;
 import myshop.shop.entity.BaseDateEntity;
+import myshop.shop.entity.Cart;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,6 +22,9 @@ public class ItemOption extends BaseDateEntity {
     private String name;
     private int additionalPrice;
     private int optionStock;
+
+    @OneToMany(mappedBy = "itemOption", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Cart> cartList = new ArrayList<>();
 
     public ItemOption() {
     }

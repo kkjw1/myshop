@@ -1,6 +1,5 @@
 package myshop.shop.dto.item;
 
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -27,7 +26,7 @@ public class ManageItemDto {
     public ManageItemDto(Item item) {
         this.itemNo = item.getNo();
         this.name = item.getName();
-        this.price = item.getPrice();
+        this.price = item.getOriginalPrice();
         this.totalStock = item.getTotalStock();
         this.itemStatus = item.getItemStatus();
         this.createdDate = item.getCreatedDate();

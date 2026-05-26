@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class AddOrderDto {
      */
     private int totalProductPrice;
     private int deliveryFee;
-    private int totalOrderPrice;
+    private BigDecimal totalOrderPrice;
 
 
     public AddOrderDto() {

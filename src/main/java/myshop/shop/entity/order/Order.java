@@ -9,6 +9,7 @@ import myshop.shop.entity.delivery.Delivery;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.member.Member;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,15 +27,18 @@ public class Order extends BaseDateEntity {
     private Member member;
 
     private OrderStatus orderStatus;
-    private int totalPrice;        // 총 결제 금액
+    private BigDecimal totalPrice;        // 총 결제 금액
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<OrderItem> orderItemList = new ArrayList<>();
+
+
+
 
     public Order() {
     }
 
-    public Order(Member member, OrderStatus orderStatus, int totalPrice) {
+    public Order(Member member, OrderStatus orderStatus, BigDecimal totalPrice) {
         this.member = member;
         this.orderStatus = orderStatus;
         this.totalPrice = totalPrice;

@@ -7,6 +7,7 @@ import myshop.shop.entity.delivery.Delivery;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.order.Order;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class OrderItem extends BaseDateEntity{
     private Delivery delivery;
 
     private int count;
-    private int price;              // 개당 가격
+    private BigDecimal price;              // 개당 가격 = (원래 가격 - (원래 가격 * 할인율)) + 옵션 추가금
     private String imageUrl;
     private String itemName;
     private String optionName;
@@ -40,7 +41,7 @@ public class OrderItem extends BaseDateEntity{
     public OrderItem() {
     }
 
-    public OrderItem(Order order, Item item, Delivery delivery, int count, int price, String imageUrl, String itemName, String optionName) {
+    public OrderItem(Order order, Item item, Delivery delivery, int count, BigDecimal price, String imageUrl, String itemName, String optionName) {
         this.order = order;
         this.item = item;
         this.delivery = delivery;

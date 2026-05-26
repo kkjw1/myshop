@@ -8,6 +8,9 @@ import myshop.shop.entity.item.ItemImage;
 import myshop.shop.entity.item.ItemOption;
 import myshop.shop.entity.member.Member;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @SequenceGenerator(name = "CART_SEQ", sequenceName = "CART_SEQ", initialValue = 1, allocationSize = 1)
@@ -30,29 +33,22 @@ public class Cart extends BaseDateEntity {
     private ItemOption itemOption;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ITEM_IMAGE_NO")
-    private ItemImage itemImage;
-
-
     private int count;
 
     public Cart() {
     }
 
-    public Cart(Member member, Item item, int count, ItemOption itemOption, ItemImage itemImage) {
+    public Cart(Member member, Item item, int count, ItemOption itemOption) {
         this.member = member;
         this.item = item;
         this.count = count;
         this.itemOption = itemOption;
-        this.itemImage = itemImage;
     }
 
-    public Cart(Member member, Item item, int count, ItemImage itemImage) {
+    public Cart(Member member, Item item, int count) {
         this.member = member;
         this.item = item;
         this.count = count;
-        this.itemImage = itemImage;
     }
 
     public void updateCount(int count) {

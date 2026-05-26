@@ -154,7 +154,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
             return new DetailItemDto(
                     detailItem.getItemCategory(),
                     detailItem.getName(),
-                    detailItem.getPrice(),
+                    detailItem.getOriginalPrice(),
                     detailItem.getDiscountPer(),
                     detailItem.getTotalStock(),
                     detailItem.getItemOptions(),

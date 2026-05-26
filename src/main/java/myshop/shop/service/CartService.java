@@ -60,8 +60,7 @@ public class CartService {
             if (itemOptionNo == null) {
                 Cart cart = new Cart(memberProxy,
                         itemProxy,
-                        count,
-                        itemImageProxy);
+                        count);
                 cartRepository.save(cart);
             }
             else {
@@ -69,8 +68,7 @@ public class CartService {
                 Cart cart = new Cart(memberProxy,
                         itemProxy,
                         count,
-                        itemOptionProxy,
-                        itemImageProxy);
+                        itemOptionProxy);
                 cartRepository.save(cart);
             }
         }

@@ -44,7 +44,7 @@ public class ModifyItemDto {
 
     public ModifyItemDto(Item item, List<ItemOption> itemOptionList) {
         this.name = item.getName();
-        this.price = item.getPrice();
+        this.price = item.getOriginalPrice();
         this.totalStock = item.getTotalStock();
         this.itemStatus = item.getItemStatus();
         this.discountPer = item.getDiscountPer();

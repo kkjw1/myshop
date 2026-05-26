@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.ToString;
 import myshop.shop.entity.BaseDateEntity;
+import myshop.shop.entity.OrderItem;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.order.Order;
 
@@ -29,6 +30,9 @@ public class Delivery extends BaseDateEntity {
 
     private int deliveryFee;
     private String deliveryRequest;
+
+    @OneToOne(mappedBy = "delivery", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private OrderItem orderItem;
 
     public Delivery() {
     }
