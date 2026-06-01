@@ -54,6 +54,7 @@ public class OrderController {
         // 구매 상품 재고 선점
         itemService.itemStockUpdate(cartToOrderDto.getCartNo());
 
+        // todo: 여기서 price오는거 처리하기
         // 배송지
         ManageAddressDto manageAddressDto = addressService.getAddressByMemberNo(memberNo);
 
@@ -109,7 +110,7 @@ public class OrderController {
 
         List<ManageCartDto> manageCartDtoList = new ArrayList<>();
         manageCartDtoList.add(manageCartDto);
-        int totalProductPrice = (manageCartDto.getOriginPrice() + manageCartDto.getOptionPrice()) * manageCartDto.getCount();
+        int totalProductPrice = (manageCartDto.getOriginalPrice() + manageCartDto.getOptionPrice()) * manageCartDto.getCount();
         int deliveryFee = totalProductPrice >= 30000 ? 0 : 3000;
         model.addAttribute("totalProductPrice", totalProductPrice);
         model.addAttribute("deliveryFee", deliveryFee);

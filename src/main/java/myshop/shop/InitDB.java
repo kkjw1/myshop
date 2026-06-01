@@ -144,10 +144,10 @@ public class InitDB {
             }
 
 
-            cartService.saveCart(new SaveCartDto(1L, 5L, 1L, 1L, 1));
-            cartService.saveCart(new SaveCartDto(1L, 5L, 4L, 1L, 2));
-            cartService.saveCart(new SaveCartDto(3L, 5L, null, 7L, 6));
-            cartService.saveCart(new SaveCartDto(4L, 5L, 7L, 9L, 1));
+            cartService.saveCart(new SaveCartDto(1L, 5L, 1L, 1));
+            cartService.saveCart(new SaveCartDto(1L, 5L, 4L, 2));
+            cartService.saveCart(new SaveCartDto(3L, 5L, null, 6));
+            cartService.saveCart(new SaveCartDto(4L, 5L, 7L, 1));
 
             em.flush();
             em.clear();

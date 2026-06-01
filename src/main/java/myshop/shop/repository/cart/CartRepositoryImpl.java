@@ -27,25 +27,34 @@ public class CartRepositoryImpl implements CartRepositoryCustom {
     @Override
     public List<ManageCartDto> getManageCartList(Long memberNo) {
 
-        return queryFactory
+        List<ManageCartDto> manageCartDtoList = queryFactory
                 .select(Projections.fields(ManageCartDto.class,
                         cart.no.as("cartNo"),
                         item.no.as("itemNo"),
                         itemOption.no.as("itemOptionNo"),
                         item.name,
-                        itemImage.imageUrl.as("imagePath"),
                         cart.count,
                         item.totalStock,
                         itemOption.optionStock,
-                        item.price.as("originPrice"),
+                        item.originalPrice,
+                        item.discountPer,
                         itemOption.additionalPrice.as("optionPrice"),
                         itemOption.name.as("optionName")))
                 .from(cart)
                 .leftJoin(cart.item, item)
                 .leftJoin(cart.itemOption, itemOption)
-                .leftJoin(cart.itemImage, itemImage)
                 .where(cart.member.no.eq(memberNo))
                 .fetch();
+
+        for (ManageCartDto manageCartDto : manageCartDtoList) {
+            Long itemNo = manageCartDto.getItemNo();
+            String imagePath = em.createQuery("select ii.imageUrl from ItemImage ii where ii.item.no=:itemNo and ii.isMain=true", String.class)
+                    .setParameter("itemNo", itemNo)
+                    .getSingleResult();
+            manageCartDto.setImagePath(imagePath);
+        }
+
+        return manageCartDtoList;
     }
 
     @Override

@@ -4,8 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @Getter @Setter
-@ToString(of = {"cartNo", "itemNo", "itemOptionNo", "name", "imagePath", "count", "totalStock", "optionStock", "originPrice", "optionPrice", "optionName"})
+@ToString(of = {"cartNo", "itemNo", "itemOptionNo", "name", "imagePath", "count", "totalStock", "optionStock", "originalPrice", "optionPrice", "optionName"})
 public class ManageCartDto {
     private Long cartNo;            // Cart
     private Long itemNo;            // Item
@@ -15,14 +17,17 @@ public class ManageCartDto {
     private int count;              // Cart
     private int totalStock;         // Item
     private int optionStock;        // ItemOption
-    private int originPrice;        // Item
+    private int originalPrice;      // Item
     private int optionPrice;        // ItemOption
+    private int discountPer;        // Item
     private String optionName;      // ItemOption
+
+    private BigDecimal price;
 
     public ManageCartDto() {
     }
 
-    public ManageCartDto(Long cartNo, Long itemNo, Long itemOptionNo, String name, String imagePath, int count, int totalStock, int optionStock, int originPrice, int optionPrice, String optionName) {
+    public ManageCartDto(Long cartNo, Long itemNo, Long itemOptionNo, String name, String imagePath, int count, int totalStock, int optionStock, int originalPrice, int optionPrice, String optionName) {
         this.cartNo = cartNo;
         this.itemNo = itemNo;
         this.itemOptionNo = itemOptionNo;
@@ -31,7 +36,7 @@ public class ManageCartDto {
         this.count = count;
         this.totalStock = totalStock;
         this.optionStock = optionStock;
-        this.originPrice = originPrice;
+        this.originalPrice = originalPrice;
         this.optionPrice = optionPrice;
         this.optionName = optionName;
     }

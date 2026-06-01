@@ -35,6 +35,7 @@ public class CartController {
         if (loginCheckMemberDto == null) {
             return false;
         }
+
         saveCartDto.setMemberNo(loginCheckMemberDto.getNo());
         cartService.saveCart(saveCartDto);
         return true;

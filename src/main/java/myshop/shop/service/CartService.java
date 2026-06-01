@@ -21,7 +21,10 @@ import myshop.shop.repository.member.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
+
+import static myshop.shop.service.ItemService.getDiscountedPrice;
 
 @Service
 @Slf4j
@@ -45,7 +48,6 @@ public class CartService {
         log.info("saveCartDto={}", saveCartDto);
         Member memberProxy = memberRepository.getReferenceById(saveCartDto.getMemberNo());
         Item itemProxy = itemRepository.getReferenceById(saveCartDto.getItemNo());
-        ItemImage itemImageProxy = itemImageRepository.getReferenceById(saveCartDto.getItemImageNo());
         Long itemOptionNo = saveCartDto.getItemOptionNo();
         int count = saveCartDto.getCount();
 
@@ -83,7 +85,17 @@ public class CartService {
      * 모든 장바구니 불러오기
      */
     public List<ManageCartDto> findAllCart(Long memberNo) {
-        return cartRepository.getManageCartList(memberNo);
+        List<ManageCartDto> manageCartList = cartRepository.getManageCartList(memberNo);
+
+        for (ManageCartDto manageCartDto : manageCartList) {
+            BigDecimal originalPrice = BigDecimal.valueOf(manageCartDto.getOriginalPrice());
+            BigDecimal discountPer = BigDecimal.valueOf(manageCartDto.getDiscountPer());
+            BigDecimal optionPrice = BigDecimal.valueOf(manageCartDto.getOptionPrice());
+            BigDecimal discountedPrice = getDiscountedPrice(originalPrice, discountPer);
+            manageCartDto.setPrice(discountedPrice.add(optionPrice));
+        }
+
+        return manageCartList;
     }
 
 

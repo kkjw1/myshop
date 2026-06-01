@@ -361,7 +361,7 @@
                                     <div class="text-right">
                                         <!-- 수량에 따라 변할 가격 표시 영역 -->
                                         <div class="price-text"
-                                             th:text="${#numbers.formatInteger((manageCartDto.originPrice + manageCartDto.optionPrice) * manageCartDto.count, 3, 'COMMA') + '원'}">
+                                             th:text="${#numbers.formatInteger(manageCartDto.price.multiply(T(java.math.BigDecimal).valueOf(manageCartDto.count)), 3, 'COMMA') + '원'}">
                                             14,000원
                                         </div>
                                         <a href="javascript:void(0)" class="text-muted small"

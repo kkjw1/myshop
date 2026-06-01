@@ -100,7 +100,7 @@ class CartServiceTest {
     @DisplayName("장바구니 처음 저장")
     public void saveCartTest() throws Exception {
         //given
-        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 1L, 1L, 5);
+        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 1L, 5);
 
         //when
         cartService.saveCart(saveCartDto);
@@ -116,13 +116,13 @@ class CartServiceTest {
     @DisplayName("같은 물품 장바구니에 저장")
     public void saveCartTest2() throws Exception {
         //given
-        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 1L, 1L,5);
+        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 1L,5);
         cartService.saveCart(saveCartDto);
         em.flush();
         em.clear();
 
         //when
-        SaveCartDto saveCartDto2 = new SaveCartDto(1L, 1L, 1L, 1L, 4);
+        SaveCartDto saveCartDto2 = new SaveCartDto(1L, 1L, 1L, 4);
         cartService.saveCart(saveCartDto2);
 
         //then
@@ -134,13 +134,13 @@ class CartServiceTest {
     @DisplayName("다른 물품 장바구니에 저장")
     public void saveCartTest3() throws Exception {
         //given
-        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 1L, 1L, 5);
+        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 1L, 5);
         cartService.saveCart(saveCartDto);
         em.flush();
         em.clear();
 
         //when
-        SaveCartDto saveCartDto2 = new SaveCartDto(1L, 1L, 2L, 1L, 4);
+        SaveCartDto saveCartDto2 = new SaveCartDto(1L, 1L, 2L, 4);
         cartService.saveCart(saveCartDto2);
 
         //then
@@ -156,11 +156,11 @@ class CartServiceTest {
     @Test
     public void findAllCartTest() throws Exception {
         //given
-        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 1L, 1L, 5);
+        SaveCartDto saveCartDto = new SaveCartDto(1L, 1L, 1L, 5);
         cartService.saveCart(saveCartDto);
-        SaveCartDto saveCartDto2 = new SaveCartDto(1L, 1L, 2L, 1L, 4);
+        SaveCartDto saveCartDto2 = new SaveCartDto(1L, 1L, 2L, 4);
         cartService.saveCart(saveCartDto2);
-        SaveCartDto saveCartDto3 = new SaveCartDto(1L, 1L, 1L, 1L, 2);
+        SaveCartDto saveCartDto3 = new SaveCartDto(1L, 1L, 1L, 2);
         cartService.saveCart(saveCartDto3);
         em.flush();
         em.clear();
