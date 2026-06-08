@@ -49,7 +49,8 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         item.no.as("itemNo"),
                         itemImage.imageUrl.as("mainImagePath"),
                         item.name,
-                        item.price,
+                        // BigDecimal -> int 타입으로 변환
+                        item.originalPrice.intValue().as("price"),
                         item.totalStock,
                         item.itemStatus,
                         item.createdDate))
@@ -123,7 +124,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         item.no.as("itemNo"),
                         itemImage.imageUrl.as("mainImagePath"),
                         item.name,
-                        item.price,
+                        item.originalPrice.intValue().as("price"),
                         item.discountPer,
                         item.viewCount))
                 .from(itemImage)

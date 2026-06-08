@@ -105,7 +105,15 @@ public class CartService {
      * 장바구니 폼 -> 구매하기
      */
     public ManageCartDto findCart(Long cartNo) {
-        return cartRepository.getManageCart(cartNo);
+        ManageCartDto manageCartDto = cartRepository.getManageCart(cartNo);
+
+        BigDecimal originalPrice = BigDecimal.valueOf(manageCartDto.getOriginalPrice());
+        BigDecimal discountPer = BigDecimal.valueOf(manageCartDto.getDiscountPer());
+        BigDecimal optionPrice = BigDecimal.valueOf(manageCartDto.getOptionPrice());
+        BigDecimal discountedPrice = getDiscountedPrice(originalPrice, discountPer);
+        manageCartDto.setPrice(discountedPrice.add(optionPrice));
+
+        return manageCartDto;
     }
 
 

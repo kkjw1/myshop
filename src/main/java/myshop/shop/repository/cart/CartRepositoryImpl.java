@@ -59,25 +59,32 @@ public class CartRepositoryImpl implements CartRepositoryCustom {
 
     @Override
     public ManageCartDto getManageCart(Long cartNo) {
-        return queryFactory
+        ManageCartDto manageCartDto = queryFactory
                 .select(Projections.fields(ManageCartDto.class,
                         cart.no.as("cartNo"),
                         item.no.as("itemNo"),
                         itemOption.no.as("itemOptionNo"),
                         item.name,
-                        itemImage.imageUrl.as("imagePath"),
                         cart.count,
                         item.totalStock,
                         itemOption.optionStock,
-                        item.price.as("originPrice"),
+                        item.originalPrice.intValue(),
+                        item.discountPer,
                         itemOption.additionalPrice.as("optionPrice"),
                         itemOption.name.as("optionName")))
                 .from(cart)
                 .leftJoin(cart.item, item)
                 .leftJoin(cart.itemOption, itemOption)
-                .leftJoin(cart.itemImage, itemImage)
                 .where(cart.no.eq(cartNo))
                 .fetchOne();
+
+        Long itemNo = manageCartDto.getItemNo();
+        String imagePath = em.createQuery("select ii.imageUrl from ItemImage ii where ii.item.no=:itemNo and ii.isMain=true", String.class)
+                .setParameter("itemNo", itemNo)
+                .getSingleResult();
+        manageCartDto.setImagePath(imagePath);
+
+        return manageCartDto;
     }
 
     @Override
@@ -101,7 +108,8 @@ public class CartRepositoryImpl implements CartRepositoryCustom {
                         item.name,
                         itemImage.imageUrl.as("imagePath"),
                         item.totalStock,
-                        item.price.as("originPrice")))
+                        item.originalPrice.intValue()
+                ))
                 .from(itemImage)
                 .leftJoin(itemImage.item, item)
                 .where(itemImage.no.eq(directOrderDto.getItemImageNo()), item.no.eq(directOrderDto.getItemNo()))

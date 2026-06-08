@@ -22,7 +22,7 @@ public class ManageCartDto {
     private int discountPer;        // Item
     private String optionName;      // ItemOption
 
-    private BigDecimal price;
+    private BigDecimal price;       // 개당가격(할인된 가격 + 옵션 추가금액)
 
     public ManageCartDto() {
     }

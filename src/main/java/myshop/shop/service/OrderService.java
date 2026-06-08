@@ -48,6 +48,7 @@ public class OrderService {
 
         // Delivery, OrderItem 저장
         List<AddOrderItemDto> addOrderItemDtoList = addOrderDto.getAddOrderItemDtoList();
+
         for (AddOrderItemDto addOrderItemDto : addOrderItemDtoList) {
             Delivery savedDelivery = deliveryRepository.save(new Delivery(null, null, DeliveryStatus.배송준비중,
                     addOrderDto.getRecipientName(), addOrderDto.getPhoneNumber(),
@@ -58,7 +59,7 @@ public class OrderService {
                     itemProxy,
                     savedDelivery,
                     addOrderItemDto.getCount(),
-                    addOrderItemDto.getPrice(),
+                    addOrderItemDto.getTotalPrice(),
                     addOrderItemDto.getImageUrl(),
                     addOrderItemDto.getItemName(),
                     addOrderItemDto.getOptionName());
