@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.controller.HomeController;
-import myshop.shop.controller.HomeController.DirectOrderDto;
+import myshop.shop.controller.HomeController.CheckDirectOrderDto;
 import myshop.shop.controller.sellerWeb.ItemController;
 import myshop.shop.controller.sellerWeb.ItemController.BulkModifyItemDto;
 import myshop.shop.dto.item.*;
@@ -257,7 +257,7 @@ public class ItemService {
     public List<MainItemDto> getMainItem(Long limit) {
         List<MainItemDto> mainItemDtoList = itemRepository.findMainItem(limit);
         for (MainItemDto mainItemDto : mainItemDtoList) {
-            mainItemDto.setDiscountedPrice(getDiscountedPrice(BigDecimal.valueOf(mainItemDto.getPrice()), BigDecimal.valueOf(mainItemDto.getDiscountPer())));
+            mainItemDto.setDiscountedPrice(getDiscountedPrice(mainItemDto.getPrice(), mainItemDto.getDiscountPer()));
         }
         log.info("mainItemDtoList={}",mainItemDtoList);
         return mainItemDtoList;
@@ -280,7 +280,7 @@ public class ItemService {
         Map<Long, String> itemImageMap = itemRepository.getImageUrls(itemNo);
         detailItemDto.setItemImageMap(itemImageMap);
 
-        detailItemDto.setDiscountedPrice(getDiscountedPrice(BigDecimal.valueOf(detailItemDto.getPrice()), BigDecimal.valueOf(detailItemDto.getDiscountPer())));
+        detailItemDto.setDiscountedPrice(getDiscountedPrice(detailItemDto.getPrice(), detailItemDto.getDiscountPer()));
         return detailItemDto;
     }
 
@@ -344,10 +344,10 @@ public class ItemService {
      * DirectOrderDto(itemNo=3, memberNo=5, itemOptionNo=null, itemImageNo=7, count=6)
      * DirectOrderDto(itemNo=4, memberNo=5, itemOptionNo=7, itemImageNo=9, count=1)
      */
-    public void itemStockUpdate(DirectOrderDto directOrderDto) {
-        Long optionNo = directOrderDto.getItemOptionNo();
-        Long itemNo = directOrderDto.getItemNo();
-        int count = directOrderDto.getCount();
+    public void itemStockUpdate(CheckDirectOrderDto checkDirectOrderDto) {
+        Long optionNo = checkDirectOrderDto.getItemOptionNo();
+        Long itemNo = checkDirectOrderDto.getItemNo();
+        int count = checkDirectOrderDto.getCount();
 
         Item item = em.createQuery("select i from Item i where i.no=:itemNo", Item.class)
                 .setParameter("itemNo", itemNo)

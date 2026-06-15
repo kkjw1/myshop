@@ -28,16 +28,17 @@ public class OrderItemRepositoryImpl implements OrderItemRepositoryCustom {
     @Override
     public DetailOrderDto getDetailOrder(Long orderNo) {
         List<DetailOrderItemDto> DetailOrderItemDtoList = queryFactory
-                .select(Projections.constructor(DetailOrderItemDto.class,
-                        orderItem.item.no.as("itemNo"),
+                .select(Projections.fields(DetailOrderItemDto.class,
                         orderItem.count,
                         orderItem.price,
+
                         orderItem.imageUrl,
                         orderItem.itemName,
                         orderItem.optionName)
                 )
                 .from(orderItem)
-                .where(orderItem.order.no.eq(orderNo))
+                .leftJoin(orderItem.order, order)
+                .where(order.no.eq(orderNo))
                 .fetch();
 
         DetailOrderDto detailOrderDto = queryFactory

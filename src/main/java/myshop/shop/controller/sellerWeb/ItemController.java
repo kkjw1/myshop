@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_SELLER;
@@ -159,12 +160,17 @@ public class ItemController {
     public static class BulkModifyItemDto {
         private List<Long> itemNos;
         private ItemStatus itemStatus;
-        private Integer discountPer;
+        private BigDecimal discountPer;
 
         public BulkModifyItemDto() {
         }
 
         public BulkModifyItemDto(List<Long> itemNos, ItemStatus itemStatus, Integer discountPer) {
+            this.itemNos = itemNos;
+            this.itemStatus = itemStatus;
+            this.discountPer = BigDecimal.valueOf(discountPer);
+        }
+        public BulkModifyItemDto(List<Long> itemNos, ItemStatus itemStatus, BigDecimal discountPer) {
             this.itemNos = itemNos;
             this.itemStatus = itemStatus;
             this.discountPer = discountPer;

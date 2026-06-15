@@ -4,13 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @Getter @Setter
-@ToString(of = {"itemNo", "count", "price", "totalPrice", "imageUrl", "itemName", "optionName"})
+@ToString(of = {"count", "price", "totalPrice", "imageUrl", "itemName", "optionName"})
 public class DetailOrderItemDto {
-    private Long itemNo;
     private int count;
-    private int price;
-    private int totalPrice;     // count * price
+    private BigDecimal price;
+    private BigDecimal totalPrice;     // count * price
     private String imageUrl;
     private String itemName;
     private String optionName;
@@ -18,11 +19,10 @@ public class DetailOrderItemDto {
     public DetailOrderItemDto() {
     }
 
-    public DetailOrderItemDto(Long itemNo, int count, int price, String imageUrl, String itemName, String optionName) {
-        this.itemNo = itemNo;
+    public DetailOrderItemDto(int count, int price, String imageUrl, String itemName, String optionName) {
         this.count = count;
-        this.price = price;
-        this.totalPrice = count * price;
+        this.price = BigDecimal.valueOf(price);
+        this.totalPrice = BigDecimal.valueOf(count).multiply(BigDecimal.valueOf(price));
         this.imageUrl = imageUrl;
         this.itemName = itemName;
         this.optionName = optionName;

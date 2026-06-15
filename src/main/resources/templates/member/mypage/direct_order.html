@@ -278,37 +278,34 @@
 
             <!-- 주문 상품 확인 -->
             <div class="order-section shadow-sm">
-                <h5 class="font-weight-bold section-title" th:text="|주문 상품 (${manageCartDtoList.size()})|">주문 상품 (2개)</h5>
+                <h5 class="font-weight-bold section-title">주문 상품 (1개)</h5>
 
-                <div th:each="manageCartDto : ${manageCartDtoList}">
-                    <div class="order-item">
-                        <!-- 서버 전송용 데이터 -->
-                        <input type="hidden" class="item-cartNo" th:value="${manageCartDto.cartNo}">
-                        <input type="hidden" class="item-optionNo" th:value="${manageCartDto.itemOptionNo}">
-                        <input type="hidden" class="item-itemNo" th:value="${manageCartDto.itemNo}">
-                        <input type="hidden" class="item-count" th:value="${manageCartDto.count}">
-                        <input type="hidden" class="item-price" th:value="${manageCartDto.price}">
-                        <input type="hidden" class="item-imageUrl" th:value="${manageCartDto.imagePath}">
-                        <input type="hidden" class="item-optionName" th:value="${manageCartDto.optionName}">
+                <div class="order-item">
+                    <!-- 서버 전송용 데이터 -->
+                    <input type="hidden" class="item-optionNo" th:value="${directOrder.itemOptionNo}">
+                    <input type="hidden" class="item-itemNo" th:value="${directOrder.itemNo}">
+                    <input type="hidden" class="item-count" th:value="${directOrder.count}">
+                    <input type="hidden" class="item-price" th:value="${directOrder.price}">
+                    <input type="hidden" class="item-imageUrl" th:value="${directOrder.imagePath}">
+                    <input type="hidden" class="item-optionName" th:value="${directOrder.optionName}">
 
-                        <!-- 보여지는 디자인 -->
-                        <img src="/static/no_image.png" th:src="${manageCartDto.imagePath}" alt="상품이미지">
-                        <div class="order-item-detail">
-                            <div class="order-item-name" th:text="${manageCartDto.name}">프리미엄 코튼 라운드 티셔츠</div>
+                    <!-- 보여지는 디자인 -->
+                    <img src="/static/no_image.png" th:src="${directOrder.imagePath}" alt="상품이미지">
+                    <div class="order-item-detail">
+                        <div class="order-item-name" th:text="${directOrder.name}">프리미엄 코튼 라운드 티셔츠</div>
 
-                            <div th:if="${manageCartDto.itemOptionNo ne null}">
-                                <div class="order-item-opt" th:text="|옵션: ${manageCartDto.optionName} (재고: ${manageCartDto.optionStock + manageCartDto.count}개)|">옵션: 화이트 / L (재고: 1개)</div>
-                                <div class="small text-dark mt-1" th:text="|개수: ${manageCartDto.count}개|">개수: 1개</div>
+                        <div th:if="${directOrder.itemOptionNo ne null}">
+                            <div class="order-item-opt" th:text="|옵션: ${directOrder.optionName} (재고: ${directOrder.optionStock + directOrder.count}개)|">옵션: 화이트 / L (재고: 1개)</div>
+                            <div class="small text-dark mt-1" th:text="|개수: ${directOrder.count}개|">개수: 1개</div>
 
-                                <div class="font-weight-bold mt-1"
-                                     th:text="${#numbers.formatDecimal(manageCartDto.price.multiply(T(java.math.BigDecimal).valueOf(manageCartDto.count.longValue())),  1, 'COMMA', 0, 'POINT') + '원'}">15,900원</div>
-                            </div>
-                            <div th:if="${manageCartDto.itemOptionNo eq null}">
-                                <div class="order-item-opt" th:text="|재고: ${manageCartDto.totalStock + manageCartDto.count}개|"></div>
-                                <div class="small text-dark mt-1" th:text="|개수: ${manageCartDto.count}개|">개수: 1개</div>
-                                <div class="font-weight-bold mt-1"
-                                     th:text="${#numbers.formatDecimal(manageCartDto.price.multiply(T(java.math.BigDecimal).valueOf(manageCartDto.count.longValue())),  1, 'COMMA', 0, 'POINT') + '원'}">15,900원</div>
-                            </div>
+                            <div class="font-weight-bold mt-1"
+                                 th:text="${#numbers.formatDecimal(directOrder.price.multiply(T(java.math.BigDecimal).valueOf(directOrder.count.longValue())),  1, 'COMMA', 0, 'POINT') + '원'}">15,900원</div>
+                        </div>
+                        <div th:if="${directOrder.itemOptionNo eq null}">
+                            <div class="order-item-opt" th:text="|재고: ${directOrder.totalStock + directOrder.count}개|"></div>
+                            <div class="small text-dark mt-1" th:text="|개수: ${directOrder.count}개|">개수: 1개</div>
+                            <div class="font-weight-bold mt-1"
+                                 th:text="${#numbers.formatDecimal(directOrder.price.multiply(T(java.math.BigDecimal).valueOf(directOrder.count.longValue())),  1, 'COMMA', 0, 'POINT') + '원'}">15,900원</div>
                         </div>
                     </div>
                 </div>
@@ -788,7 +785,7 @@
             const price = parseInt(item.querySelector('.item-price').value) || 0;
 
             addOrderDto.addOrderItemDtoList.push({
-                cartNo: item.querySelector('.item-cartNo').value,
+                cartNo: null,
                 optionNo: item.querySelector('.item-optionNo').value || null,
                 itemNo: item.querySelector('.item-itemNo').value,
                 count: count,
@@ -828,6 +825,7 @@
                 const errorText = await response.text();
                 alert("서버 오류: " + errorText);
             }
+
         } catch (error) {
             console.error("결제 전송 오류:", error);
             alert("서버와 통신하는 도중 오류가 발생했습니다.");

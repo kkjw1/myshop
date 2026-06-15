@@ -5,7 +5,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import myshop.shop.controller.HomeController;
-import myshop.shop.controller.HomeController.DirectOrderDto;
 import myshop.shop.dto.cart.ManageCartDto;
 import myshop.shop.entity.item.ItemOption;
 import myshop.shop.entity.item.QItemOption;
@@ -68,7 +67,7 @@ public class CartRepositoryImpl implements CartRepositoryCustom {
                         cart.count,
                         item.totalStock,
                         itemOption.optionStock,
-                        item.originalPrice.intValue(),
+                        item.originalPrice,
                         item.discountPer,
                         itemOption.additionalPrice.as("optionPrice"),
                         itemOption.name.as("optionName")))
@@ -100,7 +99,7 @@ public class CartRepositoryImpl implements CartRepositoryCustom {
                 .fetchOne();
     }
 
-    @Override
+  /*  @Override
     public ManageCartDto getManageCart(DirectOrderDto directOrderDto) {
         ManageCartDto manageCartDto = queryFactory
                 .select(Projections.fields(ManageCartDto.class,
@@ -108,7 +107,7 @@ public class CartRepositoryImpl implements CartRepositoryCustom {
                         item.name,
                         itemImage.imageUrl.as("imagePath"),
                         item.totalStock,
-                        item.originalPrice.intValue()
+                        item.originalPrice
                 ))
                 .from(itemImage)
                 .leftJoin(itemImage.item, item)
@@ -130,6 +129,6 @@ public class CartRepositoryImpl implements CartRepositoryCustom {
         manageCartDto.setCount(directOrderDto.getCount());
 
         return manageCartDto;
-    }
+    }*/
 
 }

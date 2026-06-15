@@ -6,6 +6,7 @@ import lombok.ToString;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.item.ItemStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter @Setter
@@ -14,7 +15,7 @@ public class ManageItemDto {
     private Long itemNo;
     private String mainImagePath;
     private String name;
-    private int price;
+    private BigDecimal price;
     private int totalStock;
     private ItemStatus itemStatus;
     private LocalDateTime createdDate;
@@ -33,6 +34,15 @@ public class ManageItemDto {
     }
 
     public ManageItemDto(Long itemNo, String mainImagePath, String name, int price, int totalStock, ItemStatus itemStatus, LocalDateTime createdDate) {
+        this.itemNo = itemNo;
+        this.mainImagePath = mainImagePath;
+        this.name = name;
+        this.price = BigDecimal.valueOf(price);
+        this.totalStock = totalStock;
+        this.itemStatus = itemStatus;
+        this.createdDate = createdDate;
+    }
+    public ManageItemDto(Long itemNo, String mainImagePath, String name, BigDecimal price, int totalStock, ItemStatus itemStatus, LocalDateTime createdDate) {
         this.itemNo = itemNo;
         this.mainImagePath = mainImagePath;
         this.name = name;

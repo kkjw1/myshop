@@ -51,6 +51,16 @@ public class OrderItem extends BaseDateEntity{
         this.itemName = itemName;
         this.optionName = optionName;
     }
+    public OrderItem(Order order, Item item, Delivery delivery, int count, int price, String imageUrl, String itemName, String optionName) {
+        this.order = order;
+        this.item = item;
+        this.delivery = delivery;
+        this.count = count;
+        this.price = BigDecimal.valueOf(price);
+        this.imageUrl = imageUrl;
+        this.itemName = itemName;
+        this.optionName = optionName;
+    }
 
     //==========편의 메서드===========
     public void updateOrder(Order order) {

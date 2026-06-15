@@ -5,6 +5,7 @@ import lombok.Getter;
 import myshop.shop.entity.BaseDateEntity;
 import myshop.shop.entity.Cart;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class ItemOption extends BaseDateEntity {
     @JoinColumn(name = "ITEM_NO")
     private Item item;
     private String name;
-    private int additionalPrice;
+    private BigDecimal additionalPrice;
     private int optionStock;
 
     @OneToMany(mappedBy = "itemOption", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -30,6 +31,12 @@ public class ItemOption extends BaseDateEntity {
     }
 
     public ItemOption(Item item, String name, int additionalPrice, int optionStock) {
+        this.item = item;
+        this.name = name;
+        this.additionalPrice = BigDecimal.valueOf(additionalPrice);
+        this.optionStock = optionStock;
+    }
+    public ItemOption(Item item, String name, BigDecimal additionalPrice, int optionStock) {
         this.item = item;
         this.name = name;
         this.additionalPrice = additionalPrice;

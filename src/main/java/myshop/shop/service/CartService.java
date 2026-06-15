@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import myshop.shop.controller.HomeController;
-import myshop.shop.controller.HomeController.DirectOrderDto;
 import myshop.shop.dto.cart.ManageCartDto;
 import myshop.shop.dto.cart.SaveCartDto;
 import myshop.shop.entity.Cart;
@@ -88,13 +87,14 @@ public class CartService {
         List<ManageCartDto> manageCartList = cartRepository.getManageCartList(memberNo);
 
         for (ManageCartDto manageCartDto : manageCartList) {
-            BigDecimal originalPrice = BigDecimal.valueOf(manageCartDto.getOriginalPrice());
-            BigDecimal discountPer = BigDecimal.valueOf(manageCartDto.getDiscountPer());
-            BigDecimal optionPrice = BigDecimal.valueOf(manageCartDto.getOptionPrice());
+            BigDecimal originalPrice = manageCartDto.getOriginalPrice();
+            BigDecimal discountPer = manageCartDto.getDiscountPer();
+            BigDecimal optionPrice = manageCartDto.getOptionPrice() == null ? BigDecimal.valueOf(0) : manageCartDto.getOptionPrice();
             BigDecimal discountedPrice = getDiscountedPrice(originalPrice, discountPer);
             manageCartDto.setPrice(discountedPrice.add(optionPrice));
         }
 
+        log.info("manageCartList={}", manageCartList);
         return manageCartList;
     }
 
@@ -107,9 +107,9 @@ public class CartService {
     public ManageCartDto findCart(Long cartNo) {
         ManageCartDto manageCartDto = cartRepository.getManageCart(cartNo);
 
-        BigDecimal originalPrice = BigDecimal.valueOf(manageCartDto.getOriginalPrice());
-        BigDecimal discountPer = BigDecimal.valueOf(manageCartDto.getDiscountPer());
-        BigDecimal optionPrice = BigDecimal.valueOf(manageCartDto.getOptionPrice());
+        BigDecimal originalPrice = manageCartDto.getOriginalPrice();
+        BigDecimal discountPer = manageCartDto.getDiscountPer();
+        BigDecimal optionPrice = manageCartDto.getOptionPrice() == null ? BigDecimal.valueOf(0) : manageCartDto.getOptionPrice();
         BigDecimal discountedPrice = getDiscountedPrice(originalPrice, discountPer);
         manageCartDto.setPrice(discountedPrice.add(optionPrice));
 
@@ -122,9 +122,9 @@ public class CartService {
      * 주문/결제 폼
      * 상품 상세 폼 -> 바로 구매
      */
-    public ManageCartDto findCart(DirectOrderDto directOrderDto) {
+/*    public ManageCartDto findCart(DirectOrderDto directOrderDto) {
         return cartRepository.getManageCart(directOrderDto);
-    }
+    }*/
 
 
 

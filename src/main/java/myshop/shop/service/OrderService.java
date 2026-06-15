@@ -2,9 +2,12 @@ package myshop.shop.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import myshop.shop.controller.HomeController;
+import myshop.shop.controller.HomeController.CheckDirectOrderDto;
 import myshop.shop.dto.order.AddOrderItemDto;
 import myshop.shop.dto.order.AddOrderDto;
 import myshop.shop.dto.order.DetailOrderDto;
+import myshop.shop.dto.order.DirectOrderDto;
 import myshop.shop.entity.OrderItem;
 import myshop.shop.entity.delivery.Delivery;
 import myshop.shop.entity.delivery.DeliveryStatus;
@@ -20,7 +23,10 @@ import myshop.shop.repository.orderItem.OrderItemRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
+
+import static myshop.shop.service.ItemService.getDiscountedPrice;
 
 @Service
 @Transactional
@@ -76,6 +82,25 @@ public class OrderService {
      */
     public DetailOrderDto getOrder(Long orderNo) {
         return orderItemRepository.getDetailOrder(orderNo);
+    }
+
+
+    /**
+     * 주문/결제 폼
+     * 상품 상세 폼 -> 바로 구매
+     */
+    public DirectOrderDto getDirectOrder(CheckDirectOrderDto checkDirectOrderDto) {
+        DirectOrderDto directOrderDto = orderRepository.getDirectOrder(checkDirectOrderDto);
+
+        directOrderDto.setCount(checkDirectOrderDto.getCount());
+
+        BigDecimal originalPrice = directOrderDto.getOriginalPrice();
+        BigDecimal discountPer = directOrderDto.getDiscountPer();
+        BigDecimal optionPrice = directOrderDto.getOptionPrice() == null ? BigDecimal.valueOf(0) : directOrderDto.getOptionPrice();
+        BigDecimal discountedPrice = getDiscountedPrice(originalPrice, discountPer);
+        directOrderDto.setPrice(discountedPrice.add(optionPrice));
+
+        return directOrderDto;
     }
 
 }

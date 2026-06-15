@@ -27,7 +27,7 @@ public class Order extends BaseDateEntity {
     private Member member;
 
     private OrderStatus orderStatus;
-    private BigDecimal totalPrice;        // 총 결제 금액
+    private BigDecimal totalPrice;        // 총 결제 금액: orderItemList의 price합
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<OrderItem> orderItemList = new ArrayList<>();
@@ -38,9 +38,22 @@ public class Order extends BaseDateEntity {
     public Order() {
     }
 
+    public Order(Member member, OrderStatus orderStatus, int totalPrice) {
+        this.member = member;
+        this.orderStatus = orderStatus;
+        this.totalPrice = BigDecimal.valueOf(totalPrice);
+    }
     public Order(Member member, OrderStatus orderStatus, BigDecimal totalPrice) {
         this.member = member;
         this.orderStatus = orderStatus;
         this.totalPrice = totalPrice;
+    }
+
+
+    //==========편의 메서드 ============
+    public void setTotalPrice(BigDecimal totalPrice) {
+        for (OrderItem orderItem : orderItemList) {
+            this.totalPrice.add(orderItem.getPrice());
+        }
     }
 }

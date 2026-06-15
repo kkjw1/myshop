@@ -7,6 +7,7 @@ import myshop.shop.entity.Cart;
 import myshop.shop.entity.OrderItem;
 import myshop.shop.entity.Seller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +26,9 @@ public class Item extends BaseDateEntity {
     private String name;
     @Enumerated(EnumType.STRING)
     private ItemCategory itemCategory;
-    private int originalPrice;
+    private BigDecimal originalPrice;
     private int totalStock;
-    private int discountPer;
+    private BigDecimal discountPer;
     private String content;
 
     @Enumerated(EnumType.STRING)
@@ -55,6 +56,18 @@ public class Item extends BaseDateEntity {
         this.seller = seller;
         this.name = name;
         this.itemCategory = itemCategory;
+        this.originalPrice = BigDecimal.valueOf(originalPrice);
+        this.totalStock = totalStock;
+        this.discountPer = BigDecimal.valueOf(discountPer);
+        this.content = content;
+        this.itemStatus = itemStatus;
+        this.viewCount = 0L;
+    }
+    // int -> BigDecimal: originalPrice, discountPer
+    public Item(Seller seller, String name, ItemCategory itemCategory, BigDecimal originalPrice, int totalStock, BigDecimal discountPer, String content, ItemStatus itemStatus) {
+        this.seller = seller;
+        this.name = name;
+        this.itemCategory = itemCategory;
         this.originalPrice = originalPrice;
         this.totalStock = totalStock;
         this.discountPer = discountPer;
@@ -65,6 +78,17 @@ public class Item extends BaseDateEntity {
 
     // viewCount 주입, 테스트 전용
     public Item(Seller seller, String name, ItemCategory itemCategory, int originalPrice, int totalStock, int discountPer, String content, ItemStatus itemStatus, Long viewCount) {
+        this.seller = seller;
+        this.name = name;
+        this.itemCategory = itemCategory;
+        this.originalPrice = BigDecimal.valueOf(originalPrice);
+        this.totalStock = totalStock;
+        this.discountPer = BigDecimal.valueOf(discountPer);
+        this.content = content;
+        this.itemStatus = itemStatus;
+        this.viewCount = viewCount;
+    }
+    public Item(Seller seller, String name, ItemCategory itemCategory, BigDecimal originalPrice, int totalStock, BigDecimal discountPer, String content, ItemStatus itemStatus, Long viewCount) {
         this.seller = seller;
         this.name = name;
         this.itemCategory = itemCategory;
@@ -81,9 +105,12 @@ public class Item extends BaseDateEntity {
     }
 
     public void updatePrice(int price) {
-        this.originalPrice = price;
+        this.originalPrice = BigDecimal.valueOf(price);
     }
 
+    public void updatePrice(BigDecimal price) {
+        this.originalPrice = price;
+    }
 
     public void updateTotalStock(int totalStock) {
         this.totalStock = totalStock;
@@ -94,6 +121,10 @@ public class Item extends BaseDateEntity {
     }
 
     public void updateDiscount(int discountPer) {
+        this.discountPer = BigDecimal.valueOf(discountPer);
+    }
+
+    public void updateDiscount(BigDecimal discountPer) {
         this.discountPer = discountPer;
     }
 

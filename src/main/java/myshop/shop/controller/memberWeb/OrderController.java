@@ -7,13 +7,14 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.controller.HomeController;
-import myshop.shop.controller.HomeController.DirectOrderDto;
+import myshop.shop.controller.HomeController.CheckDirectOrderDto;
 import myshop.shop.dto.order.AddOrderItemDto;
 import myshop.shop.dto.address.ManageAddressDto;
 import myshop.shop.dto.cart.ManageCartDto;
 import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.dto.order.AddOrderDto;
 import myshop.shop.dto.order.DetailOrderDto;
+import myshop.shop.dto.order.DirectOrderDto;
 import myshop.shop.entity.order.Order;
 import myshop.shop.service.AddressService;
 import myshop.shop.service.CartService;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,9 +80,9 @@ public class OrderController {
     @ToString(of = {"cartNo", "totalProductPrice", "deliveryFee", "totalOrderPrice"})
     public static class CartToOrderDto {
         private List<Long> cartNo = new ArrayList<>();
-        private int totalProductPrice;
+        private BigDecimal totalProductPrice;
         private int deliveryFee;
-        private int totalOrderPrice;
+        private BigDecimal totalOrderPrice;
 
         public CartToOrderDto() {
         }
@@ -90,35 +92,35 @@ public class OrderController {
 
     /**
      * 주문/결제 폼
-     * 상품 상세 폼 -> 바로 구매
+     * 상품 상세 폼 -> 바로 구매(2. 주문/결제 폼에 띄울 데이터 불러오기)
      */
     @GetMapping("/myPage/directOrder")
-    public String orderForm2(@ModelAttribute DirectOrderDto directOrderDto, HttpServletRequest request, Model model) {
+    public String directOrderForm(@ModelAttribute CheckDirectOrderDto checkDirectOrderDto, HttpServletRequest request, Model model) {
         new LoginCheckMemberDto().loginCheck(request, model);
 
         LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         Long memberNo = loginCheckMemberDto.getNo();
-        directOrderDto.setMemberNo(memberNo);
-        log.info("주문/결제 폼, directOrderDto={}", directOrderDto);
+        checkDirectOrderDto.setMemberNo(memberNo);
+        log.info("주문/결제 폼, checkDirectOrderDto={}", checkDirectOrderDto);
 
         // 배송지
         ManageAddressDto manageAddressDto = addressService.getAddressByMemberNo(memberNo);
-        ManageCartDto manageCartDto = cartService.findCart(directOrderDto);
-        log.info("mangeCartDto={}", manageCartDto);
+
+        // 구매 상품 정보
+        DirectOrderDto directOrder = orderService.getDirectOrder(checkDirectOrderDto);
+        log.info("directOrder={}", directOrder);
 
 
+        BigDecimal totalProductPrice = directOrder.getPrice().multiply(BigDecimal.valueOf(directOrder.getCount()));
+        int deliveryFee = totalProductPrice.compareTo(BigDecimal.valueOf(30000)) > 0 ? 0 : 3000;
 
-        List<ManageCartDto> manageCartDtoList = new ArrayList<>();
-        manageCartDtoList.add(manageCartDto);
-        int totalProductPrice = (manageCartDto.getOriginalPrice() + manageCartDto.getOptionPrice()) * manageCartDto.getCount();
-        int deliveryFee = totalProductPrice >= 30000 ? 0 : 3000;
         model.addAttribute("totalProductPrice", totalProductPrice);
         model.addAttribute("deliveryFee", deliveryFee);
-        model.addAttribute("totalOrderPrice", totalProductPrice + deliveryFee);
+        model.addAttribute("totalOrderPrice", totalProductPrice.add(BigDecimal.valueOf(deliveryFee)));
         model.addAttribute("manageAddressDto", manageAddressDto);
-        model.addAttribute("manageCartDtoList", manageCartDtoList);
+        model.addAttribute("directOrder", directOrder);
 
-        return "member/mypage/order";
+        return "member/mypage/direct_order";
     }
 
 
@@ -139,11 +141,14 @@ public class OrderController {
 
     /**
      * 주문/결제 폼 -> 결제하기
+     * 장바구니 -> 결제
+     * 바로구매 -> 결제(addOrderDto의 cartNo=null)
      */
     @PostMapping("/myPage/order/payment")
     @ResponseBody
     public Long payment(@RequestBody AddOrderDto addOrderDto, HttpServletRequest request) {
         log.info("addOrderDto={}", addOrderDto);
+
         LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         Long memberNo = loginCheckMemberDto.getNo();
 
@@ -153,7 +158,9 @@ public class OrderController {
         // 장바구니에서 제거하기
         List<AddOrderItemDto> addOrderItemDtoList = addOrderDto.getAddOrderItemDtoList();
         for (AddOrderItemDto addOrderItemDto : addOrderItemDtoList) {
-            cartService.removeCart(addOrderItemDto.getCartNo());
+            if (addOrderItemDto.getCartNo() != null) {
+                cartService.removeCart(addOrderItemDto.getCartNo());
+            }
         }
         return order.getNo();
     }
@@ -168,7 +175,7 @@ public class OrderController {
     @GetMapping("/order/complete")
     public String orderComplete(@RequestParam("orderNo") Long orderNo, HttpServletRequest request, Model model) {
         log.info("orderComplete, orderNo={}", orderNo);
-
+        // todo: 여기서 orderNo로 데이터 select하는 부분 에러가 발생함, 수정 필요
         DetailOrderDto detailOrderDto = orderService.getOrder(orderNo);
 
         model.addAttribute("detailOrderDto", detailOrderDto);

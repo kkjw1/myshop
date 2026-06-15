@@ -8,6 +8,7 @@ import myshop.shop.entity.item.ItemOption;
 import myshop.shop.entity.item.ItemStatus;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,11 +17,11 @@ import java.util.List;
 public class ModifyItemDto {
     private Long itemNo;
     private String name;
-    private int price;
+    private BigDecimal price;
 
     private int totalStock;
     private ItemStatus itemStatus;
-    private int discountPer;
+    private BigDecimal discountPer;
 
     private List<ModifyItemOptionDto> modifyItemOptionDtoList = new ArrayList<>();
 
@@ -34,6 +35,14 @@ public class ModifyItemDto {
     }
 
     public ModifyItemDto(String name, int price, int totalStock, ItemStatus itemStatus, int discountPer, List<ModifyItemOptionDto> modifyItemOptionDtoList) {
+        this.name = name;
+        this.price = BigDecimal.valueOf(price);
+        this.totalStock = totalStock;
+        this.itemStatus = itemStatus;
+        this.discountPer = BigDecimal.valueOf(discountPer);
+        this.modifyItemOptionDtoList = modifyItemOptionDtoList;
+    }
+    public ModifyItemDto(String name, BigDecimal price, int totalStock, ItemStatus itemStatus, BigDecimal discountPer, List<ModifyItemOptionDto> modifyItemOptionDtoList) {
         this.name = name;
         this.price = price;
         this.totalStock = totalStock;

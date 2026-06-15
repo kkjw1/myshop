@@ -13,7 +13,7 @@ public class AddOrderItemDto {
     private Long optionNo;
     private Long itemNo;
     private int count;
-    private int discountedPrice;
+    private BigDecimal discountedPrice;     // 할인된 가격
     private BigDecimal totalPrice;     // count * price
     private String imageUrl;
     private String itemName;

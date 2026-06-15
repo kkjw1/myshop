@@ -333,7 +333,7 @@
                             <div th:if="${manageCartDto.itemOptionNo ne null}"
                                  class="product-info-detail"
                                  th:cart-no="${manageCartDto.cartNo}"
-                                 th:cart-item-price="${manageCartDto.originPrice + manageCartDto.optionPrice}">
+                                 th:cart-item-price="${manageCartDto.price}">
 
                                 <div class="product-option" th:text="|옵션: ${manageCartDto.optionName}|">
                                     옵션: 블랙
@@ -361,7 +361,7 @@
                                     <div class="text-right">
                                         <!-- 수량에 따라 변할 가격 표시 영역 -->
                                         <div class="price-text"
-                                             th:text="${#numbers.formatInteger(manageCartDto.price.multiply(T(java.math.BigDecimal).valueOf(manageCartDto.count)), 3, 'COMMA') + '원'}">
+                                             th:text="${#numbers.formatDecimal(manageCartDto.price.multiply(T(java.math.BigDecimal).valueOf(manageCartDto.count.longValue())), 1, 'COMMA', 0, 'POINT')} + '원'">
                                             14,000원
                                         </div>
                                         <a href="javascript:void(0)" class="text-muted small"
@@ -375,7 +375,7 @@
                             <div th:if="${manageCartDto.itemOptionNo eq null}"
                                  class="product-info-detail"
                                  th:cart-no="${manageCartDto.cartNo}"
-                                 th:cart-item-price="${manageCartDto.originPrice}">
+                                 th:cart-item-price="${manageCartDto.price}">
 
                                 <!-- 재고 및 배송 정보 -->
                                 <div class="mb-2">
@@ -399,7 +399,7 @@
                                     <div class="text-right">
                                         <!-- 수량에 따라 변할 가격 표시 영역 -->
                                         <div class="price-text"
-                                             th:text="${#numbers.formatInteger(manageCartDto.originPrice * manageCartDto.count, 3, 'COMMA') + '원'}">
+                                             th:text="${#numbers.formatDecimal(manageCartDto.originalPrice * manageCartDto.count,  1, 'COMMA', 0, 'POINT') + '원'}">
                                             14,000원
                                         </div>
                                         <a href="javascript:void(0)" class="text-muted small"

@@ -685,7 +685,7 @@
 
         // Cart컨트롤러 만들기
 
-        const DirectOrderDto = {
+        const CheckDirectOrderDto = {
             itemNo: itemNo,
             memberNo: null,
             itemOptionNo: itemOptionNo,
@@ -693,12 +693,12 @@
             count: count
         };
 
-        const res = await fetch('/item/directOrder', {
+        const res = await fetch('/item/checkDirectOrder', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(DirectOrderDto)
+            body: JSON.stringify(CheckDirectOrderDto)
         });
 
         const resVal = await res.text();
@@ -708,7 +708,8 @@
         } else if (resVal === "loginFail") {
             location.href = '/login?redirectURL=/item?itemNo=' + itemNo;
         } else {
-            const orderData = { ...DirectOrderDto };
+            // CheckDirectOrderDto 내용으로 객체 생성
+            const orderData = { ...CheckDirectOrderDto };
 
             // 값이 없거나, 문자열 "null", 진짜 null인 속성들을 동적으로 제거
             Object.keys(orderData).forEach(key => {
@@ -732,7 +733,7 @@
         const itemOptionNo = document.getElementById('optionSelect')?.value || document.getElementById('optionSelect2').value;
 
 
-        console.log("itemNo=", itemNo, "count=", count, "itemOptionNo=", itemOptionNo, "itemImageNo=", itemImageNo);
+        console.log("itemNo=", itemNo, "count=", count, "itemOptionNo=", itemOptionNo);
         // Cart컨트롤러 만들기
 
         const res = await fetch('/cart/save', {

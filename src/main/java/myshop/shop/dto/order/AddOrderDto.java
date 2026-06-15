@@ -11,7 +11,7 @@ import java.util.List;
 @Getter @Setter
 @ToString(of = {"recipientName", "phoneNumber", "postcode", "roadAddress", "detailAddress",
         "deliveryRequest", "addOrderItemDtoList", "totalProductPrice", "deliveryFee", "totalOrderPrice"})
-public class AddOrderDto {
+public class AddOrderDto {      // 결제할 때, 주문 상세 내역을 나타낼 때 사용 됨
     /**
      * 배송지 내용
      * 1. 수신자 이름
@@ -47,7 +47,7 @@ public class AddOrderDto {
      * 2. 배송비
      * 3. 총 결제 금액
      */
-    private int totalProductPrice;
+    private BigDecimal totalProductPrice;
     private int deliveryFee;
     private BigDecimal totalOrderPrice;
 

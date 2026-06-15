@@ -68,11 +68,11 @@ public class HomeController {
 
 
     /**
-     * 상품 상세 폼 -> 바로 구매
+     * 상품 상세 폼 -> 바로 구매(1. 로그인 체크, 재고 확인, 재고 선점)
      */
-    @PostMapping("/item/directOrder")
+    @PostMapping("/item/checkDirectOrder")
     @ResponseBody
-    public String directOrder(@RequestBody DirectOrderDto directOrderDto, HttpServletRequest request, Model model) {
+    public String checkDirectOrder(@RequestBody CheckDirectOrderDto checkDirectOrderDto, HttpServletRequest request, Model model) {
         // 로그인 체크
         HttpSession session = request.getSession();
         if (session == null || session.getAttribute(LOGIN_MEMBER) == null) {
@@ -81,37 +81,37 @@ public class HomeController {
 
         // 재고 확인
         int stock;
-        if (directOrderDto.getItemOptionNo() == null) {
-            Item item = itemRepository.findById(directOrderDto.getItemNo()).orElse(null);
+        if (checkDirectOrderDto.getItemOptionNo() == null) {
+            Item item = itemRepository.findById(checkDirectOrderDto.getItemNo()).orElse(null);
             stock = item.getTotalStock();
         } else {
-            ItemOption itemOption = itemOptionRepository.findById(directOrderDto.getItemOptionNo()).orElse(null);
+            ItemOption itemOption = itemOptionRepository.findById(checkDirectOrderDto.getItemOptionNo()).orElse(null);
             stock = itemOption.getOptionStock();
         }
-        if (stock < directOrderDto.count) {
+        if (stock < checkDirectOrderDto.count) {
             return "soldOut";
         }
 
         // 구매 상품 재고 선점
-        itemService.itemStockUpdate(directOrderDto);
+        itemService.itemStockUpdate(checkDirectOrderDto);
 
         return "ok";
     }
 
     @Getter @Setter
     @ToString(of = {"itemNo", "memberNo", "itemOptionNo", "itemImageNo", "count"})
-    public static class DirectOrderDto {
+    public static class CheckDirectOrderDto {
         private Long itemNo;
         private Long memberNo;
-        private Long itemOptionNo;
+        private Long itemOptionNo;      // null or Data
         private Long itemImageNo;
         private int count;
 
 
-        public DirectOrderDto() {
+        public CheckDirectOrderDto() {
         }
 
-        public DirectOrderDto(Long itemNo, Long memberNo, Long itemOptionNo, Long itemImageNo, int count) {
+        public CheckDirectOrderDto(Long itemNo, Long memberNo, Long itemOptionNo, Long itemImageNo, int count) {
             this.itemNo = itemNo;
             this.memberNo = memberNo;
             this.itemOptionNo = itemOptionNo;

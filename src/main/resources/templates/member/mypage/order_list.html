@@ -286,7 +286,7 @@
 
                             <!-- 가격 및 수량 -->
                             <div class="text-muted small">
-                                <span th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')} + '원'">45,900원</span> ·
+                                <span th:text="${#numbers.formatDecimal(item.price,  1, 'COMMA', 0, 'POINT')} + '원'">45,900원</span> ·
                                 <span th:text="${item.count} + '개'">1개</span>
                             </div>
                         </div>
