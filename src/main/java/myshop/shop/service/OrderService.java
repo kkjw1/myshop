@@ -4,10 +4,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import myshop.shop.controller.HomeController;
 import myshop.shop.controller.HomeController.CheckDirectOrderDto;
-import myshop.shop.dto.order.AddOrderItemDto;
-import myshop.shop.dto.order.AddOrderDto;
-import myshop.shop.dto.order.DetailOrderDto;
-import myshop.shop.dto.order.DirectOrderDto;
+import myshop.shop.dto.order.*;
 import myshop.shop.entity.OrderItem;
 import myshop.shop.entity.delivery.Delivery;
 import myshop.shop.entity.delivery.DeliveryStatus;
@@ -80,8 +77,21 @@ public class OrderService {
     /**
      * 주문 상세 내역 불러오기
      */
-    public DetailOrderDto getOrder(Long orderNo) {
-        return orderItemRepository.getDetailOrder(orderNo);
+    public DetailOrderDto getDetailOrder(Long orderNo) {
+        DetailOrderDto detailOrderDto = orderItemRepository.getDetailOrder(orderNo);
+
+        List<DetailOrderItemDto> detailOrderItemDtoList = detailOrderDto.getDetailOrderItemDtoList();
+
+        BigDecimal totalItemPrice = BigDecimal.valueOf(0);
+        for (DetailOrderItemDto detailOrderItemDto : detailOrderItemDtoList) {
+            totalItemPrice = totalItemPrice.add(detailOrderItemDto.getTotalPrice());
+        }
+        System.out.println("totalItemPrice=" + totalItemPrice);
+
+        detailOrderDto.setTotalItemPrice(totalItemPrice);
+        detailOrderDto.setTotalOrderPrice(detailOrderDto.getTotalItemPrice().add(BigDecimal.valueOf(detailOrderDto.getDeliveryFee())));
+
+        return detailOrderDto;
     }
 
 

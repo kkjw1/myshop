@@ -176,9 +176,11 @@ public class OrderController {
     public String orderComplete(@RequestParam("orderNo") Long orderNo, HttpServletRequest request, Model model) {
         log.info("orderComplete, orderNo={}", orderNo);
         // todo: 여기서 orderNo로 데이터 select하는 부분 에러가 발생함, 수정 필요
-        DetailOrderDto detailOrderDto = orderService.getOrder(orderNo);
+        DetailOrderDto detailOrderDto = orderService.getDetailOrder(orderNo);
+        log.info("detailOrderDto={}", detailOrderDto);
 
         model.addAttribute("detailOrderDto", detailOrderDto);
+        model.addAttribute("orderNo", orderNo);
         return "member/mypage/order_complete";
     }
 

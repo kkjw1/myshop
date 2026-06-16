@@ -10,10 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter @Setter
-@ToString(of = {"orderNo", "recipientName", "phoneNumber", "postcode", "roadAddress", "detailAddress",
-        "deliveryRequest", "detailOrderItemDtoList", "totalProductPrice", "deliveryFee", "totalOrderPrice"})
+@ToString(of = {"recipientName", "phoneNumber", "postcode", "roadAddress", "detailAddress",
+        "deliveryRequest", "detailOrderItemDtoList", "totalItemPrice", "deliveryFee", "totalOrderPrice", "orderTime"})
 public class DetailOrderDto {
-    private Long orderNo;
     /**
      * 배송지 내용
      * 1. 수신자 이름
@@ -49,43 +48,13 @@ public class DetailOrderDto {
      * 2. 배송비
      * 3. 총 결제 금액
      */
-    private BigDecimal totalProductPrice;
+    private BigDecimal totalItemPrice; // service에서 넣기 필요
     private int deliveryFee;
-    private BigDecimal totalOrderPrice;
+    private BigDecimal totalOrderPrice; // service에서 넣기 필요
 
-
+    private LocalDateTime orderTime;
 
     public DetailOrderDto() {
     }
 
-    public DetailOrderDto(String recipientName, String phoneNumber, String postcode, String roadAddress, String detailAddress, String deliveryRequest, int deliveryFee, int totalOrderPrice) {
-        this.recipientName = recipientName;
-        this.phoneNumber = phoneNumber;
-        this.postcode = postcode;
-        this.roadAddress = roadAddress;
-        this.detailAddress = detailAddress;
-        this.deliveryRequest = deliveryRequest;
-        this.deliveryFee = deliveryFee;
-        this.totalOrderPrice = BigDecimal.valueOf(totalOrderPrice);
-    }
-    public DetailOrderDto(String recipientName, String phoneNumber, String postcode, String roadAddress, String detailAddress, String deliveryRequest, int deliveryFee, BigDecimal totalOrderPrice) {
-        this.recipientName = recipientName;
-        this.phoneNumber = phoneNumber;
-        this.postcode = postcode;
-        this.roadAddress = roadAddress;
-        this.detailAddress = detailAddress;
-        this.deliveryRequest = deliveryRequest;
-        this.deliveryFee = deliveryFee;
-        this.totalOrderPrice = totalOrderPrice;
-    }
-
-
-
-
-    public void addTotalProductPrice(int price) {
-        this.totalProductPrice.add(BigDecimal.valueOf(price));
-    }
-    public void addTotalProductPrice(BigDecimal price) {
-        this.totalProductPrice.add(price);
-    }
 }
