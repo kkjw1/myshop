@@ -293,16 +293,16 @@
 
                         <!-- 3. 버튼 영역 (상품별로 각각 존재해야 하는 액션 버튼) -->
                         <div class="col-md-4 text-right">
-                            <button class="btn btn-block btn-outline-secondary mb-2 btn-sm">배송조회</button>
+                            <button class="btn btn-block btn-outline-secondary mb-2 btn-sm"
+                                    data-toggle="modal"
+                                    data-target="#deliveryTrackingModal">
+                                배송조회
+                            </button>
                             <button class="btn btn-block btn-outline-secondary mb-2 btn-sm">교환, 반품 신청</button>
                             <button class="btn btn-block btn-track btn-sm">리뷰 작성하기</button>
                         </div>
 
                     </div> <!-- /상품 반복 끝 -->
-
-
-
-
                 </div>
             </div> <!-- /주문 목록 반복 끝 -->
 
@@ -312,6 +312,74 @@
         </div>
     </div>
 </div>
+
+
+
+<div class="modal fade" id="deliveryTrackingModal" tabindex="-1" aria-labelledby="deliveryTrackingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content" style="border-radius: 12px; overflow: hidden;">
+            <div class="modal-header bg-light" style="border-bottom: 1px solid #eee;">
+                <h5 class="modal-title font-weight-bold" id="deliveryTrackingModalLabel" style="color: #333;">배송 조회</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body p-4">
+                <div class="delivery-info mb-4 p-3" style="background-color: #f8f9fa; border-radius: 8px; font-size: 14px;">
+                    <div class="mb-1"><strong>택배사 :</strong> <span id="modalCourier">쿠팡로켓배송</span></div>
+                    <div><strong>송장번호 :</strong> <span id="modalTrackingNo" class="text-primary font-weight-bold">1234567890</span></div>
+                </div>
+
+                <style>
+                    .tracking-timeline { position: relative; padding-left: 30px; list-style: none; margin: 0; }
+                    .tracking-timeline::before { content: ''; position: absolute; left: 9px; top: 5px; bottom: 5px; width: 2px; background: #e4e4e4; }
+                    .tracking-item { position: relative; margin-bottom: 25px; }
+                    .tracking-item:last-child { margin-bottom: 0; }
+                    .tracking-icon { position: absolute; left: -26px; top: 3px; width: 12px; height: 12px; background: #ccc; border-radius: 50%; }
+                    .tracking-item.current .tracking-icon { background: #4285f4; box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.2); }
+                    .tracking-item.current .tracking-status { color: #4285f4; font-weight: bold; }
+                    .tracking-date { font-size: 12px; color: #999; }
+                    .tracking-status { font-size: 14px; font-weight: 500; color: #333; margin-top: 2px; }
+                    .tracking-location { font-size: 13px; color: #666; }
+                </style>
+
+                <ul class="tracking-timeline">
+                    <li class="tracking-item current">
+                        <div class="tracking-icon"></div>
+                        <div class="tracking-date">2026.06.16 14:22</div>
+                        <div class="tracking-status">배송 완료</div>
+                        <div class="tracking-location">정문 앞 (사진 등록 완료)</div>
+                    </li>
+                    <li class="tracking-item">
+                        <div class="tracking-icon"></div>
+                        <div class="tracking-date">2026.06.16 07:15</div>
+                        <div class="tracking-status">배송 출발</div>
+                        <div class="tracking-location">인천 서구 캠프 (배송원: 홍길동 010-1234-5678)</div>
+                    </li>
+                    <li class="tracking-item">
+                        <div class="tracking-icon"></div>
+                        <div class="tracking-date">2026.06.15 22:40</div>
+                        <div class="tracking-status">허브 터미널 입고</div>
+                        <div class="tracking-location">고양 메가 HUB</div>
+                    </li>
+                    <li class="tracking-item">
+                        <div class="tracking-icon"></div>
+                        <div class="tracking-date">2026.06.15 18:10</div>
+                        <div class="tracking-status">상품 출고</div>
+                        <div class="tracking-location">이천 제1물류센터</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="modal-footer" style="border-top: 1px solid #eee;">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <footer class="shop-footer" th:replace="~{/shop/common::footer}">
     <div class="container">
