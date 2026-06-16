@@ -113,4 +113,13 @@ public class OrderService {
         return directOrderDto;
     }
 
+    /**
+     * 주문 목록/배송 조회 폼
+     * 주문 상세 내역 -> 주문 내역 보기
+     * 마이페이지 -> 주문 목록/배송 조회
+     */
+    public List<ManageOrderDto> getManageOrder(Long memberNo) {
+        return orderItemRepository.getManageOrder(memberNo);
+    }
+
 }

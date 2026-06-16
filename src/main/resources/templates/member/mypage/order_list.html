@@ -253,41 +253,41 @@
             <h4 class="mb-4 font-weight-bold">주문 목록</h4>
 
             <!-- [변경] 주문 건별로 카드가 생성됩니다 (예: orders 리스트 반복) -->
-            <div class="order-card shadow-sm" th:each="order : ${orders}">
+            <div class="order-card shadow-sm" th:each="manageOrderDto : ${manageOrderDtoList}">
                 <div class="order-card-header">
                     <!-- 주문 날짜 및 주문 번호 출력 -->
-                    <span class="order-date" th:text="${#temporals.format(order.orderDate, 'yyyy.MM.dd') + ' 주문'}">2026.01.10 주문</span>
-                    <a href="#" th:href="@{/myPage/orderDetail(orderNo=${order.orderNo})}" class="small text-muted text-decoration-none">주문 상세보기 ></a>
+                    <span class="order-date" th:text="${#temporals.format(manageOrderDto.orderTime, 'yyyy.MM.dd') + ' 주문'}">2026.01.10 주문</span>
+                    <a href="#" th:href="@{/order/complete(orderNo=${manageOrderDto.orderNo})}" class="small text-muted text-decoration-none">주문 상세보기 ></a>
                 </div>
 
                 <div class="p-4">
                     <!-- [핵심] 하나의 주문 안에 묶인 상품 리스트(orderItems)를 반복합니다 -->
                     <div class="row align-items-center"
-                         th:each="item, iterStat : ${order.orderItems}"
+                         th:each="manageOrderItemDto, iterStat : ${manageOrderDto.manageOrderItemDtoList}"
                          th:classappend="${!iterStat.last} ? 'border-bottom pb-4 mb-4' : ''"
                          style="border-color: #eee !important;"> <!-- 구분선 색상을 은은한 연회색으로 지정 -->
 
                         <!-- 1. 상품 이미지 -->
                         <div class="col-md-2 text-center">
-                            <img src="https://via.placeholder.com/100" th:src="${item.imageUrl}" class="product-img" alt="상품">
+                            <img src="https://via.placeholder.com/100" th:src="${manageOrderItemDto.imageUrl}" class="product-img" alt="상품">
                         </div>
 
                         <!-- 2. 배송 상태 및 상품 정보 -->
                         <div class="col-md-6">
                             <!-- 주문 상태 (배송완료, 배송중 등) -->
-                            <div class="status-txt mb-1" th:text="${order.orderStatus}">배송 완료</div>
+                            <div class="status-txt mb-1" th:text="${manageOrderItemDto.deliveryStatus}">배송 완료</div>
 
                             <!-- 상품명 -->
-                            <div class="font-weight-bold mb-1" th:text="${item.itemName}">무선 저소음 기계식 키보드</div>
+                            <div class="font-weight-bold mb-1" th:text="${manageOrderItemDto.itemName}">무선 저소음 기계식 키보드</div>
 
                             <!-- 옵션 정보 (이전 답변 적용: 공백 체크) -->
                             <div class="small text-muted mb-1"
-                                 th:text="${!#strings.isEmpty(item.optionName) ? '옵션: ' + item.optionName : '옵션 없음'}">옵션: 블랙 / L</div>
+                                 th:text="${!#strings.isEmpty(manageOrderItemDto.optionName) ? '옵션: ' + manageOrderItemDto.optionName : '옵션 없음'}">옵션: 블랙 / L</div>
 
                             <!-- 가격 및 수량 -->
                             <div class="text-muted small">
-                                <span th:text="${#numbers.formatDecimal(item.price,  1, 'COMMA', 0, 'POINT')} + '원'">45,900원</span> ·
-                                <span th:text="${item.count} + '개'">1개</span>
+                                <span th:text="${#numbers.formatDecimal(manageOrderItemDto.totalPrice,  1, 'COMMA', 0, 'POINT')} + '원'">45,900원</span> ·
+                                <span th:text="${manageOrderItemDto.count} + '개'">1개</span>
                             </div>
                         </div>
 

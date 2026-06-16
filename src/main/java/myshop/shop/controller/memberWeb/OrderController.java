@@ -8,13 +8,10 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.controller.HomeController;
 import myshop.shop.controller.HomeController.CheckDirectOrderDto;
-import myshop.shop.dto.order.AddOrderItemDto;
+import myshop.shop.dto.order.*;
 import myshop.shop.dto.address.ManageAddressDto;
 import myshop.shop.dto.cart.ManageCartDto;
 import myshop.shop.dto.member.LoginCheckMemberDto;
-import myshop.shop.dto.order.AddOrderDto;
-import myshop.shop.dto.order.DetailOrderDto;
-import myshop.shop.dto.order.DirectOrderDto;
 import myshop.shop.entity.order.Order;
 import myshop.shop.service.AddressService;
 import myshop.shop.service.CartService;
@@ -174,6 +171,8 @@ public class OrderController {
      */
     @GetMapping("/order/complete")
     public String orderComplete(@RequestParam("orderNo") Long orderNo, HttpServletRequest request, Model model) {
+        new LoginCheckMemberDto().loginCheck(request, model);
+
         log.info("orderComplete, orderNo={}", orderNo);
         // todo: 여기서 orderNo로 데이터 select하는 부분 에러가 발생함, 수정 필요
         DetailOrderDto detailOrderDto = orderService.getDetailOrder(orderNo);
@@ -187,11 +186,21 @@ public class OrderController {
 
 
     /**
-     * 주문 내역 폼
+     * 주문 목록/배송 조회 폼
+     * 주문 상세 내역 -> 주문 내역 보기
+     * 마이페이지 -> 주문 목록/배송 조회
      */
     @GetMapping("/myPage/orderList")
     public String orderListForm(HttpServletRequest request, Model model) {
         new LoginCheckMemberDto().loginCheck(request, model);
+
+        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+        Long memberNo = loginCheckMemberDto.getNo();
+
+        List<ManageOrderDto> manageOrderDtoList = orderService.getManageOrder(memberNo);
+        log.info("manageOrderDtoList={}", manageOrderDtoList);
+
+        model.addAttribute("manageOrderDtoList", manageOrderDtoList);
         return "member/mypage/order_list";
     }
 

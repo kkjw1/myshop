@@ -7,8 +7,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.dto.order.DetailOrderDto;
 import myshop.shop.dto.order.DetailOrderItemDto;
+import myshop.shop.dto.order.ManageOrderDto;
+import myshop.shop.dto.order.ManageOrderItemDto;
 import myshop.shop.entity.QOrderItem;
 import myshop.shop.entity.delivery.QDelivery;
+import myshop.shop.entity.order.QOrder;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -63,5 +66,39 @@ public class OrderItemRepositoryImpl implements OrderItemRepositoryCustom {
             detailOrderDto.getDetailOrderItemDtoList().add(detailOrderItemDto);
         }
         return detailOrderDto;
+    }
+
+    @Override
+    public List<ManageOrderDto> getManageOrder(Long memberNo) {
+        List<ManageOrderDto> manageOrderDtoList = queryFactory
+                .select(Projections.fields(ManageOrderDto.class,
+                        order.no.as("orderNo"),
+                        order.createdDate.as("orderTime")
+                ))
+                .from(order)
+                .where(order.member.no.eq(memberNo))
+                .fetch();
+
+        for (ManageOrderDto manageOrderDto : manageOrderDtoList) {
+            Long orderNo = manageOrderDto.getOrderNo();
+
+            List<ManageOrderItemDto> manageOrderItemDtoList = queryFactory
+                    .select(Projections.fields(ManageOrderItemDto.class,
+                            delivery.deliveryStatus,
+                            orderItem.imageUrl,
+                            orderItem.itemName,
+                            orderItem.optionName,
+                            orderItem.price.as("totalPrice"),
+                            orderItem.count
+                    ))
+                    .from(orderItem)
+                    .leftJoin(orderItem.delivery, delivery)
+                    .where(orderItem.order.no.eq(orderNo))
+                    .fetch();
+
+            manageOrderDto.setManageOrderItemDtoList(manageOrderItemDtoList);
+        }
+
+        return manageOrderDtoList;
     }
 }
