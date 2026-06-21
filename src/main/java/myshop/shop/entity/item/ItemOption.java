@@ -22,6 +22,10 @@ public class ItemOption extends BaseDateEntity {
     private Item item;
     private String name;
     private BigDecimal additionalPrice;
+
+    @Version
+    private Long version;   // 동시성 제어
+
     private int optionStock;
 
     @OneToMany(mappedBy = "itemOption", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -33,7 +33,7 @@ public class OrderItem extends BaseDateEntity{
     private Delivery delivery;
 
     private int count;
-    private BigDecimal price;              // 개당 가격 = (원래 가격 - (원래 가격 * 할인율)) + 옵션 추가금
+    private BigDecimal price;              // 가격 = (할인된가격 + 옵션가격) * 개수
     private String imageUrl;
     private String itemName;
     private String optionName;

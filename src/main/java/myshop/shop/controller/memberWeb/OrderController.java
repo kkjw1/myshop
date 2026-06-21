@@ -53,7 +53,6 @@ public class OrderController {
         // 구매 상품 재고 선점
         itemService.itemStockUpdate(cartToOrderDto.getCartNo());
 
-        // todo: 여기서 price오는거 처리하기
         // 배송지
         ManageAddressDto manageAddressDto = addressService.getAddressByMemberNo(memberNo);
 
@@ -166,15 +165,14 @@ public class OrderController {
 
     /**
      * 주문 상세 화면
-     * 결제하기
-     * 주문 목록 폼 -> 주문 상세 보기
+     * 주문/결제 폼 -> 결제하기
+     * 주문 목록/배송 조회 폼 -> 주문 상세 보기
      */
     @GetMapping("/order/complete")
     public String orderComplete(@RequestParam("orderNo") Long orderNo, HttpServletRequest request, Model model) {
         new LoginCheckMemberDto().loginCheck(request, model);
 
         log.info("orderComplete, orderNo={}", orderNo);
-        // todo: 여기서 orderNo로 데이터 select하는 부분 에러가 발생함, 수정 필요
         DetailOrderDto detailOrderDto = orderService.getDetailOrder(orderNo);
         log.info("detailOrderDto={}", detailOrderDto);
 

@@ -27,6 +27,10 @@ public class Item extends BaseDateEntity {
     @Enumerated(EnumType.STRING)
     private ItemCategory itemCategory;
     private BigDecimal originalPrice;
+
+    @Version
+    private Long version;       // 동시성 제어
+
     private int totalStock;
     private BigDecimal discountPer;
     private String content;
