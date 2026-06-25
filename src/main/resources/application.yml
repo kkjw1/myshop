@@ -66,3 +66,7 @@ solapi:
 file:
   path: ${FILE_STORE_PATH}
   exteral-path: ${FILE_EXTERNAL_STORE_PATH}
+
+redis:
+  ttl:
+    timeout: 10   #단위:초

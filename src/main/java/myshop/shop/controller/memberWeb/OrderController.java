@@ -17,6 +17,7 @@ import myshop.shop.service.AddressService;
 import myshop.shop.service.CartService;
 import myshop.shop.service.ItemService;
 import myshop.shop.service.OrderService;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +25,10 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
+import static myshop.shop.service.RedisService.RESERVE_KEY;
 
 @Controller
 @RequiredArgsConstructor
@@ -37,7 +40,7 @@ public class OrderController {
     private final OrderService orderService;
     private final ItemService itemService;
 
-
+    private final RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 주문/결제 폼
@@ -51,7 +54,7 @@ public class OrderController {
         Long memberNo = loginCheckMemberDto.getNo();
 
         // 구매 상품 재고 선점
-        itemService.itemStockUpdate(cartToOrderDto.getCartNo());
+        itemService.reserveStock(cartToOrderDto.getCartNo(), memberNo);
 
         // 배송지
         ManageAddressDto manageAddressDto = addressService.getAddressByMemberNo(memberNo);
@@ -136,23 +139,47 @@ public class OrderController {
 
 
     /**
+     * 결제 완료(장바구니)
      * 주문/결제 폼 -> 결제하기
-     * 장바구니 -> 결제
-     * 바로구매 -> 결제(addOrderDto의 cartNo=null)
      */
+    //reserve:5:cart:[1, 2, 3]
     @PostMapping("/myPage/order/payment")
     @ResponseBody
     public Long payment(@RequestBody AddOrderDto addOrderDto, HttpServletRequest request) {
         log.info("addOrderDto={}", addOrderDto);
-
         LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+
         Long memberNo = loginCheckMemberDto.getNo();
+        List<AddOrderItemDto> addOrderItemDtoList = addOrderDto.getAddOrderItemDtoList();
+
+        List<Long> cartNoList = new ArrayList<>();
+        for (AddOrderItemDto addOrderItemDto : addOrderItemDtoList) {
+            cartNoList.add(addOrderItemDto.getCartNo());
+        }
+
+
+  /*      StringJoiner joiner = new StringJoiner(",", "[", "]");
+        for (AddOrderItemDto addOrderItemDto : addOrderItemDtoList) {
+            // getCartNo()가 null이 아닐 때만 추가되도록 안전하게 처리
+            if (addOrderItemDto.getCartNo() != null) {
+                joiner.add(addOrderItemDto.getCartNo().toString());
+            }
+        }
+        String cartNo = joiner.toString();*/
+
+        Boolean hasKey = redisTemplate.hasKey(RESERVE_KEY + memberNo + ":cart:" + cartNoList);
+        if (!hasKey) {  // 주문시간 만료
+            log.info("장바구니 결제 주문시간 만료");
+            return 0L;
+        }
+
+        // redis 키 삭제, 만료 이벤트 방지
+        redisTemplate.delete(RESERVE_KEY + memberNo + ":cart:" + cartNoList);
 
         // 주문, 배송, 상품 주문 추가
         Order order = orderService.saveOrder(memberNo, addOrderDto);
 
         // 장바구니에서 제거하기
-        List<AddOrderItemDto> addOrderItemDtoList = addOrderDto.getAddOrderItemDtoList();
         for (AddOrderItemDto addOrderItemDto : addOrderItemDtoList) {
             if (addOrderItemDto.getCartNo() != null) {
                 cartService.removeCart(addOrderItemDto.getCartNo());
@@ -161,6 +188,40 @@ public class OrderController {
         return order.getNo();
     }
 
+
+
+    /**
+     * 결제 완료(바로구매)
+     * 주문/결제 폼 -> 결제하기
+     * addOrderDto의 cartNo=null
+     */
+    //reserve:5:direct:3:null:1
+    @PostMapping("/myPage/order/directPayment")
+    @ResponseBody
+    public Long directPayment(@RequestBody AddOrderDto addOrderDto, HttpServletRequest request) {
+        log.info("addOrderDto={}", addOrderDto);
+
+        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+        Long memberNo = loginCheckMemberDto.getNo();
+
+        AddOrderItemDto addOrderItemDto = addOrderDto.getAddOrderItemDtoList().get(0);
+        Boolean hasKey = redisTemplate.hasKey(RESERVE_KEY + memberNo + ":direct:" + addOrderItemDto.getItemNo() + ":" +
+                addOrderItemDto.getOptionNo() + ":" + addOrderItemDto.getCount());
+
+        if (!hasKey) {  // 주문시간 만료
+            log.info("바로구매 결제 주문시간 만료");
+            return 0L;
+        }
+
+        // redis 키 삭제, 만료 이벤트 방지
+        redisTemplate.delete(RESERVE_KEY+memberNo+":direct:"+addOrderItemDto.getItemNo()+":"+
+                addOrderItemDto.getOptionNo()+":"+addOrderItemDto.getCount());
+
+        // 주문, 배송, 상품 주문 추가
+        Order order = orderService.saveOrder(memberNo, addOrderDto);
+
+        return order.getNo();
+    }
 
 
     /**

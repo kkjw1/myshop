@@ -123,6 +123,9 @@ public class Item extends BaseDateEntity {
     public void subTotalStock(int count) {
         this.totalStock -= count;
     }
+    public void addTotalStock(int count) {
+        this.totalStock += count;
+    }
 
     public void updateDiscount(int discountPer) {
         this.discountPer = BigDecimal.valueOf(discountPer);

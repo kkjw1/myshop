@@ -16,6 +16,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 
 import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
@@ -47,7 +48,16 @@ public class MyShopConfig implements WebMvcConfigurer {
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory());
+
+        // Key: String 직렬화
+        template.setKeySerializer(new StringRedisSerializer());
+        // Value: JSON 직렬화
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+
+        return template;
+/*        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
 
         // 모든 Key와 Value를 String으로 처리
@@ -59,7 +69,7 @@ public class MyShopConfig implements WebMvcConfigurer {
         redisTemplate.setHashValueSerializer(stringSerializer);
 
         redisTemplate.afterPropertiesSet();
-        return redisTemplate;
+        return redisTemplate;*/
     }
 
     @Bean

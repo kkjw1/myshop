@@ -1,15 +1,12 @@
 package myshop.shop.service;
 
-import com.querydsl.core.types.dsl.Wildcard;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import myshop.shop.controller.HomeController;
 import myshop.shop.controller.HomeController.CheckDirectOrderDto;
-import myshop.shop.controller.sellerWeb.ItemController;
 import myshop.shop.controller.sellerWeb.ItemController.BulkModifyItemDto;
 import myshop.shop.dto.item.*;
 import myshop.shop.entity.Seller;
@@ -23,8 +20,10 @@ import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.repository.cart.CartRepository;
 import myshop.shop.repository.seller.SellerRepository;
 import myshop.shop.service.ItemImageService.ImagePath;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,11 +31,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.querydsl.core.types.dsl.Wildcard.count;
+import static myshop.shop.service.RedisService.RESERVE_KEY;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +53,10 @@ public class ItemService {
     private final ItemImageService itemImageService;
     private final CartRepository cartRepository;
 
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    @Value("${redis.ttl.timeout}")
+    private int timeoutSecond;
     /**
      * 상품 등록
      */
@@ -251,6 +256,7 @@ public class ItemService {
     }
 
 
+
     /**
      * 메인 페이지 상품들 가져오기
      */
@@ -272,6 +278,7 @@ public class ItemService {
     }
 
 
+
     /**
      * 상품 클릭 -> 상품 상세 가져오기
      */
@@ -285,6 +292,7 @@ public class ItemService {
     }
 
 
+
     /**
      * 상품 조회수 증가
      */
@@ -293,15 +301,22 @@ public class ItemService {
     }
 
 
+
     /**
      * 상품 재고 선점
      * 장바구니 폼 -> 구매하기
      */
-    public void itemStockUpdate(List<Long> cartNoList) {
+    public void reserveStock(List<Long> cartNoList, Long memberNo) {
+
         List<ItemStockUpdateDto> itemStockUpdateDtoList = new ArrayList<>();
+        Map<Long, ItemStockUpdateDto> redisVal = new HashMap<>();
+
+        log.info("reserveStock start, cartNoList={} memberNo={}", cartNoList, memberNo);
 
         for (Long cartNo : cartNoList) {
-            itemStockUpdateDtoList.add(cartRepository.getItemStockUpdate(cartNo));
+            ItemStockUpdateDto itemStockUpdate = cartRepository.getItemStockUpdate(cartNo);
+            redisVal.put(cartNo, itemStockUpdate);
+            itemStockUpdateDtoList.add(itemStockUpdate);
         }
 
         for (ItemStockUpdateDto itemStockUpdateDto : itemStockUpdateDtoList) {
@@ -320,14 +335,24 @@ public class ItemService {
                 itemOption.subOptionStock(count);
             }
             item.subTotalStock(count);
-
-
             em.flush();
             em.clear();
         }
-    }
 
+        // redis TTL
+        String redisKey = RESERVE_KEY + memberNo + ":cart:" + cartNoList;
+
+        log.info("redisVal={}", redisVal);
+        redisTemplate.opsForValue().set(
+                redisKey,
+                redisVal,
+                timeoutSecond,
+                TimeUnit.SECONDS
+        );
+        log.info("장바구니 재고 선점 완료, memberNo={}, cartNoList={}, {}초 후 만료", memberNo, cartNoList, timeoutSecond);
+    }
     @Getter @Setter
+    @ToString(of = {"itemNo", "optionNo", "count"})
     public static class ItemStockUpdateDto {
         private Long itemNo;
         private Long optionNo;
@@ -344,10 +369,14 @@ public class ItemService {
      * DirectOrderDto(itemNo=3, memberNo=5, itemOptionNo=null, itemImageNo=7, count=6)
      * DirectOrderDto(itemNo=4, memberNo=5, itemOptionNo=7, itemImageNo=9, count=1)
      */
-    public void itemStockUpdate(CheckDirectOrderDto checkDirectOrderDto) {
+    public void reserveStock(CheckDirectOrderDto checkDirectOrderDto) {
+
         Long optionNo = checkDirectOrderDto.getItemOptionNo();
         Long itemNo = checkDirectOrderDto.getItemNo();
         int count = checkDirectOrderDto.getCount();
+        Long memberNo = checkDirectOrderDto.getMemberNo();
+
+        log.info("reserveStock start, memberNo={} itemInfo={}", memberNo, checkDirectOrderDto);
 
         Item item = em.createQuery("select i from Item i where i.no=:itemNo", Item.class)
                 .setParameter("itemNo", itemNo)
@@ -359,11 +388,81 @@ public class ItemService {
             itemOption.subOptionStock(count);
         }
         item.subTotalStock(count);
-
         em.flush();
         em.clear();
 
+        // redis TTL
+        String redisKey = RESERVE_KEY + memberNo + ":direct:" + itemNo + ":" + optionNo + ":" + count;
+        // "itemNo": "123", "optionNo": null, "stock": 10
+        Map<String, Object> redisVal = new HashMap<>();
+        redisVal.put("itemNo", itemNo);
+        redisVal.put("optionNo", optionNo == null ? 0 : optionNo);
+        redisVal.put("stock", count);
+        log.info("redisVal={}", redisVal);
+
+        redisTemplate.opsForValue().set(
+                redisKey,
+                redisVal,
+                timeoutSecond,
+                TimeUnit.SECONDS
+        );
+        log.info("재고 선점 완료, memberNo={}, itemNo={}, optionNo={}, stock={}, {}초 후 만료", memberNo, itemNo, optionNo, count, timeoutSecond);
     }
+
+
+
+    /**
+     * 결제시간 만료 롤백 (장바구니)
+     */
+    public void cartRollbackStock(List<Long> cartNoList) {
+        List<ItemStockUpdateDto> itemStockUpdateDtoList = new ArrayList<>();
+
+        for (Long cartNo : cartNoList) {
+            ItemStockUpdateDto itemStockUpdate = cartRepository.getItemStockUpdate(cartNo);
+            itemStockUpdateDtoList.add(itemStockUpdate);
+        }
+
+        for (ItemStockUpdateDto itemStockUpdateDto : itemStockUpdateDtoList) {
+            Long itemNo = itemStockUpdateDto.getItemNo();
+            Long optionNo = itemStockUpdateDto.getOptionNo();
+            int count = itemStockUpdateDto.getCount();
+
+
+            Item item = em.createQuery("select i from Item i where i.no=:itemNo", Item.class)
+                    .setParameter("itemNo", itemNo)
+                    .getSingleResult();
+            if (optionNo != null) {
+                ItemOption itemOption = em.createQuery("select io from ItemOption io where io.no=:optionNo", ItemOption.class)
+                        .setParameter("optionNo", optionNo)
+                        .getSingleResult();
+                itemOption.addOptionStock(count);
+            }
+            item.addTotalStock(count);
+            em.flush();
+            em.clear();
+        }
+    }
+
+
+    /**
+     * 결제시간 만료 롤백 (바로 구매)
+     */
+    public void directRollbackStock(Long itemNo, Long optionNo, int count) {
+        Item item = em.createQuery("select i from Item i where i.no=:itemNo", Item.class)
+                .setParameter("itemNo", itemNo)
+                .getSingleResult();
+        if (optionNo != null) {
+            ItemOption itemOption = em.createQuery("select io from ItemOption io where io.no=:optionNo", ItemOption.class)
+                    .setParameter("optionNo", optionNo)
+                    .getSingleResult();
+            itemOption.addOptionStock(count);
+        }
+        item.addTotalStock(count);
+        em.flush();
+        em.clear();
+    }
+
+
 
 
 }

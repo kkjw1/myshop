@@ -12,7 +12,6 @@ import myshop.shop.controller.memberWeb.MemberController;
 import myshop.shop.dto.item.DetailItemDto;
 import myshop.shop.dto.item.MainItemDto;
 import myshop.shop.dto.member.LoginCheckMemberDto;
-import myshop.shop.dto.member.LoginMemberDto;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.item.ItemOption;
 import myshop.shop.repository.Item.ItemOptionRepository;
@@ -21,7 +20,6 @@ import myshop.shop.service.ItemService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -78,6 +76,7 @@ public class HomeController {
         if (session == null || session.getAttribute(LOGIN_MEMBER) == null) {
             return "loginFail";
         }
+        checkDirectOrderDto.setMemberNo(((LoginCheckMemberDto) session.getAttribute(LOGIN_MEMBER)).getNo());
 
         // 재고 확인
         int stock;
@@ -93,7 +92,7 @@ public class HomeController {
         }
 
         // 구매 상품 재고 선점
-        itemService.itemStockUpdate(checkDirectOrderDto);
+        itemService.reserveStock(checkDirectOrderDto);
 
         return "ok";
     }

@@ -805,7 +805,7 @@
         console.log("addOrderDto", addOrderDto);
         // 4. 서버 전송
         try {
-            const response = await fetch('/myPage/order/payment', {
+            const response = await fetch('/myPage/order/directPayment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -815,11 +815,12 @@
 
             if (response.ok) {
                 const result = await response.json();
-                if (result !== null) {
+                if (result !== 0) {
                     alert("주문 및 결제가 완료되었습니다.");
                     location.href = `/order/complete?orderNo=${result}`; // 주문 내역 페이지로 이동
                 } else {
-                    alert("재고 부족 등 주문 처리 중 문제가 발생했습니다.");
+                    alert("결제 가능 시간이 만료되어 주문이 취소되었습니다.");
+                    location.href = `/home`;
                 }
             } else {
                 const errorText = await response.text();
