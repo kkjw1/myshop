@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import myshop.shop.dto.cart.SaveCartDto;
 import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
+import myshop.shop.dto.order.AddOrderDto;
+import myshop.shop.dto.order.AddOrderItemDto;
 import myshop.shop.entity.*;
 import myshop.shop.entity.item.ItemCategory;
 import myshop.shop.entity.item.ItemStatus;
@@ -17,11 +19,13 @@ import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.repository.seller.SellerRepository;
 import myshop.shop.service.CartService;
 import myshop.shop.service.ItemService;
+import myshop.shop.service.OrderService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +53,8 @@ public class InitDB {
         private final SellerRepository sellerRepository;
         private final ItemService itemService;
         private final CartService cartService;
+        private final OrderService orderService;
+
 
         public void dbInit() {
             /**
@@ -143,11 +149,42 @@ public class InitDB {
                         emptySubImageList, "상품옵션없음, 추가이미지없음", true));
             }
 
-
+            /**
+             * 장바구니 데이터
+             */
             cartService.saveCart(new SaveCartDto(1L, 5L, 1L, 1));
             cartService.saveCart(new SaveCartDto(1L, 5L, 4L, 2));
             cartService.saveCart(new SaveCartDto(3L, 5L, null, 6));
             cartService.saveCart(new SaveCartDto(4L, 5L, 7L, 1));
+
+            em.flush();
+            em.clear();
+
+            /**
+             * 주문 목록 데이터
+             */
+            List<AddOrderItemDto> addOrderItemDtoList1 = new ArrayList<>();
+            addOrderItemDtoList1.add(new AddOrderItemDto(1L, 1L, 1L, 1, null, BigDecimal.valueOf(24300),
+                    "/shop_image/8ea0eafb-b1a7-492c-b574-654946184243.jpg", "상품테스트1", "검정색"));
+            addOrderItemDtoList1.add(new AddOrderItemDto(3L, null, 3L, 6, null, BigDecimal.valueOf(1500000),
+                    "/shop_image/30537136-0d60-450e-8544-2f9eda4e4800.png", "상품테스트3(옵션X)", ""));
+            orderService.saveOrder(5L, new AddOrderDto("메인수령인", "010-1234-1234", "12345", "인천광역시 서구",
+                    "A아파트", "배송 전 미리 연락 부탁드립니다.", addOrderItemDtoList1, BigDecimal.valueOf(1524300),
+                    0, BigDecimal.valueOf(1524300)));
+
+            List<AddOrderItemDto> addOrderItemDtoList2 = new ArrayList<>();
+            addOrderItemDtoList2.add(new AddOrderItemDto(4L, 7L, 4L, 1, null, BigDecimal.valueOf(150000),
+                    "/shop_image/b3ecf6ae-140e-4950-81bf-74adce043239.png", "상품테스트4(추가이미지X)", "250"));
+            orderService.saveOrder(5L, new AddOrderDto("메인수령인", "010-1234-1234", "12345", "인천광역시 서구",
+                    "A아파트", "배송 전 미리 연락 부탁드립니다.", addOrderItemDtoList2, BigDecimal.valueOf(150000),
+                    0, BigDecimal.valueOf(150000)));
+
+            List<AddOrderItemDto> addOrderItemDtoList3 = new ArrayList<>();
+            addOrderItemDtoList3.add(new AddOrderItemDto(1L, 1L, 1L, 1, null, BigDecimal.valueOf(24300),
+                    "/shop_image/8ea0eafb-b1a7-492c-b574-654946184243.jpg", "상품테스트1", "검정색"));
+            orderService.saveOrder(5L, new AddOrderDto("메인수령인", "010-1234-1234", "12345", "인천광역시 서구",
+                    "A아파트", "부재 시 문 앞에 놓아주세요.", addOrderItemDtoList3, BigDecimal.valueOf(24300),
+                    3000, BigDecimal.valueOf(27300)));
 
             em.flush();
             em.clear();

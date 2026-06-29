@@ -69,4 +69,4 @@ file:
 
 redis:
   ttl:
-    timeout: 10   #단위:초
+    timeout: 20   #단위:초

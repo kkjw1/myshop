@@ -21,4 +21,16 @@ public class AddOrderItemDto {
 
     public AddOrderItemDto() {
     }
+
+    public AddOrderItemDto(Long cartNo, Long optionNo, Long itemNo, int count, BigDecimal discountedPrice, BigDecimal totalPrice, String imageUrl, String itemName, String optionName) {
+        this.cartNo = cartNo;
+        this.optionNo = optionNo;
+        this.itemNo = itemNo;
+        this.count = count;
+        this.discountedPrice = discountedPrice;
+        this.totalPrice = totalPrice;
+        this.imageUrl = imageUrl;
+        this.itemName = itemName;
+        this.optionName = optionName;
+    }
 }

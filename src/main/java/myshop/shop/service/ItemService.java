@@ -56,7 +56,7 @@ public class ItemService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Value("${redis.ttl.timeout}")
-    private int timeoutSecond;
+    private int timeoutSeconds;
     /**
      * 상품 등록
      */
@@ -342,14 +342,13 @@ public class ItemService {
         // redis TTL
         String redisKey = RESERVE_KEY + memberNo + ":cart:" + cartNoList;
 
-        log.info("redisVal={}", redisVal);
         redisTemplate.opsForValue().set(
                 redisKey,
                 redisVal,
-                timeoutSecond,
+                timeoutSeconds,
                 TimeUnit.SECONDS
         );
-        log.info("장바구니 재고 선점 완료, memberNo={}, cartNoList={}, {}초 후 만료", memberNo, cartNoList, timeoutSecond);
+        log.info("장바구니 재고 선점 완료, Redis 저장 ({}:{}), {}초 후 만료", redisKey, redisVal, timeoutSeconds);
     }
     @Getter @Setter
     @ToString(of = {"itemNo", "optionNo", "count"})
@@ -398,15 +397,13 @@ public class ItemService {
         redisVal.put("itemNo", itemNo);
         redisVal.put("optionNo", optionNo == null ? 0 : optionNo);
         redisVal.put("stock", count);
-        log.info("redisVal={}", redisVal);
-
         redisTemplate.opsForValue().set(
                 redisKey,
                 redisVal,
-                timeoutSecond,
+                timeoutSeconds,
                 TimeUnit.SECONDS
         );
-        log.info("재고 선점 완료, memberNo={}, itemNo={}, optionNo={}, stock={}, {}초 후 만료", memberNo, itemNo, optionNo, count, timeoutSecond);
+        log.info("장바구니 재고 선점 완료, Redis 저장 ({}:{}), {}초 후 만료", redisKey, redisVal, timeoutSeconds);
     }
 
 

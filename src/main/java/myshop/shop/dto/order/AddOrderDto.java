@@ -55,5 +55,16 @@ public class AddOrderDto {      // 결제할 때, 주문 상세 내역을 나타
     public AddOrderDto() {
     }
 
-
+    public AddOrderDto(String recipientName, String phoneNumber, String postcode, String roadAddress, String detailAddress, String deliveryRequest, List<AddOrderItemDto> addOrderItemDtoList, BigDecimal totalProductPrice, int deliveryFee, BigDecimal totalOrderPrice) {
+        this.recipientName = recipientName;
+        this.phoneNumber = phoneNumber;
+        this.postcode = postcode;
+        this.roadAddress = roadAddress;
+        this.detailAddress = detailAddress;
+        this.deliveryRequest = deliveryRequest;
+        this.addOrderItemDtoList = addOrderItemDtoList;
+        this.totalProductPrice = totalProductPrice;
+        this.deliveryFee = deliveryFee;
+        this.totalOrderPrice = totalOrderPrice;
+    }
 }

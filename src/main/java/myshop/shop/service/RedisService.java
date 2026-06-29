@@ -3,6 +3,7 @@ package myshop.shop.service;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import myshop.shop.service.ItemService.ItemStockUpdateDto;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -25,7 +27,7 @@ public class RedisService implements MessageListener {
     private final RedisMessageListenerContainer listenerContainer;
     private final ItemService itemService;
 
-    public static final String RESERVE_KEY = "reserve:";
+    public static final String RESERVE_KEY = "Reserve:";
 
     // TTL 설정
     @PostConstruct
@@ -35,10 +37,32 @@ public class RedisService implements MessageListener {
         log.info("Redis keyspace Notification 리스너 등록");
     }
 
+    /**
+     * 개인정보 확인
+     * ModifyCheckPW:{ID}
+     */
     public void saveData(String key, String value, Long time) {
         redisTemplate.opsForValue().set(key, value, time, TimeUnit.MINUTES);
-        log.info("Redis 저장 ({}:{})", key, value);
+        log.info("Redis 저장 ({}:{}), {}분 후 만료", key, value, time);
     }
+
+//    /**
+//     * 결제
+//     * Reserve:{memberNo}:direct:{itemNo}:{optionNo}:{count}
+//     */
+//    public void directReserve(String key, Map<String, Object> value, int seconds) {
+//        redisTemplate.opsForValue().set(key, value, seconds, TimeUnit.SECONDS);
+//        log.info("장바구니 재고 선점 완료, Redis 저장 ({}:{}), {}초 후 만료", key, value, seconds);
+//    }
+//
+//    /**
+//     * 결제
+//     * Reserve:{memberNo}:cart:{cartNoList}
+//     */
+//    public void cartReserve(String key, Map<Long, ItemStockUpdateDto> value, int seconds) {
+//        redisTemplate.opsForValue().set(key, value, seconds, TimeUnit.SECONDS);
+//        log.info("장바구니 재고 선점 완료, Redis 저장 ({}:{}), {}초 후 만료", key, value, seconds);
+//    }
 
     public String getData(String key) {
         ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
@@ -49,13 +73,16 @@ public class RedisService implements MessageListener {
         redisTemplate.delete(key);
     }
 
-    //reserve:5:cart:[1, 2, 3]
-    //reserve:5:direct:3:null:1
     @Override
     public void onMessage(Message message, byte @Nullable [] pattern) {
         String expiredKey = new String(message.getBody());
         log.info("Redis 키 만료 감지, {}", expiredKey);
 
+
+        /**
+         * Reserve:{memberNo}:direct:{itemNo}:{optionNo}:{count}
+         * Reserve:{memberNo}:cart:{cartNoList}
+         */
         if (expiredKey.startsWith(RESERVE_KEY))     {
             String[] keySplit = expiredKey.split(":");
             if (keySplit[2].equals("direct")) {
