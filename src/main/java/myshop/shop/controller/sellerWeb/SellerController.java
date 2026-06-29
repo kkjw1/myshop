@@ -78,12 +78,6 @@ public class SellerController {
     }
 
 
-
-    @GetMapping("/seller/order_delivery")
-    public String order_delivery() {
-        return "seller/delivery/order_delivery";
-    }
-
     @GetMapping("/seller/inquiry_manage")
     public String inquiry_manage() {
         return "seller/inquiry/inquiry_manage";

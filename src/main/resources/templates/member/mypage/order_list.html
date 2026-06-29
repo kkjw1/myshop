@@ -261,7 +261,7 @@
                 </div>
 
                 <div class="p-4">
-                    <!-- [핵심] 하나의 주문 안에 묶인 상품 리스트(orderItems)를 반복합니다 -->
+                    <!-- 상품 리스트(orderItems) -->
                     <div class="row align-items-center"
                          th:each="manageOrderItemDto, iterStat : ${manageOrderDto.manageOrderItemDtoList}"
                          th:classappend="${!iterStat.last} ? 'border-bottom pb-4 mb-4' : ''"
