@@ -10,4 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class DeliveryService {
     private final DeliveryRepository deliveryRepository;
+
+
+    public void findAllDelivery(Long sellerNo) {
+        
+    }
 }
