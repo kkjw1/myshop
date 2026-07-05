@@ -33,22 +33,30 @@ public class Order extends BaseDateEntity {
     private List<OrderItem> orderItemList = new ArrayList<>();
 
 
-
+    private String recipientName;
+    private String recipientPhone;
+    private String postcode;
+    private String roadAddress;
+    private String detailAddress;
+    private String deliveryRequest;
+    private int deliveryFee;
 
     public Order() {
     }
 
-    public Order(Member member, OrderStatus orderStatus, int totalPrice) {
-        this.member = member;
-        this.orderStatus = orderStatus;
-        this.totalPrice = BigDecimal.valueOf(totalPrice);
-    }
-    public Order(Member member, OrderStatus orderStatus, BigDecimal totalPrice) {
+    public Order(Member member, OrderStatus orderStatus, BigDecimal totalPrice, String recipientName,
+                 String recipientPhone, String postcode, String roadAddress, String detailAddress, String deliveryRequest, int deliveryFee) {
         this.member = member;
         this.orderStatus = orderStatus;
         this.totalPrice = totalPrice;
+        this.recipientName = recipientName;
+        this.recipientPhone = recipientPhone;
+        this.postcode = postcode;
+        this.roadAddress = roadAddress;
+        this.detailAddress = detailAddress;
+        this.deliveryRequest = deliveryRequest;
+        this.deliveryFee = deliveryFee;
     }
-
 
     //==========편의 메서드 ============
     public void setTotalPrice(BigDecimal totalPrice) {

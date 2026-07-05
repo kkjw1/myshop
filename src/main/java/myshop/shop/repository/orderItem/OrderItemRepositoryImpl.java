@@ -34,17 +34,16 @@ public class OrderItemRepositoryImpl implements OrderItemRepositoryCustom {
 
         DetailOrderDto detailOrderDto = queryFactory
                 .select(Projections.fields(DetailOrderDto.class,
-                        delivery.recipientName,
-                        delivery.recipientPhone.as("phoneNumber"),
-                        delivery.postcode,
-                        delivery.roadAddress,
-                        delivery.detailAddress,
-                        delivery.deliveryRequest,
-                        delivery.deliveryFee,
+                        order.recipientName,
+                        order.recipientPhone.as("phoneNumber"),
+                        order.postcode,
+                        order.roadAddress,
+                        order.detailAddress,
+                        order.deliveryRequest,
+                        order.deliveryFee,
                         order.createdDate.as("orderTime")
                 ))
                 .from(orderItem)
-                .leftJoin(orderItem.delivery, delivery)
                 .leftJoin(orderItem.order, order)
                 .where(order.no.eq(orderNo))
                 .fetchFirst();

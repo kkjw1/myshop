@@ -22,14 +22,6 @@ public class Delivery extends BaseDateEntity {
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
 
-    private String recipientName;
-    private String recipientPhone;
-    private String postcode;
-    private String roadAddress;
-    private String detailAddress;
-
-    private int deliveryFee;
-    private String deliveryRequest;
 
     @OneToOne(mappedBy = "delivery", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private OrderItem orderItem;
@@ -37,17 +29,9 @@ public class Delivery extends BaseDateEntity {
     public Delivery() {
     }
 
-    public Delivery(String courier, String trackingNumber, DeliveryStatus deliveryStatus, String recipientName, String recipientPhone,
-                    String postcode, String roadAddress, String detailAddress, int deliveryFee, String deliveryRequest) {
+    public Delivery(String courier, String trackingNumber, DeliveryStatus deliveryStatus) {
         this.courier = courier;
         this.trackingNumber = trackingNumber;
         this.deliveryStatus = deliveryStatus;
-        this.recipientName = recipientName;
-        this.recipientPhone = recipientPhone;
-        this.postcode = postcode;
-        this.roadAddress = roadAddress;
-        this.detailAddress = detailAddress;
-        this.deliveryFee = deliveryFee;
-        this.deliveryRequest = deliveryRequest;
     }
 }

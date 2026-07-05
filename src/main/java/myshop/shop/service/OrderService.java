@@ -46,17 +46,23 @@ public class OrderService {
         // Order 저장
         Order savedOrder = orderRepository.save(new Order(memberProxy,
                 OrderStatus.결제완료,
-                addOrderDto.getTotalOrderPrice()));
+                addOrderDto.getTotalOrderPrice(),
+                addOrderDto.getRecipientName(),
+                addOrderDto.getPhoneNumber(),
+                addOrderDto.getPostcode(),
+                addOrderDto.getRoadAddress(),
+                addOrderDto.getDetailAddress(),
+                addOrderDto.getDeliveryRequest(),
+                addOrderDto.getDeliveryFee()));
 
 
         // Delivery, OrderItem 저장
         List<AddOrderItemDto> addOrderItemDtoList = addOrderDto.getAddOrderItemDtoList();
 
         for (AddOrderItemDto addOrderItemDto : addOrderItemDtoList) {
-            Delivery savedDelivery = deliveryRepository.save(new Delivery(null, null, DeliveryStatus.배송준비중,
-                    addOrderDto.getRecipientName(), addOrderDto.getPhoneNumber(),
-                    addOrderDto.getPostcode(), addOrderDto.getRoadAddress(), addOrderDto.getDetailAddress(),
-                    addOrderDto.getDeliveryFee(), addOrderDto.getDeliveryRequest()));
+            Delivery savedDelivery = deliveryRepository.save(new Delivery(null,
+                    null,
+                    DeliveryStatus.상품준비중));
             Item itemProxy = itemRepository.getReferenceById(addOrderItemDto.getItemNo());
             OrderItem orderItem = new OrderItem(savedOrder,
                     itemProxy,
