@@ -293,22 +293,29 @@
 
                         <!-- 3. 버튼 영역 (상품별로 각각 존재해야 하는 액션 버튼) -->
                         <div class="col-md-4 text-right">
-                            <button class="btn btn-block btn-outline-secondary mb-2 btn-sm"
+                            <button class="btn btn-block btn-outline-secondary mb-2 btn-sm btn-delivery-track"
                                     data-toggle="modal"
-                                    data-target="#deliveryTrackingModal">
+                                    data-target="#deliveryTrackingModal"
+                                    th:data-courier="${manageOrderItemDto.courier}"
+                                    th:data-trackingNumber="${manageOrderItemDto.trackingNumber}"
+                                    th:data-status="${manageOrderItemDto.deliveryStatus.name()}">
                                 배송조회
                             </button>
-                            <button class="btn btn-block btn-outline-secondary mb-2 btn-sm">교환, 반품 신청</button>
+                            <button class="btn btn-block btn-outline-secondary mb-2 btn-sm btn-exchange-refund"
+                                    data-toggle="modal"
+                                    data-target="#exchangeRefundModal"
+                                    th:data-order-no="${manageOrderDto.orderNo}"
+                                    th:data-item-name="${manageOrderItemDto.itemName}"
+                                    th:data-option-name="${manageOrderItemDto.optionName}"
+                                    th:data-count="${manageOrderItemDto.count}">
+                                교환, 반품 신청
+                            </button>
                             <button class="btn btn-block btn-track btn-sm">리뷰 작성하기</button>
                         </div>
-
                     </div> <!-- /상품 반복 끝 -->
                 </div>
             </div> <!-- /주문 목록 반복 끝 -->
-
         </div>
-
-
         </div>
     </div>
 </div>
@@ -327,8 +334,8 @@
 
             <div class="modal-body p-4">
                 <div class="delivery-info mb-4 p-3" style="background-color: #f8f9fa; border-radius: 8px; font-size: 14px;">
-                    <div class="mb-1"><strong>택배사 :</strong> <span id="modalCourier">쿠팡로켓배송</span></div>
-                    <div><strong>송장번호 :</strong> <span id="modalTrackingNo" class="text-primary font-weight-bold">1234567890</span></div>
+                    <div class="mb-1"><strong>택배사 :</strong> <span id="modalCourier"></span></div>
+                    <div><strong>송장번호 :</strong> <span id="modalTrackingNo" class="text-primary font-weight-bold"></span></div>
                 </div>
 
                 <style>
@@ -345,29 +352,17 @@
                 </style>
 
                 <ul class="tracking-timeline">
-                    <li class="tracking-item current">
+                    <li class="tracking-item" data-step="COMPLETE">
                         <div class="tracking-icon"></div>
-                        <div class="tracking-date">2026.06.16 14:22</div>
                         <div class="tracking-status">배송 완료</div>
-                        <div class="tracking-location">정문 앞 (사진 등록 완료)</div>
                     </li>
-                    <li class="tracking-item">
+                    <li class="tracking-item" data-step="SHIPPING">
                         <div class="tracking-icon"></div>
-                        <div class="tracking-date">2026.06.16 07:15</div>
-                        <div class="tracking-status">배송 출발</div>
-                        <div class="tracking-location">인천 서구 캠프 (배송원: 홍길동 010-1234-5678)</div>
+                        <div class="tracking-status">배송 중</div>
                     </li>
-                    <li class="tracking-item">
+                    <li class="tracking-item" data-step="READY">
                         <div class="tracking-icon"></div>
-                        <div class="tracking-date">2026.06.15 22:40</div>
-                        <div class="tracking-status">허브 터미널 입고</div>
-                        <div class="tracking-location">고양 메가 HUB</div>
-                    </li>
-                    <li class="tracking-item">
-                        <div class="tracking-icon"></div>
-                        <div class="tracking-date">2026.06.15 18:10</div>
-                        <div class="tracking-status">상품 출고</div>
-                        <div class="tracking-location">이천 제1물류센터</div>
+                        <div class="tracking-status">상품 준비 중</div>
                     </li>
                 </ul>
             </div>
@@ -378,6 +373,77 @@
         </div>
     </div>
 </div>
+
+
+
+<!-- 교환/반품 신청 모달 -->
+<div class="modal fade" id="exchangeRefundModal" tabindex="-1" aria-labelledby="exchangeRefundModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content" style="border-radius: 12px; overflow: hidden;">
+            <div class="modal-header bg-light" style="border-bottom: 1px solid #eee;">
+                <h5 class="modal-title font-weight-bold" id="exchangeRefundModalLabel" style="color: #333;">교환 / 반품 신청</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form id="exchangeRefundForm" th:action="@{/myPage/exchange-refund}" method="post">
+                <div class="modal-body p-4">
+                    <!-- 선택된 상품 정보 요약 -->
+                    <div class="mb-4 p-3" style="background-color: #f8f9fa; border-radius: 8px; font-size: 14px;">
+                        <div class="mb-1"><strong>상품명 :</strong> <span id="modalItemName"></span></div>
+                        <div class="mb-1"><strong>옵션 :</strong> <span id="modalOptionName"></span></div>
+                        <div><strong>주문수량 :</strong> <span id="modalOrderCount"></span>개</div>
+
+                        <!-- 서버 전송용 hidden 필드 -->
+                        <input type="hidden" name="orderNo" id="formOrderNo">
+                        <input type="hidden" name="itemName" id="formItemName">
+                    </div>
+
+                    <!-- 신청 구분 -->
+                    <div class="form-group">
+                        <label class="font-weight-bold small text-muted">신청 종류 <span class="text-danger">*</span></label>
+                        <div class="d-flex border rounded p-2 justify-content-around">
+                            <div class="custom-control custom-radio">
+                                <input type="radio" id="typeExchange" name="requestType" value="EXCHANGE" class="custom-control-input" checked>
+                                <label class="custom-control-label font-weight-bold" for="typeExchange">교환 신청</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" id="typeRefund" name="requestType" value="REFUND" class="custom-control-input">
+                                <label class="custom-control-label font-weight-bold" for="typeRefund">반품(환불) 신청</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 사유 선택 -->
+                    <div class="form-group">
+                        <label for="reasonCode" class="font-weight-bold small text-muted">사유 선택 <span class="text-danger">*</span></label>
+                        <select class="form-control" id="reasonCode" name="reasonCode" required>
+                            <option value="">-- 사유를 선택해주세요 --</option>
+                            <option value="CHANGED_MIND">단순 변심 (색상/사이즈 등)</option>
+                            <option value="DEFECTIVE">상품 하자가 있음</option>
+                            <option value="WRONG_DELIVERY">오배송 (다른 상품이 옴)</option>
+                            <option value="DAMAGED">배송 중 상품이 파손됨</option>
+                        </select>
+                    </div>
+
+                    <!-- 상세 사유 입력 -->
+                    <div class="form-group mb-0">
+                        <label for="reasonDetail" class="font-weight-bold small text-muted">상세 사유 (선택)</label>
+                        <textarea class="form-control" id="reasonDetail" name="reasonDetail" rows="3" placeholder="구체적인 사유를 적어주시면 빠른 처리에 도움이 됩니다." style="resize: none; font-size: 14px;"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="border-top: 1px solid #eee;">
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary btn-sm font-weight-bold px-3">신청하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 
 
 
@@ -432,5 +498,73 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+<script th:inline="javascript">
+    $(document).ready(function() {
+        // 배송조회 버튼 클릭 시 모달 데이터 세팅
+        $('.btn-delivery-track').on('click', function() {
+            // 1. 버튼에 바인딩된 데이터 가져오기
+            var courier = $(this).data('courier') || '정보 없음';
+            var trackingNo = $(this).data('trackingnumber') || '정보 없음';
+            var status = $(this).data('status'); // 예: READY, SHIPPING, COMPLETE 등
+
+            // 2. 모달 텍스트 변경
+            $('#modalCourier').text(courier);
+            $('#modalTrackingNo').text(trackingNo);
+
+            // 3. 타임라인 불 켜기 (초기화 후 조건에 맞춰 current 클래스 부여)
+            $('.tracking-item').removeClass('current');
+            // 백엔드 DeliveryStatus Enum 문자열이나 한글 텍스트에 맞게 조건을 분기합니다.
+            if (status === '상품준비중') {
+                $('[data-step="READY"]').addClass('current');
+            } else if (status === '배송중') {
+                $('[data-step="SHIPPING"]').addClass('current');
+            } else if (status === '배송완료') {
+                $('[data-step="COMPLETE"]').addClass('current');
+            }
+        });
+
+
+        // 교환/반품 버튼 클릭 시 모달 데이터 세팅
+        $('.btn-exchange-refund').on('click', function() {
+            // 1. 버튼에 바인딩된 데이터 가져오기
+            var orderNo = $(this).data('order-no');
+            var itemName = $(this).data('item-name');
+            var optionName = $(this).data('option-name') || '옵션 없음';
+            var count = $(this).data('count');
+
+            // 2. 모달 내 텍스트 데이터 바인딩
+            $('#modalItemName').text(itemName);
+            $('#modalOptionName').text(optionName);
+            $('#modalOrderCount').text(count);
+
+            // 3. Form submit용 hidden input 데이터 바인딩
+            $('#formOrderNo').val(orderNo);
+            $('#formItemName').val(itemName);
+
+            // 4. 모달 열릴 때 폼 초기화
+            $('#reasonCode').val('');
+            $('#reasonDetail').val('');
+            $('#typeExchange').prop('checked', true);
+        });
+
+        // 폼 제출(Submit) 시 validation 및 alert 처리 예시
+        $('#exchangeRefundForm').on('submit', function(e) {
+            var reason = $('#reasonCode').val();
+            if(!reason) {
+                alert('사유를 선택해주세요.');
+                e.preventDefault();
+                return false;
+            }
+
+            var confirmMsg = $('input[name="requestType"]:checked').val() === 'EXCHANGE' ? '교환' : '반품';
+            if(!confirm(confirmMsg + ' 신청을 진행하시겠습니까?')) {
+                e.preventDefault();
+            }
+        });
+
+    });
+</script>
 </body>
 </html>

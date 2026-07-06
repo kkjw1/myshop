@@ -27,7 +27,7 @@ public class DeliveryController {
 
 
     /**
-     * 주문 물품 가져오기
+     * 주문/배송 관리 폼
      * 판매자 센터 -> 주문/배송 관리 폼
      */
     @GetMapping("/seller/order_delivery")

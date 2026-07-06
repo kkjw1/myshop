@@ -61,38 +61,38 @@
             <h1 class="h3 mb-0 text-dark"><i class="fas fa-truck me-2"></i> 주문/배송 관리</h1>
         </header>
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <form class="row g-3 align-items-center">
-                    <div class="col-md-3">
-                        <label class="form-label visually-hidden" for="orderStatus">주문 상태</label>
-                        <select id="orderStatus" class="form-select">
-                            <option selected>전체 주문 상태</option>
-                            <option>상품 준비 중</option>
-                            <option>배송 중</option>
-                            <option>배송 완료</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label visually-hidden" for="searchKeyword">검색어</label>
-                        <input type="text" class="form-control" id="searchKeyword" placeholder="주문번호, 상품명, 수취인 검색">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label visually-hidden" for="dateRange">기간 설정</label>
-                        <input type="text" class="form-control" id="dateRange" placeholder="주문일자 범위 설정">
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-1"></i> 검색</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+<!--        <div class="card shadow-sm mb-4">-->
+<!--            <div class="card-body">-->
+<!--                <form class="row g-3 align-items-center">-->
+<!--                    <div class="col-md-3">-->
+<!--                        <label class="form-label visually-hidden" for="orderStatus">주문 상태</label>-->
+<!--                        <select id="orderStatus" class="form-select">-->
+<!--                            <option selected>전체 주문 상태</option>-->
+<!--                            <option>상품 준비 중</option>-->
+<!--                            <option>배송 중</option>-->
+<!--                            <option>배송 완료</option>-->
+<!--                        </select>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-4">-->
+<!--                        <label class="form-label visually-hidden" for="searchKeyword">검색어</label>-->
+<!--                        <input type="text" class="form-control" id="searchKeyword" placeholder="주문번호, 상품명, 수취인 검색">-->
+<!--                    </div>-->
+<!--                    <div class="col-md-3">-->
+<!--                        <label class="form-label visually-hidden" for="dateRange">기간 설정</label>-->
+<!--                        <input type="text" class="form-control" id="dateRange" placeholder="주문일자 범위 설정">-->
+<!--                    </div>-->
+<!--                    <div class="col-md-2">-->
+<!--                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-1"></i> 검색</button>-->
+<!--                    </div>-->
+<!--                </form>-->
+<!--            </div>-->
+<!--        </div>-->
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0" th:text="|총 ${orderDeliveryDtoList.size()}건의 주문 검색 결과|">총 150건의 주문 검색 결과</h5>
             <div class="btn-group">
                 <button class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#batchProcessModal"><i class="fas fa-boxes me-1"></i> 선택 주문 상태 처리</button>
-                <button class="btn btn-outline-success"><i class="fas fa-file-download me-1"></i> 주문 엑셀 다운로드</button>
+<!--                <button class="btn btn-outline-success"><i class="fas fa-file-download me-1"></i> 주문 엑셀 다운로드</button>-->
             </div>
         </div>
 
