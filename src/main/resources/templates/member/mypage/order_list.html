@@ -239,7 +239,7 @@
             <div class="side-menu shadow-sm mb-4">
                 <div class="px-3 mb-2"><h5 class="font-weight-bold small text-muted">MY 쇼핑</h5></div>
                 <a href="#" class="active" th:href="@{/myPage/orderList}">주문 목록/배송 조회</a>
-                <a href="#" th:href="@{/myPage/exchange}">취소/반품/교환 내역</a>
+                <a href="#" th:href="@{/myPage/exchange}">취소/반품 내역</a>
                 <a href="#" th:href="@{/myPage/cart}">장바구니 관리</a>
 
                 <hr>
@@ -292,25 +292,44 @@
                         </div>
 
                         <!-- 3. 버튼 영역 (상품별로 각각 존재해야 하는 액션 버튼) -->
+                        <!-- 3. 버튼 영역 (상품별로 각각 존재해야 하는 액션 버튼) -->
                         <div class="col-md-4 text-right">
-                            <button class="btn btn-block btn-outline-secondary mb-2 btn-sm btn-delivery-track"
+                            <!-- 배송조회 버튼은 배송중 또는 배송완료일 때만 노출 -->
+                            <button th:if="${manageOrderItemDto.deliveryStatus.name() == 'SHIPPING' or manageOrderItemDto.deliveryStatus.name() == 'COMPLETE' or manageOrderItemDto.deliveryStatus == '배송중' or manageOrderItemDto.deliveryStatus == '배송완료'}"
+                                    class="btn btn-block btn-outline-secondary mb-2 btn-sm btn-delivery-track"
                                     data-toggle="modal"
                                     data-target="#deliveryTrackingModal"
                                     th:data-courier="${manageOrderItemDto.courier}"
                                     th:data-trackingNumber="${manageOrderItemDto.trackingNumber}"
-                                    th:data-status="${manageOrderItemDto.deliveryStatus.name()}">
+                                    th:data-status="${manageOrderItemDto.deliveryStatus}">
                                 배송조회
                             </button>
-                            <button class="btn btn-block btn-outline-secondary mb-2 btn-sm btn-exchange-refund"
+
+                            <!-- 상품 준비 중일 때는 '주문 취소 신청' 버튼 노출 -->
+                            <button th:if="${manageOrderItemDto.deliveryStatus == '상품준비중'}"
+                                    class="btn btn-block btn-outline-danger mb-2 btn-sm btn-cancel-order"
+                                    data-toggle="modal"
+                                    data-target="#orderCancelModal"
+                                    th:data-order-no="${manageOrderDto.orderNo}"
+                                    th:data-item-name="${manageOrderItemDto.itemName}"
+                                    th:data-option-name="${manageOrderItemDto.optionName}"
+                                    th:data-count="${manageOrderItemDto.count}">
+                                주문 취소 신청
+                            </button>
+
+                            <!-- 배송중이거나 배송완료일 때는 '반품/교환 신청' 버튼 노출 -->
+                            <button th:unless="${manageOrderItemDto.deliveryStatus == '상품준비중'}"
+                                    class="btn btn-block btn-outline-secondary mb-2 btn-sm btn-exchange-refund"
                                     data-toggle="modal"
                                     data-target="#exchangeRefundModal"
                                     th:data-order-no="${manageOrderDto.orderNo}"
                                     th:data-item-name="${manageOrderItemDto.itemName}"
                                     th:data-option-name="${manageOrderItemDto.optionName}"
                                     th:data-count="${manageOrderItemDto.count}">
-                                교환, 반품 신청
+                                반품 신청
                             </button>
-                            <button class="btn btn-block btn-track btn-sm">리뷰 작성하기</button>
+                            <button th:unless="${manageOrderItemDto.deliveryStatus == '배송완료'}"
+                                    class="btn btn-block btn-track btn-sm">리뷰 작성하기</button>
                         </div>
                     </div> <!-- /상품 반복 끝 -->
                 </div>
@@ -375,19 +394,72 @@
 </div>
 
 
-
-<!-- 교환/반품 신청 모달 -->
-<div class="modal fade" id="exchangeRefundModal" tabindex="-1" aria-labelledby="exchangeRefundModalLabel" aria-hidden="true">
+<!-- [신규 추가] 주문 취소 신청 모달 -->
+<div class="modal fade" id="orderCancelModal" tabindex="-1" aria-labelledby="orderCancelModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content" style="border-radius: 12px; overflow: hidden;">
             <div class="modal-header bg-light" style="border-bottom: 1px solid #eee;">
-                <h5 class="modal-title font-weight-bold" id="exchangeRefundModalLabel" style="color: #333;">교환 / 반품 신청</h5>
+                <h5 class="modal-title font-weight-bold" id="orderCancelModalLabel" style="color: #333;">주문 취소 신청</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
 
-            <form id="exchangeRefundForm" th:action="@{/myPage/exchange-refund}" method="post">
+            <!-- 서버 전송 URL을 취소 전용(/myPage/cancel)으로 설정 필요 시 수정 -->
+            <form id="orderCancelForm" th:action="@{/myPage/cancel}" method="post">
+                <div class="modal-body p-4">
+                    <!-- 선택된 상품 정보 요약 -->
+                    <div class="mb-4 p-3" style="background-color: #f8f9fa; border-radius: 8px; font-size: 14px;">
+                        <div class="mb-1"><strong>상품명 :</strong> <span id="cancelModalItemName"></span></div>
+                        <div class="mb-1"><strong>옵션 :</strong> <span id="cancelModalOptionName"></span></div>
+                        <div><strong>주문수량 :</strong> <span id="cancelModalOrderCount"></span>개</div>
+
+                        <!-- 서버 전송용 hidden 필드 -->
+                        <input type="hidden" name="orderNo" id="cancelFormOrderNo">
+                        <input type="hidden" name="itemName" id="cancelFormItemName">
+                    </div>
+
+                    <!-- 취소 사유 선택 -->
+                    <div class="form-group">
+                        <label for="cancelReasonCode" class="font-weight-bold small text-muted">취소 사유 선택 <span class="text-danger">*</span></label>
+                        <select class="form-control" id="cancelReasonCode" name="reasonCode" required>
+                            <option value="">-- 사유를 선택해주세요 --</option>
+                            <option value="CHANGED_MIND">단순 변심 (의사 취소)</option>
+                            <option value="WRONG_ORDER">주문 실수 (옵션/수량 잘못 선택)</option>
+                            <option value="DELIVERY_DELAY">배송 지연 우려</option>
+                            <option value="PRICE_FALL">더 저렴한 상품 발견</option>
+                        </select>
+                    </div>
+
+                    <!-- 상세 사유 입력 -->
+                    <div class="form-group mb-0">
+                        <label for="cancelReasonDetail" class="font-weight-bold small text-muted">상세 사유 (선택)</label>
+                        <textarea class="form-control" id="cancelReasonDetail" name="reasonDetail" rows="3" placeholder="구체적인 사유를 적어주시면 빠른 처리에 도움이 됩니다." style="resize: none; font-size: 14px;"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="border-top: 1px solid #eee;">
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">닫기</button>
+                    <button type="submit" class="btn btn-danger btn-sm font-weight-bold px-3">취소 신청하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- [기존 수정] 교환/반품 신청 모달 -->
+<div class="modal fade" id="exchangeRefundModal" tabindex="-1" aria-labelledby="exchangeRefundModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content" style="border-radius: 12px; overflow: hidden;">
+            <div class="modal-header bg-light" style="border-bottom: 1px solid #eee;">
+                <h5 class="modal-title font-weight-bold" id="exchangeRefundModalLabel" style="color: #333;">반품 신청</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form id="exchangeRefundForm" th:action="@{/myPage/exchange_refund}" method="post">
                 <div class="modal-body p-4">
                     <!-- 선택된 상품 정보 요약 -->
                     <div class="mb-4 p-3" style="background-color: #f8f9fa; border-radius: 8px; font-size: 14px;">
@@ -398,21 +470,6 @@
                         <!-- 서버 전송용 hidden 필드 -->
                         <input type="hidden" name="orderNo" id="formOrderNo">
                         <input type="hidden" name="itemName" id="formItemName">
-                    </div>
-
-                    <!-- 신청 구분 -->
-                    <div class="form-group">
-                        <label class="font-weight-bold small text-muted">신청 종류 <span class="text-danger">*</span></label>
-                        <div class="d-flex border rounded p-2 justify-content-around">
-                            <div class="custom-control custom-radio">
-                                <input type="radio" id="typeExchange" name="requestType" value="EXCHANGE" class="custom-control-input" checked>
-                                <label class="custom-control-label font-weight-bold" for="typeExchange">교환 신청</label>
-                            </div>
-                            <div class="custom-control custom-radio">
-                                <input type="radio" id="typeRefund" name="requestType" value="REFUND" class="custom-control-input">
-                                <label class="custom-control-label font-weight-bold" for="typeRefund">반품(환불) 신청</label>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- 사유 선택 -->
@@ -442,7 +499,6 @@
         </div>
     </div>
 </div>
-
 
 
 
