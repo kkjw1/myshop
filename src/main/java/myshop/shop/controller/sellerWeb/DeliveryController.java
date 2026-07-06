@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.controller.memberWeb.MemberController;
+import myshop.shop.dto.delivery.BatchUpdateOrderDeliveryDto;
 import myshop.shop.dto.delivery.OrderDeliveryDto;
 import myshop.shop.dto.delivery.OrderItemDeliveryDto;
 import myshop.shop.dto.delivery.UpdateDeliveryDto;
@@ -65,4 +66,15 @@ public class DeliveryController {
         return "ok";
     }
 
+    /**
+     * 주문 상태 일괄 변경
+     * 주문/배송 관리 -> 선택 주문 상태 처리
+     */
+    @PostMapping("/seller/order_delivery/batch_update")
+    @ResponseBody
+    public String batchUpdateOrderDelivery(@RequestBody BatchUpdateOrderDeliveryDto batchUpdateOrderDeliveryDto) {
+        log.info("BatchUpdateOrderDeliveryDto={}", batchUpdateOrderDeliveryDto);
+        deliveryService.updateOrderStatus(batchUpdateOrderDeliveryDto);
+        return "ok";
+    }
 }

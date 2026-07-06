@@ -121,6 +121,10 @@
                                 <span th:case="'상품준비중'" class="badge bg-info">상품 준비 중</span>
                                 <span th:case="'배송중'" class="badge bg-primary">배송 중</span>
                                 <span th:case="'배송완료'" class="badge bg-success">배송 완료</span>
+                                <span th:case="'취소접수'" class="badge bg-danger-subtle text-danger border border-danger">취소 접수</span>
+                                <span th:case="'취소완료'" class="badge bg-danger">취소 완료</span>
+                                <span th:case="'환불완료'" class="badge bg-secondary">환불 완료</span>
+                                <span th:case="*" class="badge bg-dark" th:text="${orderDeliveryDto.orderStatus.name()}">기타</span>
                             </td>
                             <td class="order-id" th:text="${orderDeliveryDto.orderNo}">20240720-00123</td>
                             <td th:text="${orderDeliveryDto.orderInfo}">프리미엄 와이드 팬츠 외 1건</td>
@@ -394,21 +398,23 @@
 
             // 서버로 보낼 전송 데이터 객체 구조 생성
             const payload = {
-                orderNos: orderIds,       // 일괄 변경할 주문번호 리스트 (Array)
+                orderNoList: orderIds,       // 일괄 변경할 주문번호 리스트 (Array)
                 orderStatus: batchStatus  // 변경할 주문 상태 (String: '상품준비중', '배송중' 등)
             };
 
             try {
                 // 백엔드 일괄 변경 API 호출
-                const response = await fetch(`/seller/order_delivery/batch-update`, {
+                const response = await fetch(`/seller/order_delivery/batch_update`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(payload)
                 });
+                const resText = await response.text();
 
-                if (!response.ok) {
+
+                if (!resText === "ok") {
                     throw new Error(`서버 저장 실패 (상태코드: ${response.status})`);
                 }
 

@@ -3,10 +3,12 @@ package myshop.shop.service;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import myshop.shop.dto.delivery.BatchUpdateOrderDeliveryDto;
 import myshop.shop.dto.delivery.OrderDeliveryDto;
 import myshop.shop.dto.delivery.OrderItemDeliveryDto;
 import myshop.shop.dto.delivery.UpdateDeliveryDto;
 import myshop.shop.entity.delivery.Delivery;
+import myshop.shop.entity.order.Order;
 import myshop.shop.repository.delivery.DeliveryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +65,17 @@ public class DeliveryService {
             em.flush();
             em.clear();
         }
+    }
 
+
+    /**
+     * 주문 상태 일괄 변경
+     * 주문/배송 관리 -> 선택 주문 상태 처리
+     */
+    public void updateOrderStatus(BatchUpdateOrderDeliveryDto batchUpdateOrderDeliveryDto) {
+        em.createQuery("update Order o set o.orderStatus = :orderStatus where o.no in :orderNoList")
+                .setParameter("orderStatus", batchUpdateOrderDeliveryDto.getOrderStatus())
+                .setParameter("orderNoList", batchUpdateOrderDeliveryDto.getOrderNoList())
+                .executeUpdate();
     }
 }
