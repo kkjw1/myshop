@@ -1,0 +1,44 @@
+package myshop.shop.entity.returnRequest;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.ToString;
+import myshop.shop.entity.BaseDateEntity;
+import myshop.shop.entity.OrderItem;
+import myshop.shop.entity.ReasonCode;
+import myshop.shop.entity.member.Member;
+
+import java.math.BigDecimal;
+
+@Entity
+@Getter
+@SequenceGenerator(name = "RETURN_REQUEST_SEQ", sequenceName = "RETURN_REQUEST_SEQ", initialValue = 1, allocationSize = 1)
+public class ReturnRequest extends BaseDateEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "RETURN_REQUEST_SEQ")
+    @Column(name = "RETURN_REQUEST_NO")
+    private Long no;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "ORDER_ITEM_NO", nullable = false)
+    private OrderItem orderItem;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "MEMBER_NO", nullable = false)
+    private Member member;
+
+    private int count;
+
+    @Enumerated(EnumType.STRING)
+    private ReasonCode reasonCode;
+
+    private String reasonDetail;
+
+    private BigDecimal price;
+
+    @Enumerated(EnumType.STRING)
+    private ReturnRequestStatus returnRequestStatus;
+
+    public ReturnRequest() {
+    }
+}

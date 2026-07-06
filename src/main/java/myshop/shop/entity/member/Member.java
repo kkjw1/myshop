@@ -17,7 +17,7 @@ import java.util.List;
 @ToString(of = {"id", "name", "email", "telecom", "phoneNumber", "gender", "memberLevel"})
 public class Member extends BaseDateEntity {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "MEMBER_SEQ")
-    @Column(name = "member_no")
+    @Column(name = "MEMBER_NO")
     private Long no;
 
     private String id;
