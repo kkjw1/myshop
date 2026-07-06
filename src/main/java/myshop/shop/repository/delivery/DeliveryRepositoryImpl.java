@@ -53,6 +53,7 @@ public class DeliveryRepositoryImpl implements DeliveryRepositoryCustom{
                     .select(Projections.fields(OrderDeliveryDto.class,
                             order.orderStatus,
                             order.no.as("orderNo"),
+                            order.orderInfo,
                             order.totalPrice,
                             order.createdDate.as("orderTime"),
                             order.recipientName,
@@ -69,7 +70,7 @@ public class DeliveryRepositoryImpl implements DeliveryRepositoryCustom{
             if (orderDeliveryDto == null) {
                 continue;
             }
-
+/*
             List<OrderItemDeliveryDto> orderItemDeliveryDtoList = queryFactory
                     .select(Projections.fields(OrderItemDeliveryDto.class,
                             orderItem.no.as("orderItemNo"),
@@ -84,23 +85,29 @@ public class DeliveryRepositoryImpl implements DeliveryRepositoryCustom{
                     .where(orderItem.order.no.eq(orderNo))
                     .fetch();
 
-            int totalCount = orderItemDeliveryDtoList.size();
-            orderDeliveryDto.setTotalCount(totalCount);
-
-            //상품 정보 처리
-            if (totalCount > 1) {
-                orderDeliveryDto.setOrderInfo(orderItemDeliveryDtoList.get(0).getItemName() + " 외 " + String.valueOf(totalCount - 1) + "건");
-            } else {
-                orderDeliveryDto.setOrderInfo(orderItemDeliveryDtoList.get(0).getItemName());
-            }
-
             orderDeliveryDto.setOrderItemDeliveryDtoList(orderItemDeliveryDtoList);
+*/
 
             orderDeliveryDtoList.add(orderDeliveryDto);
         }
         return orderDeliveryDtoList;
     }
 
-
+    @Override
+    public List<OrderItemDeliveryDto> getOrderItemDeliveryDtoList(Long orderNo) {
+        return queryFactory
+                .select(Projections.fields(OrderItemDeliveryDto.class,
+                        orderItem.no.as("orderItemNo"),
+                        orderItem.itemName,
+                        orderItem.count,
+                        orderItem.price,
+                        delivery.deliveryStatus,
+                        delivery.courier,
+                        delivery.trackingNumber))
+                .from(orderItem)
+                .leftJoin(orderItem.delivery, delivery)
+                .where(orderItem.order.no.eq(orderNo))
+                .fetch();
+    }
 
 }

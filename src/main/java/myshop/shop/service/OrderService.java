@@ -76,6 +76,13 @@ public class OrderService {
             orderItemRepository.save(orderItem);
         }
 
+        int size = addOrderItemDtoList.size();
+        if (size > 1) {
+            savedOrder.setOrderInfo(addOrderItemDtoList.get(0).getItemName() + " 외 " + String.valueOf(size - 1) + "건");
+        } else {
+            savedOrder.setOrderInfo(addOrderItemDtoList.get(0).getItemName());
+        }
+
         return savedOrder;
     }
 

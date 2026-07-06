@@ -34,4 +34,16 @@ public class Delivery extends BaseDateEntity {
         this.trackingNumber = trackingNumber;
         this.deliveryStatus = deliveryStatus;
     }
+
+    public void updateCourier(String courier) {
+        this.courier = courier;
+    }
+
+    public void updateTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
+    }
+
+    public void updateDeliveryStatus(DeliveryStatus deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+    }
 }

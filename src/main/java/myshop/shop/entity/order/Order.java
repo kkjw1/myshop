@@ -40,6 +40,7 @@ public class Order extends BaseDateEntity {
     private String detailAddress;
     private String deliveryRequest;
     private int deliveryFee;
+    private String orderInfo;
 
     public Order() {
     }
@@ -56,6 +57,10 @@ public class Order extends BaseDateEntity {
         this.detailAddress = detailAddress;
         this.deliveryRequest = deliveryRequest;
         this.deliveryFee = deliveryFee;
+    }
+
+    public void setOrderInfo(String orderInfo) {
+        this.orderInfo = orderInfo;
     }
 
     //==========편의 메서드 ============
