@@ -264,12 +264,29 @@ public class OrderController {
     }
 
 
+
     /**
-     * 교환,반품 신청 폼
-     * 주문 목록/배송 조회 -> 교환,반품 신청
+     * 주문 취소 신청
+     * 주문 목록/배송 조회 -> 주문 취소 신청
      */
-    @PostMapping("/myPage/exchange_refund")
-    public String exchangeRefundData() {
+    @PostMapping("/myPage/cancel_request")
+    public String cancelRequestForm() {
+        // 주문 취소 기능
+        // todo: DTO 생성 및 관련 기능 만들기
+        return null;
+    }
+
+
+
+
+
+    /**
+     * 반품 신청
+     * 주문 목록/배송 조회 -> 반품 신청
+     */
+    @PostMapping("/myPage/return_request")
+    public String returnRequestForm() {
+        // 반품 기능
         return null;
     }
 

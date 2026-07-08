@@ -295,7 +295,7 @@
                         <!-- 3. 버튼 영역 (상품별로 각각 존재해야 하는 액션 버튼) -->
                         <div class="col-md-4 text-right">
                             <!-- 배송조회 버튼은 배송중 또는 배송완료일 때만 노출 -->
-                            <button th:if="${manageOrderItemDto.deliveryStatus.name() == 'SHIPPING' or manageOrderItemDto.deliveryStatus.name() == 'COMPLETE' or manageOrderItemDto.deliveryStatus == '배송중' or manageOrderItemDto.deliveryStatus == '배송완료'}"
+                            <button
                                     class="btn btn-block btn-outline-secondary mb-2 btn-sm btn-delivery-track"
                                     data-toggle="modal"
                                     data-target="#deliveryTrackingModal"
@@ -306,7 +306,7 @@
                             </button>
 
                             <!-- 상품 준비 중일 때는 '주문 취소 신청' 버튼 노출 -->
-                            <button th:if="${manageOrderItemDto.deliveryStatus == '상품준비중'}"
+                            <button th:if="${manageOrderItemDto.deliveryStatus.name() == '상품준비중'}"
                                     class="btn btn-block btn-outline-danger mb-2 btn-sm btn-cancel-order"
                                     data-toggle="modal"
                                     data-target="#orderCancelModal"
@@ -318,17 +318,17 @@
                             </button>
 
                             <!-- 배송중이거나 배송완료일 때는 '반품/교환 신청' 버튼 노출 -->
-                            <button th:unless="${manageOrderItemDto.deliveryStatus == '상품준비중'}"
-                                    class="btn btn-block btn-outline-secondary mb-2 btn-sm btn-exchange-refund"
+                            <button th:unless="${manageOrderItemDto.deliveryStatus.name() == '상품준비중'}"
+                                    class="btn btn-block btn-outline-secondary mb-2 btn-sm btn-return-refund"
                                     data-toggle="modal"
-                                    data-target="#exchangeRefundModal"
+                                    data-target="#returnRequestModal"
                                     th:data-order-no="${manageOrderDto.orderNo}"
                                     th:data-item-name="${manageOrderItemDto.itemName}"
                                     th:data-option-name="${manageOrderItemDto.optionName}"
                                     th:data-count="${manageOrderItemDto.count}">
                                 반품 신청
                             </button>
-                            <button th:unless="${manageOrderItemDto.deliveryStatus == '배송완료'}"
+                            <button th:if="${manageOrderItemDto.deliveryStatus.name() == '배송완료'}"
                                     class="btn btn-block btn-track btn-sm">리뷰 작성하기</button>
                         </div>
                     </div> <!-- /상품 반복 끝 -->
@@ -394,7 +394,7 @@
 </div>
 
 
-<!-- [신규 추가] 주문 취소 신청 모달 -->
+<!-- 주문 취소 신청 모달 -->
 <div class="modal fade" id="orderCancelModal" tabindex="-1" aria-labelledby="orderCancelModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content" style="border-radius: 12px; overflow: hidden;">
@@ -406,7 +406,7 @@
             </div>
 
             <!-- 서버 전송 URL을 취소 전용(/myPage/cancel)으로 설정 필요 시 수정 -->
-            <form id="orderCancelForm" th:action="@{/myPage/cancel}" method="post">
+            <form id="orderCancelForm" th:action="@{/myPage/cancel_request}" method="post">
                 <div class="modal-body p-4">
                     <!-- 선택된 상품 정보 요약 -->
                     <div class="mb-4 p-3" style="background-color: #f8f9fa; border-radius: 8px; font-size: 14px;">
@@ -422,7 +422,7 @@
                     <!-- 취소 사유 선택 -->
                     <div class="form-group">
                         <label for="cancelReasonCode" class="font-weight-bold small text-muted">취소 사유 선택 <span class="text-danger">*</span></label>
-                        <select class="form-control" id="cancelReasonCode" name="reasonCode" required>
+                        <select class="form-control" id="cancelReasonCode" name="cancelReasonCode" required>
                             <option value="">-- 사유를 선택해주세요 --</option>
                             <option value="CHANGED_MIND">단순 변심 (의사 취소)</option>
                             <option value="WRONG_ORDER">주문 실수 (옵션/수량 잘못 선택)</option>
@@ -448,18 +448,18 @@
 </div>
 
 
-<!-- [기존 수정] 교환/반품 신청 모달 -->
-<div class="modal fade" id="exchangeRefundModal" tabindex="-1" aria-labelledby="exchangeRefundModalLabel" aria-hidden="true">
+<!-- 반품 신청 모달 -->
+<div class="modal fade" id="returnRequestModal" tabindex="-1" aria-labelledby="returnRequestModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content" style="border-radius: 12px; overflow: hidden;">
             <div class="modal-header bg-light" style="border-bottom: 1px solid #eee;">
-                <h5 class="modal-title font-weight-bold" id="exchangeRefundModalLabel" style="color: #333;">반품 신청</h5>
+                <h5 class="modal-title font-weight-bold" id="returnRequestModalLabel" style="color: #333;">반품 신청</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
 
-            <form id="exchangeRefundForm" th:action="@{/myPage/exchange_refund}" method="post">
+            <form id="returnRequestForm" th:action="@{/myPage/return_request}" method="post">
                 <div class="modal-body p-4">
                     <!-- 선택된 상품 정보 요약 -->
                     <div class="mb-4 p-3" style="background-color: #f8f9fa; border-radius: 8px; font-size: 14px;">
@@ -582,8 +582,48 @@
         });
 
 
-        // 교환/반품 버튼 클릭 시 모달 데이터 세팅
-        $('.btn-exchange-refund').on('click', function() {
+
+
+        // 주문 취소 신청 버튼 클릭 시 모달 데이터 세팅
+        $('.btn-cancel-order').on('click', function() {
+            // 1. 버튼에 바인딩된 데이터 가져오기
+            var orderNo = $(this).data('order-no');
+            var itemName = $(this).data('item-name');
+            var optionName = $(this).data('option-name') || '옵션 없음';
+            var count = $(this).data('count');
+
+            // 2. 모달 내 텍스트 데이터 바인딩
+            $('#cancelModalItemName').text(itemName);
+            $('#cancelModalOptionName').text(optionName);
+            $('#cancelModalOrderCount').text(count);
+
+            // 3. Form submit용 hidden input 데이터 바인딩
+            $('#cancelFormOrderNo').val(orderNo);
+            $('#cancelFormItemName').val(itemName);
+
+            // 4. 모달 열릴 때 폼 초기화
+            $('#cancelReasonCode').val('');
+            $('#cancelReasonDetail').val('');
+        });
+
+        // 폼 제출(Submit) 시 validation 및 alert 처리 예시
+        $('#orderCancelForm').on('submit', function(e) {
+            var reason = $('#reasonCode').val();
+            if(!reason) {
+                alert('사유를 선택해주세요.');
+                e.preventDefault();
+                return false;
+            }
+
+            var confirmMsg = $('input[name="requestType"]:checked').val() === 'EXCHANGE' ? '교환' : '반품';
+            if(!confirm(confirmMsg + ' 신청을 진행하시겠습니까?')) {
+                e.preventDefault();
+            }
+        });
+
+
+        // 반품 신청 버튼 클릭 시 모달 데이터 세팅
+        $('.btn-return-refund').on('click', function() {
             // 1. 버튼에 바인딩된 데이터 가져오기
             var orderNo = $(this).data('order-no');
             var itemName = $(this).data('item-name');
@@ -602,11 +642,10 @@
             // 4. 모달 열릴 때 폼 초기화
             $('#reasonCode').val('');
             $('#reasonDetail').val('');
-            $('#typeExchange').prop('checked', true);
         });
 
         // 폼 제출(Submit) 시 validation 및 alert 처리 예시
-        $('#exchangeRefundForm').on('submit', function(e) {
+        $('#returnRequestForm').on('submit', function(e) {
             var reason = $('#reasonCode').val();
             if(!reason) {
                 alert('사유를 선택해주세요.');
