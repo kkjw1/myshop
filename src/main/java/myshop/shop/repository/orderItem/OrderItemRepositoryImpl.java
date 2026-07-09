@@ -83,6 +83,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepositoryCustom {
 
             List<ManageOrderItemDto> manageOrderItemDtoList = queryFactory
                     .select(Projections.fields(ManageOrderItemDto.class,
+                            orderItem.no.as("orderItemNo"),
                             delivery.deliveryStatus,
                             delivery.courier,
                             delivery.trackingNumber,

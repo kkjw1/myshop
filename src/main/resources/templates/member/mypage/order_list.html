@@ -313,7 +313,11 @@
                                     th:data-order-no="${manageOrderDto.orderNo}"
                                     th:data-item-name="${manageOrderItemDto.itemName}"
                                     th:data-option-name="${manageOrderItemDto.optionName}"
-                                    th:data-count="${manageOrderItemDto.count}">
+                                    th:data-count="${manageOrderItemDto.count}"
+                                    th:data-order-item-no="${manageOrderDto.orderItemNo}"
+                                    th:data-price="${manageOrderDto.totalPrice}"
+                                    th:data-member-no="${loginCheckMemberDto.no}"
+                            >
                                 주문 취소 신청
                             </button>
 
@@ -416,13 +420,16 @@
 
                         <!-- 서버 전송용 hidden 필드 -->
                         <input type="hidden" name="orderNo" id="cancelFormOrderNo">
-                        <input type="hidden" name="itemName" id="cancelFormItemName">
+                        <input type="hidden" name="orderItemNo" id="cancelFormOrderItemNo">
+                        <input type="hidden" name="price" id="cancelFormPrice">
+                        <input type="hidden" name="memberNo" id="cancelFormMemberNo">
+
                     </div>
 
                     <!-- 취소 사유 선택 -->
                     <div class="form-group">
                         <label for="cancelReasonCode" class="font-weight-bold small text-muted">취소 사유 선택 <span class="text-danger">*</span></label>
-                        <select class="form-control" id="cancelReasonCode" name="cancelReasonCode" required>
+                        <select class="form-control" id="cancelReasonCode" name="reasonCode" required>
                             <option value="">-- 사유를 선택해주세요 --</option>
                             <option value="CHANGED_MIND">단순 변심 (의사 취소)</option>
                             <option value="WRONG_ORDER">주문 실수 (옵션/수량 잘못 선택)</option>
@@ -591,6 +598,11 @@
             var itemName = $(this).data('item-name');
             var optionName = $(this).data('option-name') || '옵션 없음';
             var count = $(this).data('count');
+            var orderItemNo = $(this).data('order-item-no');
+            var price = $(this).data('price');
+            var memberNo = $(this).data('member-no');
+
+            // data-member-no
 
             // 2. 모달 내 텍스트 데이터 바인딩
             $('#cancelModalItemName').text(itemName);
@@ -599,7 +611,10 @@
 
             // 3. Form submit용 hidden input 데이터 바인딩
             $('#cancelFormOrderNo').val(orderNo);
-            $('#cancelFormItemName').val(itemName);
+            $('#cancelFormOrderItemNo').val(orderItemNo);
+            $('#cancelFormPrice').val(price);
+            $('#cancelFormMemberNo').val(memberNo);
+
 
             // 4. 모달 열릴 때 폼 초기화
             $('#cancelReasonCode').val('');

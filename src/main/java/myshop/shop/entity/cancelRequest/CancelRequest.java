@@ -40,6 +40,20 @@ public class CancelRequest extends BaseDateEntity {
     @Enumerated(EnumType.STRING)
     private CancelRequestStatus cancelRequestStatus;
 
+
+
+
+
     public CancelRequest() {
+    }
+
+    public CancelRequest(OrderItem orderItem, Member member, int count, ReasonCode reasonCode, String reasonDetail, BigDecimal price, CancelRequestStatus cancelRequestStatus) {
+        this.orderItem = orderItem;
+        this.member = member;
+        this.count = count;
+        this.reasonCode = reasonCode;
+        this.reasonDetail = reasonDetail;
+        this.price = price;
+        this.cancelRequestStatus = cancelRequestStatus;
     }
 }
