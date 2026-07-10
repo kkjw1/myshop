@@ -31,7 +31,7 @@ public class CancelRequestService {
 
         CancelRequest saveCancelRequest = new CancelRequest(orderItemProxy, memberProxy,
                 saveCancelRequestDto.getCount(),
-                saveCancelRequestDto.getReasonCode(),
+                saveCancelRequestDto.getCancelReasonCode(),
                 saveCancelRequestDto.getReasonDetail(),
                 saveCancelRequestDto.getPrice(),
                 CancelRequestStatus.요청);

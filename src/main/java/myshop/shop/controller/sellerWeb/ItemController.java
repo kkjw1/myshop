@@ -131,7 +131,6 @@ public class ItemController {
             modifyItemDto.setSubImagesPath(fileService.storeFiles(modifyItemDto.getSubImages()));
         }
 
-        //todo: 들어온 데이터로 수정하기
         itemService.itemModify(modifyItemDto);
 
         return "redirect:/seller/item_manage";

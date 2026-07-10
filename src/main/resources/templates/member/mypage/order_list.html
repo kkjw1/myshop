@@ -314,8 +314,8 @@
                                     th:data-item-name="${manageOrderItemDto.itemName}"
                                     th:data-option-name="${manageOrderItemDto.optionName}"
                                     th:data-count="${manageOrderItemDto.count}"
-                                    th:data-order-item-no="${manageOrderDto.orderItemNo}"
-                                    th:data-price="${manageOrderDto.totalPrice}"
+                                    th:data-order-item-no="${manageOrderItemDto.orderItemNo}"
+                                    th:data-price="${manageOrderItemDto.totalPrice}"
                                     th:data-member-no="${loginCheckMemberDto.no}"
                             >
                                 주문 취소 신청
@@ -329,7 +329,10 @@
                                     th:data-order-no="${manageOrderDto.orderNo}"
                                     th:data-item-name="${manageOrderItemDto.itemName}"
                                     th:data-option-name="${manageOrderItemDto.optionName}"
-                                    th:data-count="${manageOrderItemDto.count}">
+                                    th:data-count="${manageOrderItemDto.count}"
+                                    th:data-order-item-no="${manageOrderItemDto.orderItemNo}"
+                                    th:data-price="${manageOrderItemDto.totalPrice}"
+                                    th:data-member-no="${loginCheckMemberDto.no}">
                                 반품 신청
                             </button>
                             <button th:if="${manageOrderItemDto.deliveryStatus.name() == '배송완료'}"
@@ -423,18 +426,17 @@
                         <input type="hidden" name="orderItemNo" id="cancelFormOrderItemNo">
                         <input type="hidden" name="price" id="cancelFormPrice">
                         <input type="hidden" name="memberNo" id="cancelFormMemberNo">
-
+                        <input type="hidden" name="count" id="cancelFormCount">
                     </div>
 
                     <!-- 취소 사유 선택 -->
                     <div class="form-group">
                         <label for="cancelReasonCode" class="font-weight-bold small text-muted">취소 사유 선택 <span class="text-danger">*</span></label>
-                        <select class="form-control" id="cancelReasonCode" name="reasonCode" required>
-                            <option value="">-- 사유를 선택해주세요 --</option>
-                            <option value="CHANGED_MIND">단순 변심 (의사 취소)</option>
-                            <option value="WRONG_ORDER">주문 실수 (옵션/수량 잘못 선택)</option>
-                            <option value="DELIVERY_DELAY">배송 지연 우려</option>
-                            <option value="PRICE_FALL">더 저렴한 상품 발견</option>
+                        <select class="form-control" id="cancelReasonCode" name="cancelReasonCode" required>
+                            <option selected value="">-- 사유를 선택해주세요 --</option>
+                            <option th:each="cancelReasonCode : ${T(myshop.shop.entity.cancelRequest.CancelReasonCode).values()}"
+                                    th:value="${cancelReasonCode}"
+                                    th:text="${cancelReasonCode.description}"></option>
                         </select>
                     </div>
 
@@ -472,22 +474,27 @@
                     <div class="mb-4 p-3" style="background-color: #f8f9fa; border-radius: 8px; font-size: 14px;">
                         <div class="mb-1"><strong>상품명 :</strong> <span id="modalItemName"></span></div>
                         <div class="mb-1"><strong>옵션 :</strong> <span id="modalOptionName"></span></div>
-                        <div><strong>주문수량 :</strong> <span id="modalOrderCount"></span>개</div>
+                        <div><strong>주문수량 :</strong> <span th:name="count" id="modalOrderCount"></span>개</div>
 
                         <!-- 서버 전송용 hidden 필드 -->
                         <input type="hidden" name="orderNo" id="formOrderNo">
                         <input type="hidden" name="itemName" id="formItemName">
+                        <input type="hidden" name="orderItemNo" id="formOrderItemNo">
+                        <input type="hidden" name="memberNo" id="formMemberNo">
+                        <input type="hidden" name="price" id="formPrice">
+                        <input type="hidden" name="count" id="formCount">
+
+
                     </div>
 
                     <!-- 사유 선택 -->
                     <div class="form-group">
                         <label for="reasonCode" class="font-weight-bold small text-muted">사유 선택 <span class="text-danger">*</span></label>
-                        <select class="form-control" id="reasonCode" name="reasonCode" required>
-                            <option value="">-- 사유를 선택해주세요 --</option>
-                            <option value="CHANGED_MIND">단순 변심 (색상/사이즈 등)</option>
-                            <option value="DEFECTIVE">상품 하자가 있음</option>
-                            <option value="WRONG_DELIVERY">오배송 (다른 상품이 옴)</option>
-                            <option value="DAMAGED">배송 중 상품이 파손됨</option>
+                        <select class="form-control" id="reasonCode" name="returnReasonCode" required>
+                            <option selected value="">-- 사유를 선택해주세요 --</option>
+                            <option th:each="returnReasonCode : ${T(myshop.shop.entity.returnRequest.ReturnReasonCode).values()}"
+                                    th:value="${returnReasonCode}"
+                                    th:text="${returnReasonCode.description}"></option>
                         </select>
                     </div>
 
@@ -614,7 +621,7 @@
             $('#cancelFormOrderItemNo').val(orderItemNo);
             $('#cancelFormPrice').val(price);
             $('#cancelFormMemberNo').val(memberNo);
-
+            $('#cancelFormCount').val(count);
 
             // 4. 모달 열릴 때 폼 초기화
             $('#cancelReasonCode').val('');
@@ -623,7 +630,7 @@
 
         // 폼 제출(Submit) 시 validation 및 alert 처리 예시
         $('#orderCancelForm').on('submit', function(e) {
-            var reason = $('#reasonCode').val();
+            var reason = $('#cancelReasonCode').val();
             if(!reason) {
                 alert('사유를 선택해주세요.');
                 e.preventDefault();
@@ -644,6 +651,9 @@
             var itemName = $(this).data('item-name');
             var optionName = $(this).data('option-name') || '옵션 없음';
             var count = $(this).data('count');
+            var orderItemNo = $(this).data('order-item-no');
+            var price = $(this).data('price');
+            var memberNo = $(this).data('member-no')
 
             // 2. 모달 내 텍스트 데이터 바인딩
             $('#modalItemName').text(itemName);
@@ -653,6 +663,11 @@
             // 3. Form submit용 hidden input 데이터 바인딩
             $('#formOrderNo').val(orderNo);
             $('#formItemName').val(itemName);
+            $('#formOrderItemNo').val(orderItemNo);
+            $('#formMemberNo').val(memberNo);
+            $('#formPrice').val(price);
+            $('#formCount').val(count);
+
 
             // 4. 모달 열릴 때 폼 초기화
             $('#reasonCode').val('');
@@ -660,16 +675,16 @@
         });
 
         // 폼 제출(Submit) 시 validation 및 alert 처리 예시
-        $('#returnRequestForm').on('submit', function(e) {
+        $('#returnRequestForm').on('submit', function (e) {
             var reason = $('#reasonCode').val();
-            if(!reason) {
+            if (!reason) {
                 alert('사유를 선택해주세요.');
                 e.preventDefault();
                 return false;
             }
 
             var confirmMsg = $('input[name="requestType"]:checked').val() === 'EXCHANGE' ? '교환' : '반품';
-            if(!confirm(confirmMsg + ' 신청을 진행하시겠습니까?')) {
+            if (!confirm(confirmMsg + ' 신청을 진행하시겠습니까?')) {
                 e.preventDefault();
             }
         });

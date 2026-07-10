@@ -2,10 +2,8 @@ package myshop.shop.entity.returnRequest;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.ToString;
 import myshop.shop.entity.BaseDateEntity;
 import myshop.shop.entity.OrderItem;
-import myshop.shop.entity.ReasonCode;
 import myshop.shop.entity.member.Member;
 
 import java.math.BigDecimal;
@@ -30,7 +28,7 @@ public class ReturnRequest extends BaseDateEntity {
     private int count;
 
     @Enumerated(EnumType.STRING)
-    private ReasonCode reasonCode;
+    private ReturnReasonCode returnReasonCode;
 
     private String reasonDetail;
 
@@ -40,5 +38,15 @@ public class ReturnRequest extends BaseDateEntity {
     private ReturnRequestStatus returnRequestStatus;
 
     public ReturnRequest() {
+    }
+
+    public ReturnRequest(OrderItem orderItem, Member member, int count, ReturnReasonCode returnReasonCode, String reasonDetail, BigDecimal price, ReturnRequestStatus returnRequestStatus) {
+        this.orderItem = orderItem;
+        this.member = member;
+        this.count = count;
+        this.returnReasonCode = returnReasonCode;
+        this.reasonDetail = reasonDetail;
+        this.price = price;
+        this.returnRequestStatus = returnRequestStatus;
     }
 }

@@ -2,10 +2,8 @@ package myshop.shop.entity.cancelRequest;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.ToString;
 import myshop.shop.entity.BaseDateEntity;
 import myshop.shop.entity.OrderItem;
-import myshop.shop.entity.ReasonCode;
 import myshop.shop.entity.member.Member;
 
 import java.math.BigDecimal;
@@ -31,7 +29,7 @@ public class CancelRequest extends BaseDateEntity {
     private int count;
 
     @Enumerated(EnumType.STRING)
-    private ReasonCode reasonCode;
+    private CancelReasonCode cancelReasonCode;
 
     private String reasonDetail;
 
@@ -47,11 +45,11 @@ public class CancelRequest extends BaseDateEntity {
     public CancelRequest() {
     }
 
-    public CancelRequest(OrderItem orderItem, Member member, int count, ReasonCode reasonCode, String reasonDetail, BigDecimal price, CancelRequestStatus cancelRequestStatus) {
+    public CancelRequest(OrderItem orderItem, Member member, int count, CancelReasonCode cancelReasonCode, String reasonDetail, BigDecimal price, CancelRequestStatus cancelRequestStatus) {
         this.orderItem = orderItem;
         this.member = member;
         this.count = count;
-        this.reasonCode = reasonCode;
+        this.cancelReasonCode = cancelReasonCode;
         this.reasonDetail = reasonDetail;
         this.price = price;
         this.cancelRequestStatus = cancelRequestStatus;

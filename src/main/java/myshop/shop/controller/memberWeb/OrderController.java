@@ -7,7 +7,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.controller.HomeController.CheckDirectOrderDto;
-import myshop.shop.dto.cancelRequest.SaveCancelRequestDto;
 import myshop.shop.dto.order.*;
 import myshop.shop.dto.address.ManageAddressDto;
 import myshop.shop.dto.cart.ManageCartDto;
@@ -18,7 +17,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ public class OrderController {
     private final CartService cartService;
     private final OrderService orderService;
     private final ItemService itemService;
-    private final CancelRequestService cancelRequestService;
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -261,35 +258,5 @@ public class OrderController {
         return "member/mypage/order_list";
     }
 
-
-
-    /**
-     * 주문 취소 신청
-     * 주문 목록/배송 조회 -> 주문 취소 신청
-     */
-    @PostMapping("/myPage/cancel_request")
-    public String cancelRequestForm(@ModelAttribute SaveCancelRequestDto saveCancelRequestDto, RedirectAttributes redirectAttributes) {
-        // 주문 취소 기능
-        log.info("saveCancelRequestDto={}", saveCancelRequestDto);
-        cancelRequestService.saveCancelRequest(saveCancelRequestDto);
-
-        // redirect로 취소 반품 페이지로 가기
-        return null;
-    }
-
-
-
-
-
-    /**
-     * 반품 신청
-     * 주문 목록/배송 조회 -> 반품 신청
-     */
-    @PostMapping("/myPage/return_request")
-    public String returnRequestForm() {
-        // 반품 기능
-        // todo: reasonCode 클로드 보고 고치기, select에 떠서 선택하는거 value고치기
-        return null;
-    }
 
 }
