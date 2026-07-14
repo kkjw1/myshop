@@ -24,9 +24,7 @@ import myshop.shop.entity.returnRequest.ReturnRequestStatus;
 import myshop.shop.repository.address.AddressRepository;
 import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.repository.seller.SellerRepository;
-import myshop.shop.service.CartService;
-import myshop.shop.service.ItemService;
-import myshop.shop.service.OrderService;
+import myshop.shop.service.*;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -61,6 +59,8 @@ public class InitDB {
         private final ItemService itemService;
         private final CartService cartService;
         private final OrderService orderService;
+        private final CancelRequestService cancelRequestService;
+        private final ReturnRequestService returnRequestService;
 
 
         public void dbInit() {
@@ -195,7 +195,7 @@ public class InitDB {
 
             em.flush();
             em.clear();
-            // 하나 배송완료로 변경, 취소1, 반품1, 취소1 (순서 이렇게)
+            // 반품, 반품은 배송완료, 배송중 상태에서만 가능하다.
             em.createQuery("update Delivery d " +
                             "set d.deliveryStatus=:status, d.courier=:courier, d.trackingNumber=:trackingNumber " +
                             "where d.no = 1L")
@@ -203,17 +203,19 @@ public class InitDB {
                     .setParameter("courier", "우체국택배")
                     .setParameter("trackingNumber", "12345432")
                     .executeUpdate();
-
-
             SaveReturnRequestDto returnRequestDto = new SaveReturnRequestDto(1L, 5L, 1, ReturnReasonCode.DEFECTIVE,
                     "모서리쪽 스크래치가 있음", BigDecimal.valueOf(24300), ReturnRequestStatus.요청);
+            returnRequestService.saveReturnRequest(returnRequestDto);
 
-            new SaveCancelRequestDto(3L, 4L, 5L, 1, CancelReasonCode.WRONG_ORDER,
+            // 취소
+            SaveCancelRequestDto saveCancelRequestDto = new SaveCancelRequestDto(3L, 4L, 5L, 1, CancelReasonCode.WRONG_ORDER,
                     "사이즈 잘못 선택함", BigDecimal.valueOf(24300), CancelRequestStatus.요청);
+            cancelRequestService.saveCancelRequest(saveCancelRequestDto);
 
-            // todo: 취소1개 추가로 넣어야 됨. 그리고 취소/반품 내역 나오는거 테스트하는거 테스트 필요
-
-
+            // 취소2
+            SaveCancelRequestDto saveCancelRequestDto2 = new SaveCancelRequestDto(1L, 2L, 5L, 6, CancelReasonCode.CHANGED_MIND,
+                    "단순변심", BigDecimal.valueOf(1500000), CancelRequestStatus.요청);
+            cancelRequestService.saveCancelRequest(saveCancelRequestDto2);
         }
     }
 }
