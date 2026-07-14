@@ -10,6 +10,7 @@ import myshop.shop.entity.returnRequest.ReturnRequestStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter @Setter
 @ToString()
@@ -37,7 +38,7 @@ public class ManageCancelReturnDto {
     private String reasonDetail;
     private String itemName;
     private String optionName;
-    private LocalDate requestTime;
+    private LocalDateTime requestTime;
     private int count;
 
     public ManageCancelReturnDto() {

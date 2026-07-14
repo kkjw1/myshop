@@ -216,6 +216,9 @@ public class InitDB {
             SaveCancelRequestDto saveCancelRequestDto2 = new SaveCancelRequestDto(1L, 2L, 5L, 6, CancelReasonCode.CHANGED_MIND,
                     "단순변심", BigDecimal.valueOf(1500000), CancelRequestStatus.요청);
             cancelRequestService.saveCancelRequest(saveCancelRequestDto2);
+
+
+            // todo: 저장 날짜 수정해서 orderBy되는지 확인하기
         }
     }
 }
