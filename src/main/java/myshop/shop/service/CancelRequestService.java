@@ -39,4 +39,15 @@ public class CancelRequestService {
         cancelRequestRepository.save(saveCancelRequest);
     }
 
+
+
+    /**
+     * 취소/반품 폼
+     * 취소/반품 내역
+     * 주문 취소 신청 -> 취소/반품 폼
+     * 반품 신청 -> 취소/반품 폼
+     */
+    public void getCancelReturnList() {
+
+    }
 }

@@ -48,4 +48,24 @@ public class LoginCheckMemberDto {
         model.addAttribute("isLogin", true);
         return true;
     }
+
+    public LoginCheckMemberDto loginCheck2(HttpServletRequest request, Model model) {
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            model.addAttribute("isLogin", false);
+            return null;
+        }
+
+        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) session.getAttribute(LOGIN_MEMBER);
+
+        if (loginCheckMemberDto == null) {
+            model.addAttribute("isLogin", false);
+            return null;
+        }
+
+        model.addAttribute("loginCheckMemberDto", loginCheckMemberDto);
+        model.addAttribute("isLogin", true);
+        return loginCheckMemberDto;
+    }
 }

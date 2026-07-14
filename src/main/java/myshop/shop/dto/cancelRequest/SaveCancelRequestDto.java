@@ -22,4 +22,15 @@ public class SaveCancelRequestDto {
 
     public SaveCancelRequestDto() {
     }
+
+    public SaveCancelRequestDto(Long orderNo, Long orderItemNo, Long memberNo, int count, CancelReasonCode cancelReasonCode, String reasonDetail, BigDecimal price, CancelRequestStatus cancelRequestStatus) {
+        this.orderNo = orderNo;
+        this.orderItemNo = orderItemNo;
+        this.memberNo = memberNo;
+        this.count = count;
+        this.cancelReasonCode = cancelReasonCode;
+        this.reasonDetail = reasonDetail;
+        this.price = price;
+        this.cancelRequestStatus = cancelRequestStatus;
+    }
 }

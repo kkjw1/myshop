@@ -21,4 +21,14 @@ public class SaveReturnRequestDto {
 
     public SaveReturnRequestDto() {
     }
+
+    public SaveReturnRequestDto(Long orderItemNo, Long memberNo, int count, ReturnReasonCode returnReasonCode, String reasonDetail, BigDecimal price, ReturnRequestStatus returnRequestStatus) {
+        this.orderItemNo = orderItemNo;
+        this.memberNo = memberNo;
+        this.count = count;
+        this.returnReasonCode = returnReasonCode;
+        this.reasonDetail = reasonDetail;
+        this.price = price;
+        this.returnRequestStatus = returnRequestStatus;
+    }
 }

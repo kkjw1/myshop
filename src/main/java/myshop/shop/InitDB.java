@@ -3,17 +3,24 @@ package myshop.shop;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import myshop.shop.dto.cancelRequest.SaveCancelRequestDto;
 import myshop.shop.dto.cart.SaveCartDto;
 import myshop.shop.dto.item.AddItemDto;
 import myshop.shop.dto.item.AddItemOptionDto;
 import myshop.shop.dto.order.AddOrderDto;
 import myshop.shop.dto.order.AddOrderItemDto;
+import myshop.shop.dto.returnRequest.SaveReturnRequestDto;
 import myshop.shop.entity.*;
+import myshop.shop.entity.cancelRequest.CancelReasonCode;
+import myshop.shop.entity.cancelRequest.CancelRequestStatus;
+import myshop.shop.entity.delivery.DeliveryStatus;
 import myshop.shop.entity.item.ItemCategory;
 import myshop.shop.entity.item.ItemStatus;
 import myshop.shop.entity.member.Gender;
 import myshop.shop.entity.member.Member;
 import myshop.shop.entity.member.MemberLevel;
+import myshop.shop.entity.returnRequest.ReturnReasonCode;
+import myshop.shop.entity.returnRequest.ReturnRequestStatus;
 import myshop.shop.repository.address.AddressRepository;
 import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.repository.seller.SellerRepository;
@@ -188,6 +195,24 @@ public class InitDB {
 
             em.flush();
             em.clear();
+            // 하나 배송완료로 변경, 취소1, 반품1, 취소1 (순서 이렇게)
+            em.createQuery("update Delivery d " +
+                            "set d.deliveryStatus=:status, d.courier=:courier, d.trackingNumber=:trackingNumber " +
+                            "where d.no = 1L")
+                    .setParameter("status", DeliveryStatus.배송완료)
+                    .setParameter("courier", "우체국택배")
+                    .setParameter("trackingNumber", "12345432")
+                    .executeUpdate();
+
+
+            SaveReturnRequestDto returnRequestDto = new SaveReturnRequestDto(1L, 5L, 1, ReturnReasonCode.DEFECTIVE,
+                    "모서리쪽 스크래치가 있음", BigDecimal.valueOf(24300), ReturnRequestStatus.요청);
+
+            new SaveCancelRequestDto(3L, 4L, 5L, 1, CancelReasonCode.WRONG_ORDER,
+                    "사이즈 잘못 선택함", BigDecimal.valueOf(24300), CancelRequestStatus.요청);
+
+            // todo: 취소1개 추가로 넣어야 됨. 그리고 취소/반품 내역 나오는거 테스트하는거 테스트 필요
+
 
         }
     }
