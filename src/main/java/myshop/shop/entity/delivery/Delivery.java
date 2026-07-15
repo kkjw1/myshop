@@ -2,11 +2,8 @@ package myshop.shop.entity.delivery;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.ToString;
 import myshop.shop.entity.BaseDateEntity;
-import myshop.shop.entity.OrderItem;
-import myshop.shop.entity.item.Item;
-import myshop.shop.entity.order.Order;
+import myshop.shop.entity.orderItem.OrderItem;
 
 @Entity
 @Getter

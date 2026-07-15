@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import myshop.shop.entity.BaseDateEntity;
 import myshop.shop.entity.Cart;
-import myshop.shop.entity.OrderItem;
+import myshop.shop.entity.orderItem.OrderItem;
 import myshop.shop.entity.Seller;
 
 import java.math.BigDecimal;

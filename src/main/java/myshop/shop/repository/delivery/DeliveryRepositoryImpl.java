@@ -5,16 +5,14 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import myshop.shop.dto.delivery.OrderDeliveryDto;
 import myshop.shop.dto.delivery.OrderItemDeliveryDto;
-import myshop.shop.entity.QOrderItem;
-import myshop.shop.entity.delivery.QDelivery;
-import myshop.shop.entity.order.QOrder;
+
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static myshop.shop.entity.QOrderItem.orderItem;
+import static myshop.shop.entity.orderItem.QOrderItem.orderItem;
 import static myshop.shop.entity.delivery.QDelivery.delivery;
 import static myshop.shop.entity.item.QItem.item;
 import static myshop.shop.entity.order.QOrder.order;

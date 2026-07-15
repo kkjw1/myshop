@@ -2,11 +2,8 @@ package myshop.shop.entity.order;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.ToString;
 import myshop.shop.entity.BaseDateEntity;
-import myshop.shop.entity.OrderItem;
-import myshop.shop.entity.delivery.Delivery;
-import myshop.shop.entity.item.Item;
+import myshop.shop.entity.orderItem.OrderItem;
 import myshop.shop.entity.member.Member;
 
 import java.math.BigDecimal;
@@ -26,7 +23,9 @@ public class Order extends BaseDateEntity {
     @JoinColumn(name = "MEMBER_NO")
     private Member member;
 
+    @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
+
     private BigDecimal totalPrice;        // 총 결제 금액: orderItemList의 price합
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE, orphanRemoval = true)

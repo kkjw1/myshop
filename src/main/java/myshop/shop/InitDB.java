@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -218,7 +219,23 @@ public class InitDB {
             cancelRequestService.saveCancelRequest(saveCancelRequestDto2);
 
 
-            // todo: 저장 날짜 수정해서 orderBy되는지 확인하기
+            em.createQuery("update CancelRequest cr set cr.createdDate=:updateDate, cr.lastModifiedDate=:updateDate2 where cr.no = 1L")
+                    .setParameter("updateDate", LocalDateTime.of(2026, 7, 1, 0, 0))
+                    .setParameter("updateDate2", LocalDateTime.of(2026, 7, 1, 0, 0))
+                    .executeUpdate();
+
+            em.createQuery("update ReturnRequest rr set rr.createdDate=:updateDate, rr.lastModifiedDate=:updateDate2 where rr.no = 1L")
+                    .setParameter("updateDate", LocalDateTime.of(2026, 7, 4, 0, 0))
+                    .setParameter("updateDate2", LocalDateTime.of(2026, 7, 4, 0, 0))
+                    .executeUpdate();
+
+            em.createQuery("update CancelRequest cr set cr.createdDate=:updateDate, cr.lastModifiedDate=:updateDate2 where cr.no = 2L")
+                    .setParameter("updateDate", LocalDateTime.of(2026, 7, 7, 0, 0))
+                    .setParameter("updateDate2", LocalDateTime.of(2026, 7, 7, 0, 0))
+                    .executeUpdate();
+
+            em.flush();
+            em.clear();
         }
     }
 }

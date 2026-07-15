@@ -9,15 +9,10 @@ import myshop.shop.dto.order.DetailOrderDto;
 import myshop.shop.dto.order.DetailOrderItemDto;
 import myshop.shop.dto.order.ManageOrderDto;
 import myshop.shop.dto.order.ManageOrderItemDto;
-import myshop.shop.entity.QOrderItem;
-import myshop.shop.entity.delivery.QDelivery;
-import myshop.shop.entity.order.QOrder;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
-import static myshop.shop.entity.QOrderItem.orderItem;
+import static myshop.shop.entity.orderItem.QOrderItem.orderItem;
 import static myshop.shop.entity.delivery.QDelivery.delivery;
 import static myshop.shop.entity.item.QItem.item;
 import static myshop.shop.entity.order.QOrder.order;
@@ -84,6 +79,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepositoryCustom {
             List<ManageOrderItemDto> manageOrderItemDtoList = queryFactory
                     .select(Projections.fields(ManageOrderItemDto.class,
                             orderItem.no.as("orderItemNo"),
+                            orderItem.orderItemStatus,
                             delivery.deliveryStatus,
                             delivery.courier,
                             delivery.trackingNumber,

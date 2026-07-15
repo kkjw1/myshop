@@ -256,70 +256,99 @@
             </div>
         </div>
 
-        <div class="col-md-9">
+        <div class="col-md-9" th:with="cancelCount=${#lists.size(cancelReturnList.?[cancelReasonCode != null])},
+                                returnCount=${#lists.size(cancelReturnList.?[returnReasonCode != null])}">
             <h4 class="mb-4 font-weight-bold">취소/반품 내역</h4>
 
-            <!-- 필터 탭 (id와 data-filter 속성 추가) -->
             <div class="filter-tab mb-4 shadow-sm" id="filterTab">
                 <div class="filter-item active" data-filter="all">전체</div>
-                <div class="filter-item" data-filter="cancel">취소 (1)</div>
-                <div class="filter-item" data-filter="return">반품 (1)</div>
+                <div class="filter-item" data-filter="cancel" th:text="|취소 (${cancelCount})|">취소 (0)</div>
+                <div class="filter-item" data-filter="return" th:text="|반품 (${returnCount})|">반품 (0)</div>
             </div>
 
-            <!-- 1. 반품 완료 카드 (data-type="return" 추가) -->
-            <div class="cancel-card shadow-sm order-item-card" data-type="return">
+            <div th:if="${#lists.isEmpty(cancelReturnList)}" class="text-center py-5 text-muted">
+                취소/반품 내역이 존재하지 않습니다.
+            </div>
+
+            <div th:each="dto : ${cancelReturnList}"
+                 class="cancel-card shadow-sm order-item-card"
+                 th:data-type="${dto.cancelReasonCode != null ? 'cancel' : 'return'}">
+
                 <div class="cancel-card-header d-flex justify-content-between">
-                    <span>주문번호: 20260110-001234</span>
-                    <span>2026.01.10 접수</span>
+                    <span th:text="|주문상품번호: ${dto.orderItemNo}|">주문상품번호: 0</span>
+                    <span th:text="|${#temporals.format(dto.requestTime, 'yyyy.MM.dd')} 접수|">2026.07.01 접수</span>
                 </div>
+
                 <div class="p-4">
                     <div class="row">
                         <div class="col-md-2 text-center">
-                            <img src="https://via.placeholder.com/80" class="product-img">
+                            <img src="https://via.placeholder.com/80" th:src="${dto.imageUrl}" class="product-img" alt="상품 이미지">
                         </div>
                         <div class="col-md-7">
-                            <span class="status-badge badge-complete">반품/환불완료</span>
-                            <div class="font-weight-bold mb-1">무선 저소음 기계식 키보드 - 화이트</div>
-                            <div class="text-muted small">반품사유: 단순 변심</div>
-                        </div>
-                        <div class="col-md-3 text-right">
-                            <button class="btn btn-sm btn-outline-secondary btn-block" data-toggle="modal" data-target="#inquiryModal">문의하기</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="refund-info">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-muted">환불 금액</span>
-                        <span class="font-weight-bold text-danger">45,900원 (환불완료)</span>
-                    </div>
-                </div>
-            </div>
+                            <th:block th:if="${dto.cancelReasonCode != null}">
+                                <span th:if="${#strings.toString(dto.cancelRequestStatus) == '요청'}" class="status-badge badge-cancel">취소요청</span>
+                                <span th:if="${#strings.toString(dto.cancelRequestStatus) == '승인'}" class="status-badge badge-complete">취소승인</span>
+                                <span th:if="${#strings.toString(dto.cancelRequestStatus) == '거부'}" class="status-badge badge-return">취소거부</span>
+                                <span th:if="${#strings.toString(dto.cancelRequestStatus) == '완료'}" class="status-badge badge-cancel">결제취소 완료</span>
+                            </th:block>
 
-            <!-- 2. 결제 취소 카드 (data-type="cancel" 추가) -->
-            <div class="cancel-card shadow-sm order-item-card" data-type="cancel">
-                <div class="cancel-card-header d-flex justify-content-between">
-                    <span>주문번호: 20260105-998877</span>
-                    <span>2026.01.05 취소</span>
-                </div>
-                <div class="p-4">
-                    <div class="row">
-                        <div class="col-md-2 text-center">
-                            <img src="https://via.placeholder.com/80" class="product-img">
+                            <th:block th:if="${dto.returnReasonCode != null}">
+                                <span th:if="${#strings.toString(dto.returnRequestStatus) == '요청'}" class="status-badge badge-complete">반품요청</span>
+                                <span th:if="${#strings.toString(dto.returnRequestStatus) == '픽업예정' || #strings.toString(dto.returnRequestStatus) == '픽업완료'}" class="status-badge badge-complete">수거진행중</span>
+                                <span th:if="${#strings.toString(dto.returnRequestStatus) == '검사중'}" class="status-badge badge-complete">품질검사중</span>
+                                <span th:if="${#strings.toString(dto.returnRequestStatus) == '승인'}" class="status-badge badge-complete">반품승인</span>
+                                <span th:if="${#strings.toString(dto.returnRequestStatus) == '거부'}" class="status-badge badge-return">반품거부</span>
+                                <span th:if="${#strings.toString(dto.returnRequestStatus) == '완료'}" class="status-badge badge-cancel">반품/환불완료</span>
+                            </th:block>
+
+                            <div class="font-weight-bold mb-1">
+                                <span th:text="${dto.itemName}">상품테스트3</span>
+                                <span th:if="${dto.optionName != null && !#strings.isEmpty(dto.optionName)}"
+                                      th:text="| - ${dto.optionName}|" class="text-secondary small"> - 검정색</span>
+                            </div>
+
+                            <div class="text-muted small mb-1" th:text="|수량: ${dto.count}개|">수량: 1개</div>
+
                         </div>
-                        <div class="col-md-7">
-                            <span class="status-badge badge-cancel">결제취소</span>
-                            <div class="font-weight-bold mb-1">프리미엄 고당도 스테비아 토마토 500g</div>
-                            <div class="text-muted small">취소사유: 주문 실수</div>
-                        </div>
+
                         <div class="col-md-3 text-right">
-                            <button class="btn btn-sm btn-outline-secondary btn-block" data-toggle="modal" data-target="#cancelDetailModal">취소 상세</button>
+                            <button th:if="${dto.cancelReasonCode != null}"
+                                    class="btn btn-sm btn-outline-secondary btn-block btn-cancel-detail"
+                                    data-toggle="modal"
+                                    data-target="#cancelDetailModal"
+                                    th:data-order-item-no="${dto.orderItemNo}"
+                                    th:data-request-time="${#temporals.format(dto.requestTime, 'yyyy.MM.dd HH:mm')}"
+                                    th:data-item-name="${dto.itemName}"
+                                    th:data-option-name="${dto.optionName}"
+                                    th:data-count="${dto.count}"
+                                    th:data-image-url="${dto.imageUrl}"
+                                    th:data-reason-code="${dto.cancelReasonCode}"
+                                    th:data-reason-detail="${dto.reasonDetail}"
+                                    th:data-status="${dto.cancelRequestStatus}"
+                                    th:data-price="|${#numbers.formatDecimal(dto.price, 0, 'COMMA', 0, 'POINT')}원|">
+                                취소 상세
+                            </button>
+
+                            <button th:if="${dto.returnReasonCode != null}"
+                                    class="btn btn-sm btn-outline-secondary btn-block btn-inquiry-detail"
+                                    data-toggle="modal"
+                                    data-target="#inquiryModal"
+                                    th:data-order-item-no="${dto.orderItemNo}"
+                                    th:data-item-name="${dto.itemName}"
+                                    th:data-option-name="${dto.optionName}"
+                                    th:data-image-url="${dto.imageUrl}">
+                                문의하기
+                            </button>
                         </div>
+
                     </div>
                 </div>
+
                 <div class="refund-info">
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-muted">환불 금액</span>
-                        <span class="font-weight-bold text-danger">12,900원</span>
+                        <span class="text-muted">환불 예정 금액</span>
+                        <span class="font-weight-bold text-danger"
+                              th:text="|${#numbers.formatDecimal(dto.price, 0, 'COMMA', 0, 'POINT')}원|">1,500,000원</span>
                     </div>
                 </div>
             </div>
@@ -329,33 +358,27 @@
 </div>
 
 
-
-<!-- 문의하기 모달 -->
 <div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 12px; border: none; overflow: hidden;">
-
-            <!-- 모달 헤더 -->
             <div class="modal-header bg-light" style="border-bottom: 1px solid #eee;">
                 <h5 class="modal-title font-weight-bold" id="inquiryModalLabel" style="font-size: 1.1rem; color: #333;">1:1 문의하기</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-
-            <!-- 모달 바디 (폼 시작) -->
             <form id="inquiryForm" action="/myPage/inquiry" method="post">
+                <input type="hidden" id="inquiryOrderItemNo" name="orderItemNo">
+
                 <div class="modal-body p-4">
-                    <!-- 대상 상품 정보 요약 -->
                     <div class="d-flex align-items-center mb-4 p-2" style="border-bottom: 1px solid #f5f5f5;">
-                        <img src="https://via.placeholder.com/50" class="product-img mr-3" style="width: 50px; height: 50px; border-radius: 4px;">
+                        <img id="inquiryModalImg" src="https://via.placeholder.com/50" class="product-img mr-3" style="width: 50px; height: 50px; border-radius: 4px;">
                         <div>
-                            <div class="font-weight-bold text-dark small">무선 저소음 기계식 키보드 - 화이트</div>
-                            <div class="text-muted extra-small" style="font-size: 11px;">주문번호: 20260110-001234</div>
+                            <div id="inquiryModalItemName" class="font-weight-bold text-dark small">상품명</div>
+                            <div id="inquiryModalOrderNo" class="text-muted extra-small" style="font-size: 11px;">주문상품번호: </div>
                         </div>
                     </div>
 
-                    <!-- 문의 유형 선택 -->
                     <div class="form-group mb-3">
                         <label for="inquiryType" class="font-weight-bold small text-dark">문의 유형 <span class="required-mark">*</span></label>
                         <select class="form-control" id="inquiryType" name="inquiryType" required style="height: 45px; font-size: 0.9rem; border-radius: 6px;">
@@ -366,7 +389,6 @@
                         </select>
                     </div>
 
-                    <!-- 문의 내용 입력 -->
                     <div class="form-group mb-2">
                         <label for="inquiryContent" class="font-weight-bold small text-dark">문의 내용 <span class="required-mark">*</span></label>
                         <textarea class="form-control" id="inquiryContent" name="inquiryContent" rows="5" placeholder="문의하실 내용을 입력해주세요. (최대 500자)" required style="font-size: 0.9rem; border-radius: 6px; resize: none;"></textarea>
@@ -375,8 +397,6 @@
                         <span id="charCount">0</span>/500자
                     </div>
                 </div>
-
-                <!-- 모달 푸터 (취소/등록 버튼) -->
                 <div class="modal-footer p-3" style="border-top: 1px solid #eee; background-color: #fcfcfc;">
                     <div class="row w-100 m-0">
                         <div class="col-6 pl-0 pr-1">
@@ -388,74 +408,60 @@
                     </div>
                 </div>
             </form>
-
         </div>
     </div>
 </div>
 
 
-
-<!-- 취소 상세 모달 (배송비/환불수단 제외 버전) -->
 <div class="modal fade" id="cancelDetailModal" tabindex="-1" aria-labelledby="cancelDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 12px; border: none; overflow: hidden;">
-
-            <!-- 모달 헤더 -->
             <div class="modal-header bg-light" style="border-bottom: 1px solid #eee;">
                 <h5 class="modal-title font-weight-bold" id="cancelDetailModalLabel" style="font-size: 1.1rem; color: #333;">취소 상세 내역</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-
-            <!-- 모달 바디 -->
             <div class="modal-body p-4">
-                <!-- 주문/취소 정보 요약 -->
                 <div class="d-flex justify-content-between mb-3 pb-3" style="border-bottom: 1px solid #f5f5f5; font-size: 0.9rem; color: #666;">
-                    <span>주문번호: <strong class="text-dark">20260105-998877</strong></span>
-                    <span>취소일시: 2026.01.05 14:22</span>
+                    <span>주문상품번호: <strong id="cancelModalOrderNo" class="text-dark"></strong></span>
+                    <span>접수일시: <span id="cancelModalRequestTime"></span></span>
                 </div>
 
-                <!-- 상품 정보 -->
                 <div class="d-flex align-items-center mb-4 p-3" style="background-color: #f8f9fa; border-radius: 8px;">
-                    <img src="https://via.placeholder.com/60" class="product-img mr-3" style="width: 60px; height: 60px; border-radius: 4px;">
+                    <img id="cancelModalImg" src="https://via.placeholder.com/60" class="product-img mr-3" style="width: 60px; height: 60px; border-radius: 4px;">
                     <div class="flex-grow-1">
-                        <div class="font-weight-bold text-dark" style="font-size: 0.95rem;">프리미엄 고당도 스테비아 토마토 500g</div>
-                        <div class="text-muted small mt-1">수량: 1개</div>
+                        <div id="cancelModalItemName" class="font-weight-bold text-dark" style="font-size: 0.95rem;">상품명</div>
+                        <div id="cancelModalCount" class="text-muted small mt-1">수량: 0개</div>
                     </div>
                 </div>
 
-                <!-- 상세 내역 목록 -->
                 <div class="px-1">
                     <table class="table table-sm table-borderless mb-0" style="font-size: 0.95rem;">
                         <tr style="border-bottom: 1px solid #f9f9f9;">
                             <td class="text-muted pl-0 py-2" style="width: 30%;">취소 사유</td>
-                            <td class="text-dark font-weight-bold py-2">주문 실수</td>
+                            <td>
+                                <span id="cancelModalReasonCode" class="text-dark font-weight-bold"></span>
+                                <div id="cancelModalReasonDetail" class="text-muted small mt-1" style="display:none;"></div>
+                            </td>
                         </tr>
                         <tr style="border-bottom: 1px solid #f9f9f9;">
                             <td class="text-muted pl-0 py-2">처리 상태</td>
-                            <td class="py-2"><span class="badge badge-cancel px-2 py-1">결제취소 완료</span></td>
+                            <td class="py-2"><span id="cancelModalStatusBadge" class="badge px-2 py-1">요청</span></td>
                         </tr>
                         <tr>
                             <td class="text-muted pl-0 py-3 align-middle">환불 금액</td>
-                            <td class="text-danger font-weight-bold py-3 align-middle" style="font-size: 1.2rem;">
-                                12,900원
-                            </td>
+                            <td id="cancelModalPrice" class="text-danger font-weight-bold py-3 align-middle" style="font-size: 1.2rem;">0원</td>
                         </tr>
                     </table>
                 </div>
             </div>
-
-            <!-- 모달 푸터 -->
             <div class="modal-footer" style="border-top: 1px solid #eee; background-color: #fcfcfc;">
                 <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal" style="font-size: 0.95rem; font-weight: bold; height: 45px; border-radius: 6px;">확인</button>
             </div>
-
         </div>
     </div>
 </div>
-
-
 
 
 <footer class="shop-footer" th:replace="~{/shop/common::footer}">
@@ -509,24 +515,107 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+
 <script th:inline="javascript">
     $(document).ready(function() {
-        // 필터 탭 클릭 이벤트
+        // 기존 필터 탭 코드 유지
         $('#filterTab .filter-item').on('click', function() {
-            // 1. 활성화 탭 디자인 변경
             $('#filterTab .filter-item').removeClass('active');
             $(this).addClass('active');
-
-            // 2. 선택한 필터 값 가져오기 (all, cancel, return)
             var filterValue = $(this).data('filter');
+            if (filterValue === 'all') { $('.order-item-card').show(); }
+            else { $('.order-item-card').hide(); $('.order-item-card[data-type="' + filterValue + '"]').show(); }
+        });
 
-            // 3. 필터링 조건에 따라 카드 노출/숨김 처리
-            if (filterValue === 'all') {
-                $('.order-item-card').show();
-            } else {
-                $('.order-item-card').hide();
-                $('.order-item-card[data-type="' + filterValue + '"]').show();
+        // ================= 취소 사유 및 상태 매핑 데이터 정의 =================
+        var cancelReasonMap = {
+            'CHANGED_MIND': '단순 변심 (의사 취소)',
+            'WRONG_ORDER': '주문 실수 (옵션/수량 잘못 선택)',
+            'DELIVERY_DELAY': '배송 지연 우려',
+            'PRICE_FALL': '더 저렴한 상품 발견',
+            'OTHER': '기타'
+        };
+
+        var cancelStatusMap = {
+            '요청': { text: '취소 요청', class: 'badge-complete' },
+            '승인': { text: '취소 승인', class: 'badge-complete' },
+            '거부': { text: '취소 거부', class: 'badge-return' },
+            '완료': { text: '결제취소 완료', class: 'badge-cancel' }
+        };
+
+        // 취소 상세 버튼 클릭 이벤트
+        $('.btn-cancel-detail').on('click', function() {
+            var orderItemNo = $(this).data('order-item-no');
+            var requestTime = $(this).data('request-time');
+            var itemName = $(this).data('item-name');
+            var optionName = $(this).data('option-name');
+            var count = $(this).data('count');
+            var imageUrl = $(this).data('image-url');
+            var reasonCode = $(this).data('reason-code');
+            var reasonDetail = $(this).data('reason-detail');
+            var status = $(this).data('status');
+            var price = $(this).data('price');
+
+            // 1. 상품명 조합
+            var fullItemName = itemName;
+            if(optionName && optionName.trim() !== '') {
+                fullItemName += ' (옵션: ' + optionName + ')';
             }
+            $('#cancelModalItemName').text(fullItemName);
+            $('#cancelModalOrderNo').text(orderItemNo);
+            $('#cancelModalRequestTime').text(requestTime);
+            $('#cancelModalCount').text('수량: ' + count + '개');
+            $('#cancelModalPrice').text(price);
+
+            // 2. 취소 사유 코드 한국어 매핑 및 상세 사유 노출
+            var koreanReason = cancelReasonMap[reasonCode] || '기타';
+            $('#cancelModalReasonCode').text(koreanReason);
+
+            if(reasonDetail && reasonDetail.trim() !== '') {
+                // 단순 코드 외에 직접 적은 상세 내용이 있을 경우 하단에 추가 노출
+                $('#cancelModalReasonDetail').text('상세내용: ' + reasonDetail).show();
+            } else {
+                $('#cancelModalReasonDetail').hide();
+            }
+
+            // 3. 처리 상태 배지 맵 연동
+            var statusInfo = cancelStatusMap[status] || { text: status, class: 'badge-cancel' };
+            $('#cancelModalStatusBadge')
+                .text(statusInfo.text)
+                .removeClass('badge-cancel badge-complete badge-return')
+                .addClass(statusInfo.class);
+
+            // 4. 이미지 바인딩
+            if(imageUrl) { $('#cancelModalImg').attr('src', imageUrl); }
+            else { $('#cancelModalImg').attr('src', 'https://via.placeholder.com/60'); }
+        });
+
+        // 문의하기 버튼 클릭 이벤트 및 글자수 세기 유지
+        $('.btn-inquiry-detail').on('click', function() {
+            var orderItemNo = $(this).data('order-item-no');
+            var itemName = $(this).data('item-name');
+            var optionName = $(this).data('option-name');
+            var imageUrl = $(this).data('image-url');
+
+            var fullItemName = itemName;
+            if(optionName && optionName.trim() !== '') { fullItemName += ' - ' + optionName; }
+
+            $('#inquiryOrderItemNo').val(orderItemNo);
+            $('#inquiryModalOrderNo').text('주문상품번호: ' + orderItemNo);
+            $('#inquiryModalItemName').text(fullItemName);
+
+            if(imageUrl) { $('#inquiryModalImg').attr('src', imageUrl); }
+            else { $('#inquiryModalImg').attr('src', 'https://via.placeholder.com/50'); }
+
+            $('#inquiryType').val('');
+            $('#inquiryContent').val('');
+            $('#charCount').text('0');
+        });
+
+        $('#inquiryContent').on('input', function() {
+            var content = $(this).val();
+            if(content.length > 500) { $(this).val(content.substring(0, 500)); content = $(this).val(); }
+            $('#charCount').text(content.length);
         });
     });
 </script>

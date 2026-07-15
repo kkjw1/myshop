@@ -1,20 +1,19 @@
-package myshop.shop.entity;
+package myshop.shop.entity.orderItem;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.ToString;
+import myshop.shop.entity.BaseDateEntity;
 import myshop.shop.entity.delivery.Delivery;
+import myshop.shop.entity.delivery.DeliveryStatus;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.order.Order;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
 @SequenceGenerator(name = "ORDER_ITEM_SEQ", sequenceName = "ORDER_ITEM_SEQ", initialValue = 1, allocationSize = 1)
-public class OrderItem extends BaseDateEntity{
+public class OrderItem extends BaseDateEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ORDER_ITEM_SEQ")
     @Column(name = "ORDER_ITEM_NO")
@@ -38,10 +37,13 @@ public class OrderItem extends BaseDateEntity{
     private String itemName;
     private String optionName;
 
+    @Enumerated(EnumType.STRING)
+    private OrderItemStatus orderItemStatus;
+
     public OrderItem() {
     }
 
-    public OrderItem(Order order, Item item, Delivery delivery, int count, BigDecimal price, String imageUrl, String itemName, String optionName) {
+    public OrderItem(Order order, Item item, Delivery delivery, int count, BigDecimal price, String imageUrl, String itemName, String optionName, OrderItemStatus orderItemStatus) {
         this.order = order;
         this.item = item;
         this.delivery = delivery;
@@ -50,8 +52,9 @@ public class OrderItem extends BaseDateEntity{
         this.imageUrl = imageUrl;
         this.itemName = itemName;
         this.optionName = optionName;
+        this.orderItemStatus = orderItemStatus;
     }
-    public OrderItem(Order order, Item item, Delivery delivery, int count, int price, String imageUrl, String itemName, String optionName) {
+    public OrderItem(Order order, Item item, Delivery delivery, int count, int price, String imageUrl, String itemName, String optionName, OrderItemStatus orderItemStatus) {
         this.order = order;
         this.item = item;
         this.delivery = delivery;
@@ -60,6 +63,7 @@ public class OrderItem extends BaseDateEntity{
         this.imageUrl = imageUrl;
         this.itemName = itemName;
         this.optionName = optionName;
+        this.orderItemStatus = orderItemStatus;
     }
 
     //==========편의 메서드===========
@@ -71,5 +75,15 @@ public class OrderItem extends BaseDateEntity{
     public void updateItem(Item item) {
         this.item = item;
         item.getOrderItemList().add(this);
+    }
+
+    public void updateOrderItemStatus(OrderItemStatus orderItemStatus) {
+        this.orderItemStatus = orderItemStatus;
+    }
+
+    public void updateOrderItemStatus(DeliveryStatus deliveryStatus) {
+        if (deliveryStatus == DeliveryStatus.상품준비중) { this.orderItemStatus = OrderItemStatus.상품준비중; }
+        else if (deliveryStatus == DeliveryStatus.배송중) { this.orderItemStatus = OrderItemStatus.배송중; }
+        else if (deliveryStatus == DeliveryStatus.배송완료) { this.orderItemStatus = OrderItemStatus.배송완료; }
     }
 }

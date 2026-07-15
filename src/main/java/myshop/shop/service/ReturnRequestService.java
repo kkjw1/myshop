@@ -2,12 +2,10 @@ package myshop.shop.service;
 
 import lombok.RequiredArgsConstructor;
 import myshop.shop.dto.cancelRequest.ManageCancelReturnDto;
-import myshop.shop.dto.cancelRequest.SaveCancelRequestDto;
 import myshop.shop.dto.returnRequest.SaveReturnRequestDto;
-import myshop.shop.entity.OrderItem;
-import myshop.shop.entity.cancelRequest.CancelRequest;
-import myshop.shop.entity.cancelRequest.CancelRequestStatus;
+import myshop.shop.entity.orderItem.OrderItem;
 import myshop.shop.entity.member.Member;
+import myshop.shop.entity.orderItem.OrderItemStatus;
 import myshop.shop.entity.returnRequest.ReturnRequest;
 import myshop.shop.entity.returnRequest.ReturnRequestStatus;
 import myshop.shop.repository.cancelRequest.CancelRequestRepository;
@@ -35,10 +33,12 @@ public class ReturnRequestService {
      * 주문 목록/배송 조회 -> 반품 신청
      */
     public void saveReturnRequest(SaveReturnRequestDto saveReturnRequestDto) {
-        OrderItem orderItemProxy = orderItemRepository.getReferenceById(saveReturnRequestDto.getOrderItemNo());
+        OrderItem orderItem = orderItemRepository.findById(saveReturnRequestDto.getOrderItemNo()).orElse(null);
         Member memberProxy = memberRepository.getReferenceById(saveReturnRequestDto.getMemberNo());
 
-        ReturnRequest saveReturnRequest = new ReturnRequest(orderItemProxy, memberProxy,
+        orderItem.updateOrderItemStatus(OrderItemStatus.반품접수);
+
+        ReturnRequest saveReturnRequest = new ReturnRequest(orderItem, memberProxy,
                 saveReturnRequestDto.getCount(),
                 saveReturnRequestDto.getReturnReasonCode(),
                 saveReturnRequestDto.getReasonDetail(),
@@ -46,6 +46,7 @@ public class ReturnRequestService {
                 ReturnRequestStatus.요청);
 
         returnRequestRepository.save(saveReturnRequest);
+
     }
 
 

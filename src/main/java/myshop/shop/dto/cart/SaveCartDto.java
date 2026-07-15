@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString(of = {"itemNo", "memberNo", "itemOptionNo", "itemImageNo", "count"})
+@ToString(of = {"itemNo", "memberNo", "itemOptionNo", "count"})
 public class SaveCartDto {
     private Long itemNo;
     private Long memberNo;

@@ -27,6 +27,7 @@ public class ManageCancelReturnDto {
      * 옵션
      * 요청 일시
      * 개수
+     * 상품 이미지
      */
     private Long orderItemNo;
     private Long itemNo;
@@ -40,6 +41,7 @@ public class ManageCancelReturnDto {
     private String optionName;
     private LocalDateTime requestTime;
     private int count;
+    private String imageUrl;
 
     public ManageCancelReturnDto() {
     }

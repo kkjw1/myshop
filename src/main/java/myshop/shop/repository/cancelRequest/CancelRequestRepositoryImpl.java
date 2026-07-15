@@ -1,27 +1,14 @@
 package myshop.shop.repository.cancelRequest;
 
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import myshop.shop.dto.cancelRequest.ManageCancelReturnDto;
-import myshop.shop.entity.QOrderItem;
-import myshop.shop.entity.cancelRequest.CancelReasonCode;
-import myshop.shop.entity.cancelRequest.CancelRequestStatus;
-import myshop.shop.entity.cancelRequest.QCancelRequest;
-import myshop.shop.entity.item.QItem;
-import myshop.shop.entity.returnRequest.QReturnRequest;
-import myshop.shop.entity.returnRequest.ReturnReasonCode;
-import myshop.shop.entity.returnRequest.ReturnRequestStatus;
-
-import java.math.BigDecimal;
-import java.net.Authenticator;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static myshop.shop.entity.QOrderItem.orderItem;
+import static myshop.shop.entity.orderItem.QOrderItem.orderItem;
 import static myshop.shop.entity.cancelRequest.QCancelRequest.cancelRequest;
 import static myshop.shop.entity.item.QItem.item;
 import static myshop.shop.entity.returnRequest.QReturnRequest.returnRequest;
@@ -46,7 +33,8 @@ public class CancelRequestRepositoryImpl implements  CancelRequestRepositoryCust
                         orderItem.itemName.as("itemName"),
                         orderItem.optionName.as("optionName"),
                         cancelRequest.createdDate.as("requestTime"),
-                        cancelRequest.count
+                        cancelRequest.count,
+                        orderItem.imageUrl
                 ))
                 .from(cancelRequest)
                 .join(cancelRequest.orderItem, orderItem)
@@ -67,7 +55,8 @@ public class CancelRequestRepositoryImpl implements  CancelRequestRepositoryCust
                         orderItem.itemName.as("itemName"),
                         orderItem.optionName.as("optionName"),
                         returnRequest.createdDate.as("requestTime"),
-                        returnRequest.count
+                        returnRequest.count,
+                        orderItem.imageUrl
                 ))
                 .from(returnRequest)
                 .join(returnRequest.orderItem, orderItem)

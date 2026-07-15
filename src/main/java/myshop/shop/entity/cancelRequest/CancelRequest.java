@@ -3,7 +3,7 @@ package myshop.shop.entity.cancelRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import myshop.shop.entity.BaseDateEntity;
-import myshop.shop.entity.OrderItem;
+import myshop.shop.entity.orderItem.OrderItem;
 import myshop.shop.entity.member.Member;
 
 import java.math.BigDecimal;

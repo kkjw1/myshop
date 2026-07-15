@@ -2,10 +2,11 @@ package myshop.shop.service;
 
 import lombok.RequiredArgsConstructor;
 import myshop.shop.dto.cancelRequest.SaveCancelRequestDto;
-import myshop.shop.entity.OrderItem;
+import myshop.shop.entity.orderItem.OrderItem;
 import myshop.shop.entity.cancelRequest.CancelRequest;
 import myshop.shop.entity.cancelRequest.CancelRequestStatus;
 import myshop.shop.entity.member.Member;
+import myshop.shop.entity.orderItem.OrderItemStatus;
 import myshop.shop.repository.cancelRequest.CancelRequestRepository;
 import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.repository.orderItem.OrderItemRepository;
@@ -26,10 +27,12 @@ public class CancelRequestService {
      * 주문 목록/배송 조회 -> 주문 취소 신청
      */
     public void saveCancelRequest(SaveCancelRequestDto saveCancelRequestDto) {
-        OrderItem orderItemProxy = orderItemRepository.getReferenceById(saveCancelRequestDto.getOrderItemNo());
+        OrderItem orderItem = orderItemRepository.findById(saveCancelRequestDto.getOrderItemNo()).orElse(null);
         Member memberProxy = memberRepository.getReferenceById(saveCancelRequestDto.getMemberNo());
 
-        CancelRequest saveCancelRequest = new CancelRequest(orderItemProxy, memberProxy,
+        orderItem.updateOrderItemStatus(OrderItemStatus.취소접수);
+
+        CancelRequest saveCancelRequest = new CancelRequest(orderItem, memberProxy,
                 saveCancelRequestDto.getCount(),
                 saveCancelRequestDto.getCancelReasonCode(),
                 saveCancelRequestDto.getReasonDetail(),

@@ -4,13 +4,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import myshop.shop.entity.delivery.DeliveryStatus;
+import myshop.shop.entity.orderItem.OrderItemStatus;
 
 import java.math.BigDecimal;
 
 @Getter @Setter
-@ToString(of = {"orderItemNo", "deliveryStatus", "courier", "trackingNumber", "imageUrl", "itemName", "optionName", "totalPrice", "count"})
+@ToString(of = {"orderItemNo", "orderItemStatus", "deliveryStatus", "courier", "trackingNumber", "imageUrl", "itemName", "optionName", "totalPrice", "count"})
 public class ManageOrderItemDto {
     private Long orderItemNo;
+    private OrderItemStatus orderItemStatus;
     private DeliveryStatus deliveryStatus;
     private String courier;
     private String trackingNumber;

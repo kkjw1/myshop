@@ -252,61 +252,48 @@
         <div class="col-md-9">
             <h4 class="mb-4 font-weight-bold">주문 목록</h4>
 
-            <!-- [변경] 주문 건별로 카드가 생성됩니다 (예: orders 리스트 반복) -->
             <div class="order-card shadow-sm" th:each="manageOrderDto : ${manageOrderDtoList}">
                 <div class="order-card-header">
-                    <!-- 주문 날짜 및 주문 번호 출력 -->
                     <span class="order-date" th:text="${#temporals.format(manageOrderDto.orderTime, 'yyyy.MM.dd') + ' 주문'}">2026.01.10 주문</span>
                     <a href="#" th:href="@{/order/complete(orderNo=${manageOrderDto.orderNo})}" class="small text-muted text-decoration-none">주문 상세보기 ></a>
                 </div>
 
                 <div class="p-4">
-                    <!-- 상품 리스트(orderItems) -->
                     <div class="row align-items-center"
                          th:each="manageOrderItemDto, iterStat : ${manageOrderDto.manageOrderItemDtoList}"
                          th:classappend="${!iterStat.last} ? 'border-bottom pb-4 mb-4' : ''"
-                         style="border-color: #eee !important;"> <!-- 구분선 색상을 은은한 연회색으로 지정 -->
+                         style="border-color: #eee !important;">
 
-                        <!-- 1. 상품 이미지 -->
                         <div class="col-md-2 text-center">
                             <img src="https://via.placeholder.com/100" th:src="${manageOrderItemDto.imageUrl}" class="product-img" alt="상품">
                         </div>
 
-                        <!-- 2. 배송 상태 및 상품 정보 -->
                         <div class="col-md-6">
-                            <!-- 주문 상태 (배송완료, 배송중 등) -->
-                            <div class="status-txt mb-1" th:text="${manageOrderItemDto.deliveryStatus}">배송 완료</div>
+                            <div class="status-txt mb-1" th:text="${manageOrderItemDto.orderItemStatus}">배송 완료</div>
 
-                            <!-- 상품명 -->
                             <div class="font-weight-bold mb-1" th:text="${manageOrderItemDto.itemName}">무선 저소음 기계식 키보드</div>
 
-                            <!-- 옵션 정보 (이전 답변 적용: 공백 체크) -->
                             <div class="small text-muted mb-1"
                                  th:text="${!#strings.isEmpty(manageOrderItemDto.optionName) ? '옵션: ' + manageOrderItemDto.optionName : '옵션 없음'}">옵션: 블랙 / L</div>
 
-                            <!-- 가격 및 수량 -->
                             <div class="text-muted small">
                                 <span th:text="${#numbers.formatDecimal(manageOrderItemDto.totalPrice,  1, 'COMMA', 0, 'POINT')} + '원'">45,900원</span> ·
                                 <span th:text="${manageOrderItemDto.count} + '개'">1개</span>
                             </div>
                         </div>
 
-                        <!-- 3. 버튼 영역 (상품별로 각각 존재해야 하는 액션 버튼) -->
-                        <!-- 3. 버튼 영역 (상품별로 각각 존재해야 하는 액션 버튼) -->
                         <div class="col-md-4 text-right">
-                            <!-- 배송조회 버튼은 배송중 또는 배송완료일 때만 노출 -->
-                            <button
-                                    class="btn btn-block btn-outline-secondary mb-2 btn-sm btn-delivery-track"
+
+                            <button class="btn btn-block btn-outline-secondary mb-2 btn-sm btn-delivery-track"
                                     data-toggle="modal"
                                     data-target="#deliveryTrackingModal"
                                     th:data-courier="${manageOrderItemDto.courier}"
                                     th:data-trackingNumber="${manageOrderItemDto.trackingNumber}"
-                                    th:data-status="${manageOrderItemDto.deliveryStatus}">
+                                    th:data-status="${manageOrderItemDto.deliveryStatus.name()}">
                                 배송조회
                             </button>
 
-                            <!-- 상품 준비 중일 때는 '주문 취소 신청' 버튼 노출 -->
-                            <button th:if="${manageOrderItemDto.deliveryStatus.name() == '상품준비중'}"
+                            <button th:if="${manageOrderItemDto.orderItemStatus.name() == '상품준비중'}"
                                     class="btn btn-block btn-outline-danger mb-2 btn-sm btn-cancel-order"
                                     data-toggle="modal"
                                     data-target="#orderCancelModal"
@@ -316,13 +303,11 @@
                                     th:data-count="${manageOrderItemDto.count}"
                                     th:data-order-item-no="${manageOrderItemDto.orderItemNo}"
                                     th:data-price="${manageOrderItemDto.totalPrice}"
-                                    th:data-member-no="${loginCheckMemberDto.no}"
-                            >
+                                    th:data-member-no="${loginCheckMemberDto.no}">
                                 주문 취소 신청
                             </button>
 
-                            <!-- 배송중이거나 배송완료일 때는 '반품/교환 신청' 버튼 노출 -->
-                            <button th:unless="${manageOrderItemDto.deliveryStatus.name() == '상품준비중'}"
+                            <button th:if="${manageOrderItemDto.orderItemStatus.name() == '배송중' or manageOrderItemDto.orderItemStatus.name() == '배송완료'}"
                                     class="btn btn-block btn-outline-secondary mb-2 btn-sm btn-return-refund"
                                     data-toggle="modal"
                                     data-target="#returnRequestModal"
@@ -335,14 +320,19 @@
                                     th:data-member-no="${loginCheckMemberDto.no}">
                                 반품 신청
                             </button>
-                            <button th:if="${manageOrderItemDto.deliveryStatus.name() == '배송완료'}"
-                                    class="btn btn-block btn-track btn-sm">리뷰 작성하기</button>
+
+                            <button th:if="${manageOrderItemDto.orderItemStatus.name() == '배송완료'}"
+                                    class="btn btn-block btn-track btn-sm">
+                                리뷰 작성하기
+                            </button>
+
+<!--                            <div th:if="${#strings.contains(manageOrderItemDto.orderItemStatus.name(), '취소') or #strings.contains(manageOrderItemDto.orderItemStatus.name(), '반품')}"
+                                 class="text-muted small text-right pr-2">
+                                <span class="badge badge-light p-2 text-wrap" style="width: 100%;">처리가 진행 중이거나 완료된 상품입니다.</span>
+                            </div>-->
                         </div>
-                    </div> <!-- /상품 반복 끝 -->
-                </div>
-            </div> <!-- /주문 목록 반복 끝 -->
-        </div>
-        </div>
+                    </div> </div>
+            </div> </div>
     </div>
 </div>
 
@@ -569,38 +559,32 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-
 <script th:inline="javascript">
     $(document).ready(function() {
         // 배송조회 버튼 클릭 시 모달 데이터 세팅
         $('.btn-delivery-track').on('click', function() {
-            // 1. 버튼에 바인딩된 데이터 가져오기
             var courier = $(this).data('courier') || '정보 없음';
             var trackingNo = $(this).data('trackingnumber') || '정보 없음';
-            var status = $(this).data('status'); // 예: READY, SHIPPING, COMPLETE 등
+            var status = $(this).data('status'); // 백엔드 Enum 문자열 (READY, SHIPPING, COMPLETE 등) 그대로 매핑되도록 처리
 
-            // 2. 모달 텍스트 변경
             $('#modalCourier').text(courier);
             $('#modalTrackingNo').text(trackingNo);
 
-            // 3. 타임라인 불 켜기 (초기화 후 조건에 맞춰 current 클래스 부여)
+            // 타임라인 하이라이팅 초기화
             $('.tracking-item').removeClass('current');
-            // 백엔드 DeliveryStatus Enum 문자열이나 한글 텍스트에 맞게 조건을 분기합니다.
-            if (status === '상품준비중') {
+
+            // 늘어난 Enum 규격 문자열에 맞춰 매핑 조건을 보정합니다.
+            if (status === '상품준비중' || status === 'READY') {
                 $('[data-step="READY"]').addClass('current');
-            } else if (status === '배송중') {
+            } else if (status === '배송중' || status === 'SHIPPING') {
                 $('[data-step="SHIPPING"]').addClass('current');
-            } else if (status === '배송완료') {
+            } else if (status === '배송완료' || status === 'COMPLETE') {
                 $('[data-step="COMPLETE"]').addClass('current');
             }
         });
 
-
-
-
         // 주문 취소 신청 버튼 클릭 시 모달 데이터 세팅
         $('.btn-cancel-order').on('click', function() {
-            // 1. 버튼에 바인딩된 데이터 가져오기
             var orderNo = $(this).data('order-no');
             var itemName = $(this).data('item-name');
             var optionName = $(this).data('option-name') || '옵션 없음';
@@ -609,58 +593,34 @@
             var price = $(this).data('price');
             var memberNo = $(this).data('member-no');
 
-            // data-member-no
-
-            // 2. 모달 내 텍스트 데이터 바인딩
             $('#cancelModalItemName').text(itemName);
             $('#cancelModalOptionName').text(optionName);
             $('#cancelModalOrderCount').text(count);
 
-            // 3. Form submit용 hidden input 데이터 바인딩
             $('#cancelFormOrderNo').val(orderNo);
             $('#cancelFormOrderItemNo').val(orderItemNo);
             $('#cancelFormPrice').val(price);
             $('#cancelFormMemberNo').val(memberNo);
             $('#cancelFormCount').val(count);
 
-            // 4. 모달 열릴 때 폼 초기화
             $('#cancelReasonCode').val('');
             $('#cancelReasonDetail').val('');
         });
 
-        // 폼 제출(Submit) 시 validation 및 alert 처리 예시
-        $('#orderCancelForm').on('submit', function(e) {
-            var reason = $('#cancelReasonCode').val();
-            if(!reason) {
-                alert('사유를 선택해주세요.');
-                e.preventDefault();
-                return false;
-            }
-
-            var confirmMsg = $('input[name="requestType"]:checked').val() === 'EXCHANGE' ? '교환' : '반품';
-            if(!confirm(confirmMsg + ' 신청을 진행하시겠습니까?')) {
-                e.preventDefault();
-            }
-        });
-
-
         // 반품 신청 버튼 클릭 시 모달 데이터 세팅
         $('.btn-return-refund').on('click', function() {
-            // 1. 버튼에 바인딩된 데이터 가져오기
             var orderNo = $(this).data('order-no');
             var itemName = $(this).data('item-name');
             var optionName = $(this).data('option-name') || '옵션 없음';
             var count = $(this).data('count');
             var orderItemNo = $(this).data('order-item-no');
             var price = $(this).data('price');
-            var memberNo = $(this).data('member-no')
+            var memberNo = $(this).data('member-no');
 
-            // 2. 모달 내 텍스트 데이터 바인딩
             $('#modalItemName').text(itemName);
             $('#modalOptionName').text(optionName);
             $('#modalOrderCount').text(count);
 
-            // 3. Form submit용 hidden input 데이터 바인딩
             $('#formOrderNo').val(orderNo);
             $('#formItemName').val(itemName);
             $('#formOrderItemNo').val(orderItemNo);
@@ -668,28 +628,34 @@
             $('#formPrice').val(price);
             $('#formCount').val(count);
 
-
-            // 4. 모달 열릴 때 폼 초기화
             $('#reasonCode').val('');
             $('#reasonDetail').val('');
         });
 
-        // 폼 제출(Submit) 시 validation 및 alert 처리 예시
-        $('#returnRequestForm').on('submit', function (e) {
-            var reason = $('#reasonCode').val();
-            if (!reason) {
-                alert('사유를 선택해주세요.');
+        // validation 체크
+        $('#orderCancelForm').on('submit', function(e) {
+            if(!$('#cancelReasonCode').val()) {
+                alert('취소 사유를 선택해주세요.');
                 e.preventDefault();
                 return false;
             }
-
-            var confirmMsg = $('input[name="requestType"]:checked').val() === 'EXCHANGE' ? '교환' : '반품';
-            if (!confirm(confirmMsg + ' 신청을 진행하시겠습니까?')) {
+            if(!confirm('주문 취소 신청을 진행하시겠습니까?')) {
                 e.preventDefault();
             }
         });
 
+        $('#returnRequestForm').on('submit', function (e) {
+            if (!$('#reasonCode').val()) {
+                alert('반품 사유를 선택해주세요.');
+                e.preventDefault();
+                return false;
+            }
+            if (!confirm('반품 신청을 진행하시겠습니까?')) {
+                e.preventDefault();
+            }
+        });
     });
 </script>
+
 </body>
 </html>

@@ -2,16 +2,16 @@ package myshop.shop.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import myshop.shop.controller.HomeController;
 import myshop.shop.controller.HomeController.CheckDirectOrderDto;
 import myshop.shop.dto.order.*;
-import myshop.shop.entity.OrderItem;
+import myshop.shop.entity.orderItem.OrderItem;
 import myshop.shop.entity.delivery.Delivery;
 import myshop.shop.entity.delivery.DeliveryStatus;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.member.Member;
 import myshop.shop.entity.order.Order;
 import myshop.shop.entity.order.OrderStatus;
+import myshop.shop.entity.orderItem.OrderItemStatus;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.repository.delivery.DeliveryRepository;
 import myshop.shop.repository.member.MemberRepository;
@@ -71,7 +71,8 @@ public class OrderService {
                     addOrderItemDto.getTotalPrice(),
                     addOrderItemDto.getImageUrl(),
                     addOrderItemDto.getItemName(),
-                    addOrderItemDto.getOptionName());
+                    addOrderItemDto.getOptionName(),
+                    OrderItemStatus.상품준비중);
             orderItem.updateOrder(savedOrder);
             orderItemRepository.save(orderItem);
         }

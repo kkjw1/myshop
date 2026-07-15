@@ -65,11 +65,11 @@ public class CancelReturnController {
     @GetMapping("/myPage/cancel_return_list")
     public String cancelReturnListForm(HttpServletRequest request, Model model) {
         LoginCheckMemberDto loginCheckMemberDto = new LoginCheckMemberDto().loginCheck2(request, model);
-        // todo: 주문 취소 반품 내역들 출력하는 기능
 
         List<ManageCancelReturnDto> cancelReturnList = returnRequestService.getCancelReturnList(loginCheckMemberDto.getNo());
         log.info("cancelReturnList={}", cancelReturnList);
 
+        model.addAttribute("cancelReturnList", cancelReturnList);
         return "member/mypage/cancel_return_list";
     }
 
