@@ -77,6 +77,13 @@ public class SellerController {
         return "seller/home";
     }
 
+    /**
+     * 고객 문의 관리 폼
+     */
+    @GetMapping("/seller/inquiry_manage")
+    public String requestInquiryForm() {
+        return "seller/inquiry/inquiry_manage";
+    }
 
 
     @GetMapping("/seller/inquiry_reply")

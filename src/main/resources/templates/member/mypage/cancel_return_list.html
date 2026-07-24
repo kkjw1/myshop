@@ -329,7 +329,7 @@
                                 취소 상세
                             </button>
 
-                            <button th:if="${dto.returnReasonCode != null}"
+                            <button
                                     class="btn btn-sm btn-outline-secondary btn-block btn-inquiry-detail"
                                     data-toggle="modal"
                                     data-target="#inquiryModal"
@@ -383,8 +383,8 @@
                         <label for="inquiryType" class="font-weight-bold small text-dark">문의 유형 <span class="required-mark">*</span></label>
                         <select class="form-control" id="inquiryType" name="inquiryType" required style="height: 45px; font-size: 0.9rem; border-radius: 6px;">
                             <option value="" disabled selected>문의 유형을 선택해주세요</option>
-                            <option value="REFUND">환불/결제 문의</option>
-                            <option value="RETURN">반품 회수 문의</option>
+                            <option value="REFUND">상품 반품 문의</option>
+                            <option value="RETURN">결제 취소 문의</option>
                             <option value="PRODUCT">상품/기타 문의</option>
                         </select>
                     </div>
