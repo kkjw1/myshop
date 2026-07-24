@@ -37,6 +37,8 @@ public class ReturnRequest extends BaseDateEntity {
     @Enumerated(EnumType.STRING)
     private ReturnRequestStatus returnRequestStatus;
 
+    private String decisionReason;
+
     public ReturnRequest() {
     }
 
@@ -47,6 +49,14 @@ public class ReturnRequest extends BaseDateEntity {
         this.returnReasonCode = returnReasonCode;
         this.reasonDetail = reasonDetail;
         this.price = price;
+        this.returnRequestStatus = returnRequestStatus;
+    }
+
+    public void updateDecisionReason(String decisionReason) {
+        this.decisionReason = decisionReason;
+    }
+
+    public void updateReturnRequestStatus(ReturnRequestStatus returnRequestStatus) {
         this.returnRequestStatus = returnRequestStatus;
     }
 }

@@ -38,7 +38,7 @@ public class CancelRequest extends BaseDateEntity {
     @Enumerated(EnumType.STRING)
     private CancelRequestStatus cancelRequestStatus;
 
-
+    private String decisionReason;
 
 
 
@@ -52,6 +52,14 @@ public class CancelRequest extends BaseDateEntity {
         this.cancelReasonCode = cancelReasonCode;
         this.reasonDetail = reasonDetail;
         this.price = price;
+        this.cancelRequestStatus = cancelRequestStatus;
+    }
+
+    public void updateDecisionReason(String decisionReason) {
+        this.decisionReason = decisionReason;
+    }
+
+    public void updateCancelRequestStatus(CancelRequestStatus cancelRequestStatus) {
         this.cancelRequestStatus = cancelRequestStatus;
     }
 }

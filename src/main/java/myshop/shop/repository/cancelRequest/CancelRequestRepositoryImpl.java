@@ -3,11 +3,15 @@ package myshop.shop.repository.cancelRequest;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import myshop.shop.dto.cancelRequest.ManageCancelReturnDto;
+import myshop.shop.dto.cancelRequest.SellerManageRequestDto;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static myshop.shop.entity.member.QMember.member;
 import static myshop.shop.entity.orderItem.QOrderItem.orderItem;
 import static myshop.shop.entity.cancelRequest.QCancelRequest.cancelRequest;
 import static myshop.shop.entity.item.QItem.item;
@@ -71,4 +75,51 @@ public class CancelRequestRepositoryImpl implements  CancelRequestRepositoryCust
         return manageCancelReturnDtoList;
     }
 
+    @Override
+    public List<SellerManageRequestDto> findSellerManageRequest(Long sellerNo) {
+
+        List<SellerManageRequestDto> sellerManageRequestDtoList = new ArrayList<>();
+
+        sellerManageRequestDtoList.addAll(queryFactory
+                .select(Projections.fields(SellerManageRequestDto.class,
+                        cancelRequest.no.as("no"),
+                        member.no.as("memberNo"),
+                        member.name.as("memberName"),
+                        orderItem.itemName,
+                        orderItem.optionName,
+                        cancelRequest.cancelReasonCode,
+                        cancelRequest.reasonDetail,
+                        cancelRequest.price,
+                        cancelRequest.cancelRequestStatus,
+                        cancelRequest.decisionReason
+                ))
+                .from(cancelRequest)
+                .leftJoin(cancelRequest.member, member)
+                .leftJoin(cancelRequest.orderItem, orderItem)
+                .leftJoin(orderItem.item, item)
+                .where(item.seller.no.eq(sellerNo))
+                .fetch());
+
+        sellerManageRequestDtoList.addAll(queryFactory
+                .select(Projections.fields(SellerManageRequestDto.class,
+                        returnRequest.no.as("no"),
+                        member.no.as("memberNo"),
+                        member.name.as("memberName"),
+                        orderItem.itemName,
+                        orderItem.optionName,
+                        returnRequest.returnReasonCode,
+                        returnRequest.reasonDetail,
+                        returnRequest.price,
+                        returnRequest.returnRequestStatus,
+                        returnRequest.decisionReason
+                ))
+                .from(returnRequest)
+                .leftJoin(returnRequest.member, member)
+                .leftJoin(returnRequest.orderItem, orderItem)
+                .leftJoin(orderItem.item, item)
+                .where(item.seller.no.eq(sellerNo))
+                .fetch());
+
+        return sellerManageRequestDtoList;
+    }
 }

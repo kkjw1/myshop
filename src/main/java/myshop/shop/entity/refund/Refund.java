@@ -26,11 +26,22 @@ public class Refund extends BaseDateEntity {
     @JoinColumn(name = "RETURN_REQUEST_NO")
     private ReturnRequest returnRequest;
 
-    private BigDecimal totalPrice;          //사유코드에 따라서 배송비 추가유무 결정
+    private BigDecimal deliveryFee;
+    private BigDecimal totalPrice;
+    private BigDecimal refundPrice;
 
     @Enumerated(EnumType.STRING)
     private RefundStatus refundStatus;
 
     public Refund() {
+    }
+
+    public Refund(CancelRequest cancelRequest, ReturnRequest returnRequest, BigDecimal deliveryFee, BigDecimal totalPrice, BigDecimal refundPrice, RefundStatus refundStatus) {
+        this.cancelRequest = cancelRequest;
+        this.returnRequest = returnRequest;
+        this.deliveryFee = deliveryFee;
+        this.totalPrice = totalPrice;
+        this.refundPrice = refundPrice;
+        this.refundStatus = refundStatus;
     }
 }
