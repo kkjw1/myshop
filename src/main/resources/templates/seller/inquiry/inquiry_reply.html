@@ -36,7 +36,7 @@
     <div id="page-content-wrapper" class="flex-grow-1 p-4">
         <header class="mb-4 border-bottom pb-3 d-flex justify-content-between align-items-center">
             <h1 class="h3 mb-0 text-dark"><i class="fas fa-reply me-2"></i> 문의 답변 작성</h1>
-            <button class="btn btn-outline-secondary" onclick="window.history.back();" th:onclick="|location.href='@{/inquiry_manage}'|"><i class="fas fa-list me-1"></i> 목록으로</button>
+            <button class="btn btn-outline-secondary" onclick="window.history.back();" th:onclick="|location.href='@{/request_inquiry_manage}'|"><i class="fas fa-list me-1"></i> 목록으로</button>
         </header>
 
         <div class="card shadow-sm mb-4">
@@ -87,7 +87,7 @@
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                         <button type="button" class="btn btn-outline-secondary"><i class="fas fa-save me-1"></i> 임시 저장</button>
-                        <button type="submit" class="btn btn-warning btn-lg"><i class="fas fa-check-circle me-1" th:onclick="|location.href='@{/inquiry_manage}'|"></i> 답변 등록 및 처리 완료</button>
+                        <button type="submit" class="btn btn-warning btn-lg"><i class="fas fa-check-circle me-1" th:onclick="|location.href='@{/request_inquiry_manage}'|"></i> 답변 등록 및 처리 완료</button>
                     </div>
                 </form>
             </div>

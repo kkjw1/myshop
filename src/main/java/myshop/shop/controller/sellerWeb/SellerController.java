@@ -78,12 +78,6 @@ public class SellerController {
     }
 
 
-    @GetMapping("/seller/inquiry_manage")
-    public String inquiry_manage() {
-        // todo: 고객 문의(취소, 반품 요청) 기능 추가하기
-        return "seller/inquiry/inquiry_manage";
-    }
-
 
     @GetMapping("/seller/inquiry_reply")
     public String inquiry_reply() {
