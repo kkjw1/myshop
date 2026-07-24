@@ -57,10 +57,10 @@
         <div class="sidebar d-none d-md-block" style="width: 250px;">
             <h3 class="text-center mb-4 text-white">📦 판매자 센터</h3>
             <nav class="nav flex-column">
-                <a class="nav-link" href="home.html" th:href="@{/seller}"><i class="fas fa-tachometer-alt me-2"></i> 대시보드</a>
+                <a class="nav-link" href="../home/home.html" th:href="@{/seller}"><i class="fas fa-tachometer-alt me-2"></i> 대시보드</a>
                 <a class="nav-link" href="item/item_manage.html" th:href="@{/seller/item_manage}"><i class="fas fa-box me-2"></i> 상품 관리</a>
                 <a class="nav-link" href="delivery/order_delivery.html" th:href="@{/seller/order_delivery}"><i class="fas fa-shopping-cart me-2"></i> 주문/배송</a>
-                <a class="nav-link active-menu" href="claim/order_claim.html" th:href="@{/seller/order_claim}"><i class="fas fa-undo-alt me-2"></i> 취소/반품 관리</a>
+                <a class="nav-link active-menu" href="request/request_manage.html" th:href="@{/seller/request_manage}"><i class="fas fa-undo-alt me-2"></i> 취소/반품 관리</a>
                 <a class="nav-link" href="inquiry/inquiry_manage.html" th:href="@{/seller/inquiry_manage}"><i class="fas fa-comment-dots me-2"></i> 고객 문의</a>
                 <a class="nav-link" href="../home/home.html" th:href="@{/}"><i class="fas fa-sign-out-alt me-2"></i> 로그아웃</a>
             </nav>
@@ -109,207 +109,329 @@
             </div>
         </div>
 
-        <!-- 클레임 구분 탭 (전체/취소/반품) -->
-        <ul class="nav nav-tabs mb-3" id="claimTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#claim-list-pane" type="button">전체 (5)</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="cancel-tab" data-bs-toggle="tab" data-bs-target="#claim-list-pane" type="button">취소 요청 (3)</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="return-tab" data-bs-toggle="tab" data-bs-target="#claim-list-pane" type="button">반품 요청 (2)</button>
-            </li>
-        </ul>
+        <div class="container my-4">
+            <h3 class="fw-bold mb-4"><i class="fas fa-boxes me-2"></i>취소/반품 관리</h3>
 
-        <!-- 검색 필터 -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <form class="row g-3 align-items-center">
-                    <div class="col-md-3">
-                        <input type="date" class="form-control" title="시작일">
-                    </div>
-                    <div class="col-md-3">
-                        <input type="date" class="form-control" title="종료일">
-                    </div>
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" placeholder="주문번호, 구매자명, 상품명 검색">
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-dark w-100"><i class="fas fa-search me-1"></i> 검색</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+            <!-- 📌 상단 필터 탭 -->
+            <ul class="nav nav-tabs nav-fill mb-3" id="claimTab">
+                <li class="nav-item">
+                    <button class="nav-link active fw-bold" data-filter="unprocessed" type="button">
+                        미처리 건 <span class="badge bg-danger ms-1" id="count-unprocessed">0</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-bold" data-filter="cancel" type="button">
+                        취소 요청 <span class="badge bg-secondary ms-1" id="count-cancel">0</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-bold" data-filter="return" type="button">
+                        반품 요청 <span class="badge bg-secondary ms-1" id="count-return">0</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-bold" data-filter="processed" type="button">
+                        처리 완료 (승인/거절) <span class="badge bg-secondary ms-1" id="count-processed">0</span>
+                    </button>
+                </li>
+            </ul>
 
-        <!-- 목록 테이블 -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                <h5 class="mb-0">취소 및 반품 목록</h5>
-                <div>
-                    <button class="btn btn-sm btn-outline-success me-1"><i class="fas fa-check me-1"></i> 선택 건 승인</button>
-                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-times me-1"></i> 선택 건 거절</button>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                        <tr>
-                            <th style="width: 40px;"><input type="checkbox" class="form-check-input"></th>
-                            <th>구분</th>
-                            <th>주문번호 / 신청일</th>
-                            <th>상품명 (수량)</th>
-                            <th>구매자</th>
-                            <th>사유</th>
-                            <th>환불 예정금액</th>
-                            <th>상태</th>
-                            <th style="width: 120px;" class="text-center">관리</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <!-- 취소 요청 건 -->
-                        <tr>
-                            <td><input type="checkbox" class="form-check-input"></td>
-                            <td><span class="badge bg-danger">취소요청</span></td>
-                            <td>
-                                <div class="fw-bold">20260724-0091</div>
-                                <div class="small text-muted">2026-07-24 10:15</div>
-                            </td>
-                            <td>오버핏 리넨 셔츠 (1개)</td>
-                            <td>홍길동</td>
-                            <td>
-                                <div class="claim-reason-box">
-                                    <strong class="text-dark">단순변심:</strong> 배송 출발 전에 다른 색상으로 재주문하려고 합니다.
-                                </div>
-                            </td>
-                            <td class="fw-bold text-dark">39,000원</td>
-                            <td><span class="badge bg-secondary">승인대기</span></td>
-                            <td class="text-center">
-                                <button class="btn btn-sm btn-primary mb-1 btn-claim-action"
-                                        data-bs-toggle="modal" data-bs-target="#claimModal"
-                                        data-type="취소" data-id="20260724-0091" data-name="홍길동" data-price="39,000원"
-                                        data-reason="[단순변심] 다른 색상 재주문 예정">
-                                    처리하기
-                                </button>
-                            </td>
-                        </tr>
+            <!-- 📌 데이터 목록 테이블 (HTML 원본 구조 유지) -->
+            <div class="table-responsive bg-white rounded shadow-sm border p-3">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>구분</th>
+                        <th>주문번호</th>
+                        <th>구매자</th>
+                        <th>신청 사유</th>
+                        <th>결제금액</th>
+                        <th>처리 상태</th>
+                        <th class="text-center">관리</th>
+                    </tr>
+                    </thead>
+                    <tbody id="claimTableBody">
+                    <!-- 1번 행: 취소 / 미처리 -->
+                    <tr class="claim-row" data-status="WAITING" data-type="취소">
+                        <td><span class="badge bg-danger">취소</span></td>
+                        <td class="fw-bold">20260724-0091</td>
+                        <td>홍길동</td>
+                        <td class="text-truncate" style="max-width: 200px;">[단순변심] 다른 색상 재주문 예정</td>
+                        <td>39,000원</td>
+                        <td><span class="badge bg-warning text-dark">승인 대기</span></td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-primary btn-claim-action"
+                                    data-bs-toggle="modal" data-bs-target="#claimModal"
+                                    data-type="취소" data-id="20260724-0091" data-name="홍길동"
+                                    data-original-price="39000" data-shipping-fee="0"
+                                    data-reason="[단순변심] 다른 색상 재주문 예정">
+                                처리하기
+                            </button>
+                        </td>
+                    </tr>
 
-                        <!-- 반품 요청 건 -->
-                        <tr>
-                            <td><input type="checkbox" class="form-check-input"></td>
-                            <td><span class="badge bg-warning text-dark">반품요청</span></td>
-                            <td>
-                                <div class="fw-bold">20260720-0042</div>
-                                <div class="small text-muted">2026-07-23 16:40</div>
-                            </td>
-                            <td>프리미엄 와이드 팬츠 (1개)</td>
-                            <td>김철수</td>
-                            <td>
-                                <div class="claim-reason-box">
-                                    <strong class="text-danger">상품불량:</strong> 단추 부분이 실밥이 풀려서 빠져있습니다.
-                                </div>
-                            </td>
-                            <td class="fw-bold text-dark">54,000원<br><small class="text-muted fs-7">(배송비 차감 0원)</small></td>
-                            <td><span class="badge bg-warning text-dark">수거 중</span></td>
-                            <td class="text-center">
-                                <button class="btn btn-sm btn-primary mb-1 btn-claim-action"
-                                        data-bs-toggle="modal" data-bs-target="#claimModal"
-                                        data-type="반품" data-id="20260720-0042" data-name="김철수" data-price="54,000원"
-                                        data-reason="[상품불량] 단추 부분 실밥 불량">
-                                    처리하기
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card-footer bg-white d-flex justify-content-center">
-                <nav>
-                    <ul class="pagination mb-0">
-                        <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">다음</a></li>
-                    </ul>
-                </nav>
+                    <!-- 2번 행: 반품 / 미처리 -->
+                    <tr class="claim-row" data-status="WAITING" data-type="반품">
+                        <td><span class="badge bg-primary">반품</span></td>
+                        <td class="fw-bold">20260720-0042</td>
+                        <td>김철수</td>
+                        <td class="text-truncate" style="max-width: 200px;">[단순변심] 사이즈가 작음</td>
+                        <td>57,000원</td>
+                        <td><span class="badge bg-warning text-dark">승인 대기</span></td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-primary btn-claim-action"
+                                    data-bs-toggle="modal" data-bs-target="#claimModal"
+                                    data-type="반품" data-id="20260720-0042" data-name="김철수"
+                                    data-original-price="57000" data-shipping-fee="3000"
+                                    data-reason="[단순변심] 사이즈가 작음">
+                                처리하기
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- 3번 행: 취소 / 처리완료(승인) -->
+                    <tr class="claim-row" data-status="APPROVED" data-type="취소">
+                        <td><span class="badge bg-danger">취소</span></td>
+                        <td class="fw-bold">20260715-0088</td>
+                        <td>박민수</td>
+                        <td class="text-truncate" style="max-width: 200px;">[단순변심] 필요 없어짐</td>
+                        <td>24,000원</td>
+                        <td><span class="badge bg-success">승인 완료</span></td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" disabled>완료됨</button>
+                        </td>
+                    </tr>
+
+                    <!-- 4번 행: 반품 / 처리완료(거절) -->
+                    <tr class="claim-row" data-status="REJECTED" data-type="반품">
+                        <td><span class="badge bg-primary">반품</span></td>
+                        <td class="fw-bold">20260710-0033</td>
+                        <td>최지은</td>
+                        <td class="text-truncate" style="max-width: 200px;">[단순변심] 디자인 마음에 안듦</td>
+                        <td>120,000원</td>
+                        <td><span class="badge bg-danger">요청 거절</span></td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" disabled>완료됨</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
     </div>
 </div>
 
-<!-- 승인 및 거절 처리 모달 -->
+<!-- 취소/반품 상세 및 처리 모달 -->
 <div class="modal fade" id="claimModal" tabindex="-1" aria-labelledby="claimModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-dark text-white">
-                <h5 class="modal-title" id="claimModalLabel"><i class="fas fa-tasks me-2"></i>취소/반품 상세 처리</h5>
+                <h5 class="modal-title" id="claimModalLabel"><i class="fas fa-calculator me-2"></i>취소/반품 상세 및 정산 처리</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="claimProcessForm" th:action="@{/seller/claim/process}" method="post">
+            <form id="claimProcessForm" action="/seller/claim/process" method="post">
                 <div class="modal-body p-4">
                     <input type="hidden" id="modalOrderId" name="orderId">
 
+                    <!-- 주문 정보 -->
                     <div class="mb-3">
                         <label class="form-label text-muted small fw-bold">주문 정보</label>
                         <div class="p-3 bg-light rounded">
-                            <div><strong>주문번호:</strong> <span id="modalOrderIdText">-</span></div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span><strong>주문번호:</strong> <span id="modalOrderIdText">-</span></span>
+                                <span id="modalClaimType" class="badge bg-danger">-</span>
+                            </div>
                             <div><strong>구매자:</strong> <span id="modalCustomerName">-</span></div>
-                            <div><strong>신청 유형:</strong> <span id="modalClaimType" class="badge bg-primary">-</span></div>
                         </div>
                     </div>
 
+                    <!-- 고객 신청 사유 -->
                     <div class="mb-3">
-                        <label class="form-label text-muted small fw-bold">고객 사유</label>
-                        <div class="p-3 bg-light rounded text-danger fw-bold" id="modalClaimReason">-</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label text-muted small fw-bold">환불 예정 금액</label>
-                        <div class="h4 text-dark mb-0" id="modalRefundPrice">0원</div>
+                        <label class="form-label text-muted small fw-bold">고객 신청 사유</label>
+                        <div class="p-3 bg-light rounded text-dark" id="modalClaimReason">-</div>
                     </div>
 
                     <hr>
 
+                    <!-- ⚖️ 판매자 판단 : 귀책 사유 선택 (반품 시에만 표시됨) -->
+                    <div class="mb-3" id="faultSelectGroup">
+                        <label class="form-label fw-bold text-dark">
+                            <i class="fas fa-balance-scale text-primary me-1"></i>귀책 사유 선택 (배송비 부담)
+                        </label>
+                        <div class="p-3 border rounded bg-light">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="faultType" id="faultBuyer" value="BUYER" checked>
+                                <label class="form-check-label fw-bold text-dark" for="faultBuyer">
+                                    구매자 귀책 <small class="text-muted fw-normal">(단순변심 등 - 배송비 고객 차감)</small>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="faultType" id="faultSeller" value="SELLER">
+                                <label class="form-check-label fw-bold text-danger" for="faultSeller">
+                                    판매자 귀책 <small class="text-muted fw-normal">(상품 오배송/불량 - 배송비 판매자 부담, 전액 환불)</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 💰 환불 정산 내역 -->
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">환불 정산 내역</label>
+                        <div class="p-3 border rounded bg-white">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-secondary">총 결제금액</span>
+                                <span class="fw-bold text-dark" id="modalOriginalPrice">0원</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2 text-danger">
+                                <span><i class="fas fa-minus-circle me-1"></i>차감 배송비</span>
+                                <span class="fw-bold" id="modalShippingFee">- 0원</span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between align-items-center pt-1">
+                                <span class="fw-bold text-dark fs-6">최종 환불 금액</span>
+                                <span class="fw-bold text-primary fs-4" id="modalRefundPrice">0원</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 거절 작성 필드 -->
                     <div class="mb-3">
-                        <label for="rejectReason" class="form-label fw-bold">거절 사유 <small class="text-muted">(거절 처리 시 입력 필수)</small></label>
-                        <textarea class="form-control" id="rejectReason" name="rejectReason" rows="3" placeholder="승인 거절 시 구매자에게 전달될 사유를 입력해 주세요. (예: 이미 상품이 택배사에 전달되어 취소가 불가능합니다.)"></textarea>
+                        <label for="rejectReason" class="form-label fw-bold small">거절/보류 사유 <span class="text-muted">(거절 시에만 작성)</span></label>
+                        <textarea class="form-control" id="rejectReason" name="rejectReason" rows="2" placeholder="거절 시 고객에게 안내될 사유를 입력하세요."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer bg-light">
                     <button type="submit" name="action" value="reject" class="btn btn-outline-danger me-auto">요청 거절</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                    <button type="submit" name="action" value="approve" class="btn btn-success"><i class="fas fa-check me-1"></i>승인 및 환불</button>
+                    <button type="submit" name="action" value="approve" class="btn btn-success"><i class="fas fa-check me-1"></i>환불 승인</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const claimModal = document.getElementById('claimModal');
+        let currentOriginalPrice = 0;
+        let currentShippingFee = 0;
 
-        // 모달 데이터 바인딩
-        claimModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
+        const formatWon = (num) => num.toLocaleString('ko-KR') + '원';
 
-            const type = button.getAttribute('data-type');
-            const id = button.getAttribute('data-id');
-            const name = button.getAttribute('data-name');
-            const price = button.getAttribute('data-price');
-            const reason = button.getAttribute('data-reason');
+        // 1️⃣ 탭 필터링 및 카운트 업데이트 함수
+        function filterRows(filterType) {
+            const rows = document.querySelectorAll('.claim-row');
 
-            document.getElementById('modalOrderId').value = id;
-            document.getElementById('modalOrderIdText').textContent = id;
-            document.getElementById('modalCustomerName').textContent = name;
-            document.getElementById('modalClaimType').textContent = type + '요청';
-            document.getElementById('modalRefundPrice').textContent = price;
-            document.getElementById('modalClaimReason').textContent = reason;
+            let countUnprocessed = 0;
+            let countCancel = 0;
+            let countReturn = 0;
+            let countProcessed = 0;
+
+            rows.forEach(row => {
+                const status = row.getAttribute('data-status'); // WAITING, APPROVED, REJECTED
+                const type = row.getAttribute('data-type');     // 취소, 반품
+
+                // 카운트 계산
+                if (status === 'WAITING') {
+                    countUnprocessed++;
+                    if (type === '취소') countCancel++;
+                    if (type === '반품') countReturn++;
+                } else if (status === 'APPROVED' || status === 'REJECTED') {
+                    countProcessed++;
+                }
+
+                // 노출 여부 결정 (display 속성 제어)
+                let show = false;
+                if (filterType === 'unprocessed' && status === 'WAITING') show = true;
+                else if (filterType === 'cancel' && status === 'WAITING' && type === '취소') show = true;
+                else if (filterType === 'return' && status === 'WAITING' && type === '반품') show = true;
+                else if (filterType === 'processed' && (status === 'APPROVED' || status === 'REJECTED')) show = true;
+
+                row.style.display = show ? '' : 'none';
+            });
+
+            // 뱃지 숫자 갱신
+            document.getElementById('count-unprocessed').textContent = countUnprocessed;
+            document.getElementById('count-cancel').textContent = countCancel;
+            document.getElementById('count-return').textContent = countReturn;
+            document.getElementById('count-processed').textContent = countProcessed;
+        }
+
+        // 2️⃣ 탭 클릭 이벤트 연결
+        document.querySelectorAll('#claimTab button').forEach(button => {
+            button.addEventListener('click', function () {
+                // Active 탭 클래스 변경
+                document.querySelectorAll('#claimTab button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const filter = this.getAttribute('data-filter');
+                filterRows(filter);
+            });
         });
+
+        // 3️⃣ 모달 오픈 시 클릭된 버튼 데이터 읽기
+        const claimModal = document.getElementById('claimModal');
+        if (claimModal) {
+            claimModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+
+                const type = button.getAttribute('data-type');
+                const id = button.getAttribute('data-id');
+                const name = button.getAttribute('data-name');
+                const reason = button.getAttribute('data-reason');
+
+                currentOriginalPrice = parseInt(button.getAttribute('data-original-price') || 0);
+                currentShippingFee = parseInt(button.getAttribute('data-shipping-fee') || 0);
+
+                // 모달 정보 채우기
+                document.getElementById('modalOrderId').value = id;
+                document.getElementById('modalOrderIdText').textContent = id;
+                document.getElementById('modalCustomerName').textContent = name;
+                document.getElementById('modalClaimType').textContent = type + '요청';
+                document.getElementById('modalClaimReason').textContent = reason;
+                document.getElementById('modalOriginalPrice').textContent = formatWon(currentOriginalPrice);
+
+                document.getElementById('faultBuyer').checked = true;
+
+                const faultSelectGroup = document.getElementById('faultSelectGroup');
+                if (type === '취소') {
+                    faultSelectGroup.style.display = 'none';
+                } else {
+                    faultSelectGroup.style.display = 'block';
+                }
+
+                calculateRefund();
+            });
+
+            // 라디오 버튼 변경 이벤트
+            document.getElementById('faultBuyer').addEventListener('change', calculateRefund);
+            document.getElementById('faultSeller').addEventListener('change', calculateRefund);
+        }
+
+        // 4️⃣ 환불 금액 계산
+        function calculateRefund() {
+            const isSellerFault = document.getElementById('faultSeller').checked;
+            const modalClaimType = document.getElementById('modalClaimType').textContent;
+
+            let finalShippingFee = currentShippingFee;
+
+            // 취소 요청이거나 판매자 귀책일 때 배송비 0원 처리
+            if (modalClaimType === '취소요청' || isSellerFault) {
+                finalShippingFee = 0;
+            }
+
+            const finalRefundPrice = currentOriginalPrice - finalShippingFee;
+
+            document.getElementById('modalShippingFee').textContent = '- ' + formatWon(finalShippingFee);
+            document.getElementById('modalRefundPrice').textContent = formatWon(finalRefundPrice);
+        }
+
+        // 초기 화면 실행 (미처리 건 탭 기준 필터)
+        filterRows('unprocessed');
     });
 </script>
 </body>
