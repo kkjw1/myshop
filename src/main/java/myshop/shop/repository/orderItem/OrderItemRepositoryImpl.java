@@ -80,6 +80,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepositoryCustom {
 
             List<ManageOrderItemDto> manageOrderItemDtoList = queryFactory
                     .select(Projections.fields(ManageOrderItemDto.class,
+                            item.no.as("itemNo"),
                             orderItem.no.as("orderItemNo"),
                             orderItem.orderItemStatus,
                             delivery.deliveryStatus,
@@ -93,6 +94,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepositoryCustom {
                     ))
                     .from(orderItem)
                     .leftJoin(orderItem.delivery, delivery)
+                    .leftJoin(orderItem.item, item)
                     .where(orderItem.order.no.eq(orderNo))
                     .fetch();
 

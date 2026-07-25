@@ -9,8 +9,9 @@ import myshop.shop.entity.orderItem.OrderItemStatus;
 import java.math.BigDecimal;
 
 @Getter @Setter
-@ToString(of = {"orderItemNo", "orderItemStatus", "deliveryStatus", "courier", "trackingNumber", "imageUrl", "itemName", "optionName", "totalPrice", "count"})
+@ToString(of = {"orderItemNo", "itemNo", "orderItemStatus", "deliveryStatus", "courier", "trackingNumber", "imageUrl", "itemName", "optionName", "totalPrice", "count"})
 public class ManageOrderItemDto {
+    private Long itemNo;
     private Long orderItemNo;
     private OrderItemStatus orderItemStatus;
     private DeliveryStatus deliveryStatus;
