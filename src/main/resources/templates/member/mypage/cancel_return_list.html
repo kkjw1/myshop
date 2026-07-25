@@ -325,7 +325,7 @@
                                     th:data-reason-code="${dto.cancelReasonCode}"
                                     th:data-reason-detail="${dto.reasonDetail}"
                                     th:data-status="${dto.cancelRequestStatus}"
-                                    th:data-price="|${#numbers.formatDecimal(dto.price, 0, 'COMMA', 0, 'POINT')}원|">
+                                    th:data-price="${#numbers.formatDecimal(dto.price, 0, 'COMMA', 0, 'POINT') + '원'}">
                                 취소 상세
                             </button>
 
@@ -357,7 +357,7 @@
     </div>
 </div>
 
-
+<!--문의하기 모달-->
 <div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 12px; border: none; overflow: hidden;">
@@ -412,7 +412,7 @@
     </div>
 </div>
 
-
+<!--취소상세 모달-->
 <div class="modal fade" id="cancelDetailModal" tabindex="-1" aria-labelledby="cancelDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 12px; border: none; overflow: hidden;">
@@ -545,16 +545,16 @@
 
         // 취소 상세 버튼 클릭 이벤트
         $('.btn-cancel-detail').on('click', function() {
-            var orderItemNo = $(this).data('order-item-no');
-            var requestTime = $(this).data('request-time');
-            var itemName = $(this).data('item-name');
-            var optionName = $(this).data('option-name');
-            var count = $(this).data('count');
-            var imageUrl = $(this).data('image-url');
-            var reasonCode = $(this).data('reason-code');
-            var reasonDetail = $(this).data('reason-detail');
-            var status = $(this).data('status');
-            var price = $(this).data('price');
+            var orderItemNo = $(this).attr('data-order-item-no');
+            var requestTime = $(this).attr('data-request-time');
+            var itemName = $(this).attr('data-item-name');
+            var optionName = $(this).attr('data-option-name');
+            var count = $(this).attr('data-count');
+            var imageUrl = $(this).attr('data-image-url');
+            var reasonCode = $(this).attr('data-reason-code');
+            var reasonDetail = $(this).attr('data-reason-detail');
+            var status = $(this).attr('data-status');
+            var price = $(this).attr('data-price');
 
             // 1. 상품명 조합
             var fullItemName = itemName;
@@ -592,10 +592,10 @@
 
         // 문의하기 버튼 클릭 이벤트 및 글자수 세기 유지
         $('.btn-inquiry-detail').on('click', function() {
-            var orderItemNo = $(this).data('order-item-no');
-            var itemName = $(this).data('item-name');
-            var optionName = $(this).data('option-name');
-            var imageUrl = $(this).data('image-url');
+            var orderItemNo = $(this).attr('data-order-item-no');
+            var itemName = $(this).attr('data-item-name');
+            var optionName = $(this).attr('data-option-name');
+            var imageUrl = $(this).attr('data-image-url');
 
             var fullItemName = itemName;
             if(optionName && optionName.trim() !== '') { fullItemName += ' - ' + optionName; }
