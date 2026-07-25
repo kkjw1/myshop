@@ -5,11 +5,13 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import myshop.shop.dto.cancelRequest.ManageCancelReturnDto;
 import myshop.shop.dto.order.DetailOrderDto;
 import myshop.shop.dto.order.DetailOrderItemDto;
 import myshop.shop.dto.order.ManageOrderDto;
 import myshop.shop.dto.order.ManageOrderItemDto;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static myshop.shop.entity.orderItem.QOrderItem.orderItem;
@@ -97,6 +99,8 @@ public class OrderItemRepositoryImpl implements OrderItemRepositoryCustom {
             manageOrderDto.setManageOrderItemDtoList(manageOrderItemDtoList);
         }
 
+        // 내림차순
+        manageOrderDtoList.sort(Comparator.comparing(ManageOrderDto::getOrderTime).reversed());
         return manageOrderDtoList;
     }
 }
