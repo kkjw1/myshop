@@ -57,19 +57,6 @@ public class MyShopConfig implements WebMvcConfigurer {
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
 
         return template;
-/*        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
-
-        // 모든 Key와 Value를 String으로 처리
-        StringRedisSerializer stringSerializer = new StringRedisSerializer();
-
-        redisTemplate.setKeySerializer(stringSerializer);
-        redisTemplate.setValueSerializer(stringSerializer);
-        redisTemplate.setHashKeySerializer(stringSerializer);
-        redisTemplate.setHashValueSerializer(stringSerializer);
-
-        redisTemplate.afterPropertiesSet();
-        return redisTemplate;*/
     }
 
     @Bean

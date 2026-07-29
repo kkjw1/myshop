@@ -2,6 +2,7 @@ package myshop.shop.controller.memberWeb;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +13,9 @@ import myshop.shop.dto.member.*;
 import myshop.shop.entity.member.Gender;
 import myshop.shop.entity.member.Member;
 import myshop.shop.repository.member.MemberRepository;
-import myshop.shop.service.AddressService;
-import myshop.shop.service.MailService;
-import myshop.shop.service.MemberService;
-import myshop.shop.service.RedisService;
+import myshop.shop.service.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -24,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.Duration;
 import java.util.Objects;
 
 import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
@@ -36,9 +37,10 @@ public class MemberController {
 
     private final MemberRepository memberRepository;
     private final MemberService memberService;
-    private final AddressService addressService;
     private final RedisService redisService;
     private final MailService mailService;
+    private final JwtService jwtService;
+
 
     /**
      * 로그인 폼
@@ -69,7 +71,9 @@ public class MemberController {
      */
     @PostMapping("/login")
     public String login(@Validated @ModelAttribute("loginMemberDto") LoginMemberDto loginMemberDto, BindingResult bindingResult,
-                        HttpServletRequest request, @RequestParam(required = false) String redirectURL) {
+                        HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) String redirectURL) {
+        log.info("loginMemberDto={}", loginMemberDto);
+
         if (bindingResult.hasErrors()) {
             log.info("login fail");
             return "member/login";
@@ -81,19 +85,75 @@ public class MemberController {
             return "member/login";
         }
 
-        HttpSession session = request.getSession();
-        session.setAttribute(LOGIN_MEMBER, new LoginCheckMemberDto(login));
+/*        HttpSession session = request.getSession();
+        session.setAttribute(LOGIN_MEMBER, new LoginCheckMemberDto(login));*/
+
+        String accessToken = jwtService.createAccessToken(login.getNo(), login.getId());
+
+        long refreshValidity = loginMemberDto.getLoginCheck() == true
+                ? Duration.ofDays(14).toMillis()
+                : Duration.ofHours(3).toMillis();
+
+        String refreshToken = jwtService.createRefreshToken(login.getNo(), refreshValidity);
+        jwtService.save(login.getNo(), refreshToken, refreshValidity);
+
+        ResponseCookie.ResponseCookieBuilder refreshCookieBuilder = ResponseCookie
+                .from("refreshToken", refreshToken)     // 쿠키 이름, value
+                .httpOnly(true)                               // js 접근 차단, http요청만
+                .secure(false)                                // HTTPS
+                .path("/")                                    // url 경로 범위
+                .sameSite("Strict");                          // 외부사이트 요청에 쿠키 사용X <-> "Lax"
+
+        if (loginMemberDto.getLoginCheck()) {
+            refreshCookieBuilder.maxAge(Duration.ofMillis(refreshValidity));
+        }
+
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookieBuilder.build().toString());
+
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
+                .httpOnly(true).secure(false).path("/")
+                .maxAge(Duration.ofMinutes(30))
+                .sameSite("Strict")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+
+        // todo: 클로드에서 "로그인 / 재발급 API" 에서 로그인까지 함
 
         String target = (redirectURL != null && !redirectURL.isBlank()) ? redirectURL : "/";
         log.info("redirectURL={} target={}", redirectURL, target);
         return "redirect:" + target;
     }
 
-
-
     /**
-     * 로그아웃은 security Spring에서 알아서 처리("/logout", 세션 쿠키 삭제)
+     * 로그아웃
      */
+    @PostMapping("/logout")
+    public String logout(@RequestParam("memberNo") Long memberNo, HttpServletResponse response) {
+
+        // 1. Redis에서 Refresh Token 폐기 (핵심)
+        jwtService.delete(memberNo);
+
+        // 2. 클라이언트 쿠키 삭제
+        ResponseCookie deleteRefresh = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0) // 즉시 만료
+                .sameSite("Strict")
+                .build();
+
+        ResponseCookie deleteAccess = ResponseCookie.from("accessToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteRefresh.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteAccess.toString());
+        return "redirect:/";
+    }
 
 
 

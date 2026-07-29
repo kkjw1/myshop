@@ -1,4 +1,62 @@
 package myshop.shop.filter;
 
-public class JwtFilter {
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import myshop.shop.service.JwtService;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.List;
+
+@Component
+@RequiredArgsConstructor
+public class JwtFilter extends OncePerRequestFilter {
+    private final JwtService jwtService;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        String token = resolveToken(request);
+
+        if (token != null) {
+            try {
+                Claims claims = jwtService.parseClaims(token);
+                Long memberId = Long.valueOf(claims.getSubject());
+                String role = claims.get("role", String.class);
+
+                var auth = new UsernamePasswordAuthenticationToken(
+                        memberId, null, List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                );
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } catch (ExpiredJwtException e) {
+                // 401을 던지고 클라이언트가 /reissue 호출하도록 유도
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"error\":\"ACCESS_TOKEN_EXPIRED\"}");
+                return;
+            } catch (JwtException | IllegalArgumentException e) {
+                SecurityContextHolder.clearContext();
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        return null;
+    }
 }

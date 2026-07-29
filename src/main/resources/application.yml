@@ -70,3 +70,6 @@ file:
 redis:
   ttl:
     timeout: 20   #단위:초
+
+jwt:
+  secret: ${JWT_SECRET}
