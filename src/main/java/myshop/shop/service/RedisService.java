@@ -9,14 +9,17 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -27,8 +30,10 @@ public class RedisService implements MessageListener {
     private final RedisTemplate<String, Object> redisTemplate;
     private final RedisMessageListenerContainer listenerContainer;
     private final ItemService itemService;
+    private final StringRedisTemplate stringRedisTemplate;
 
     public static final String RESERVE_KEY = "Reserve:";
+    private static final String REFRESH_KEY = "Refresh:";
 
     // TTL 설정
     @PostConstruct
@@ -46,6 +51,39 @@ public class RedisService implements MessageListener {
         redisTemplate.opsForValue().set(key, value, time, TimeUnit.MINUTES);
         log.info("Redis 저장 ({}:{}), {}분 후 만료", key, value, time);
     }
+
+    /**
+     * refresh 토큰 저장
+     */
+    public void tokenSave(String memberId, String refreshToken, long validityMillis) {
+        stringRedisTemplate.opsForValue().set(
+                REFRESH_KEY + memberId,
+                refreshToken,
+                Duration.ofMillis(validityMillis)
+        );
+    }
+
+
+    /**
+     * refresh 토큰 삭제
+     */
+    public void tokenDelete(String memberId) {
+        stringRedisTemplate.delete(REFRESH_KEY + memberId);
+    }
+
+
+    /**
+     * refresh토큰 가져오기
+     */
+    public String getToken(String memberId) {
+        return stringRedisTemplate.opsForValue().get(REFRESH_KEY + memberId);
+    }
+
+
+    public Optional<String> findBymemberNo(Long memberNo) {
+        return Optional.ofNullable(stringRedisTemplate.opsForValue().get(REFRESH_KEY + memberNo));
+    }
+
 
 //    /**
 //     * 결제

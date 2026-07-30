@@ -5,12 +5,14 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -27,38 +29,20 @@ public class JwtService {
 
     private SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
-    private final StringRedisTemplate stringRedisTemplate;
     private final long accessTokenValidity = 1000 * 60 * 30; // 30분
     private final long refreshTokenValidity = 1000L * 60 * 60 * 24 * 14; // 14일
+    private final RedisService redisService;
 
-    private static final String KEY_PREFIX = "refresh:";
-
-
-
-    /**
-     * 토큰 저장
-     */
-    public void save(Long memberNo, String refreshToken, long validityMillis) {
-        stringRedisTemplate.opsForValue().set(
-                KEY_PREFIX + memberNo,
-                refreshToken,
-                Duration.ofMillis(validityMillis)
-        );
-    }
 
 
     /**
      * 토큰 삭제
      */
-    public void delete(Long memberNo) {
-        stringRedisTemplate.delete(KEY_PREFIX + memberNo);
-    }
 
-
-    public String createAccessToken(Long memberNo, String id) {
+    public String createAccessToken(String memberId, String memberName) {
         return Jwts.builder()
-                .subject(String.valueOf(memberNo))
-                .claim("id", id)
+                .subject(memberId)
+                .claim("name", memberName)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + accessTokenValidity))
                 .signWith(secretKey)
@@ -66,15 +50,19 @@ public class JwtService {
     }
 
 
-    public String createRefreshToken(Long memberId, long validityMillis) {
+    public String createRefreshToken(String memberId, long validityMillis) {
         return Jwts.builder()
-                .subject(String.valueOf(memberId))
+                .subject(memberId)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + validityMillis))
                 .signWith(secretKey)
                 .compact();
     }
 
+
+    /**
+     * 토큰 데이터 불러오기 (토큰 파싱)
+     */
     public Claims parseClaims(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
@@ -83,19 +71,36 @@ public class JwtService {
                 .getPayload();
     }
 
-    public boolean validateToken(String token) {
+
+    /**
+     * refresh 토큰 검증
+     */
+    public boolean validToken(String clientToken) {
+        if (!StringUtils.hasText(clientToken)) {
+            return false;
+        }
         try {
-            parseClaims(token);
-            return true;
-        } catch (ExpiredJwtException e) {
-            throw e; // 만료는 재발급 로직에서 따로 처리하도록 구분
-        } catch (JwtException | IllegalArgumentException e) {
+            Claims claims = parseClaims(clientToken);
+
+            String memberId = claims.getSubject();
+            String serverToken = redisService.getToken(memberId);
+
+            if (StringUtils.hasText(serverToken) && clientToken.equals(serverToken)) {
+                return true;
+            }
+            return false;
+
+        } catch (JwtException e) {      // 위조, 만료
             return false;
         }
     }
 
-
-    public Optional<String> findBymemberNo(Long memberNo) {
-        return Optional.ofNullable(stringRedisTemplate.opsForValue().get(KEY_PREFIX + memberNo));
+    public String getMemberId(String token) {
+        return String.valueOf(parseClaims(token).getSubject());
     }
+
+    public String getMemberName(String token) {
+        return parseClaims(token).get("name", String.class);
+    }
+
 }

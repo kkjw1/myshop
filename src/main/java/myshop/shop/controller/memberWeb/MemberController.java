@@ -1,5 +1,6 @@
 package myshop.shop.controller.memberWeb;
 
+import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -88,14 +89,15 @@ public class MemberController {
 /*        HttpSession session = request.getSession();
         session.setAttribute(LOGIN_MEMBER, new LoginCheckMemberDto(login));*/
 
-        String accessToken = jwtService.createAccessToken(login.getNo(), login.getId());
+        String accessToken = jwtService.createAccessToken(login.getId(), login.getName());
 
-        long refreshValidity = loginMemberDto.getLoginCheck() == true
+        long refreshDate = loginMemberDto.getLoginCheck() == true
                 ? Duration.ofDays(14).toMillis()
                 : Duration.ofHours(3).toMillis();
 
-        String refreshToken = jwtService.createRefreshToken(login.getNo(), refreshValidity);
-        jwtService.save(login.getNo(), refreshToken, refreshValidity);
+        String refreshToken = jwtService.createRefreshToken(login.getId(), refreshDate);
+        redisService.tokenSave(login.getId(), refreshToken, refreshDate);
+
 
         ResponseCookie.ResponseCookieBuilder refreshCookieBuilder = ResponseCookie
                 .from("refreshToken", refreshToken)     // 쿠키 이름, value
@@ -103,21 +105,21 @@ public class MemberController {
                 .secure(false)                                // HTTPS
                 .path("/")                                    // url 경로 범위
                 .sameSite("Strict");                          // 외부사이트 요청에 쿠키 사용X <-> "Lax"
-
         if (loginMemberDto.getLoginCheck()) {
-            refreshCookieBuilder.maxAge(Duration.ofMillis(refreshValidity));
+            refreshCookieBuilder.maxAge(Duration.ofMillis(refreshDate));
         }
-
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookieBuilder.build().toString());
 
-        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
-                .httpOnly(true).secure(false).path("/")
+        ResponseCookie accessCookie = ResponseCookie
+                .from("accessToken", accessToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
                 .maxAge(Duration.ofMinutes(30))
                 .sameSite("Strict")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
-        // todo: 클로드에서 "로그인 / 재발급 API" 에서 로그인까지 함
 
         String target = (redirectURL != null && !redirectURL.isBlank()) ? redirectURL : "/";
         log.info("redirectURL={} target={}", redirectURL, target);
@@ -128,12 +130,11 @@ public class MemberController {
      * 로그아웃
      */
     @PostMapping("/logout")
-    public String logout(@RequestParam("memberNo") Long memberNo, HttpServletResponse response) {
+    public String logout(@RequestParam("memberId") String memberId, HttpServletResponse response) {
 
-        // 1. Redis에서 Refresh Token 폐기 (핵심)
-        jwtService.delete(memberNo);
+        redisService.tokenDelete(memberId);
 
-        // 2. 클라이언트 쿠키 삭제
+        // 클라이언트 쿠키 삭제
         ResponseCookie deleteRefresh = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
                 .secure(false)

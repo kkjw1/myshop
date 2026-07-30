@@ -36,7 +36,6 @@ public class CancelReturnController {
         log.info("saveCancelRequestDto={}", saveCancelRequestDto);
 
         cancelRequestService.saveCancelRequest(saveCancelRequestDto);
-        // todo: redirect로 취소 반품 페이지로 가기
         return "redirect:/myPage/orderList";
     }
 
@@ -51,7 +50,6 @@ public class CancelReturnController {
         log.info("saveReturnRequestDto={}", saveReturnRequestDto);
 
         returnRequestService.saveReturnRequest(saveReturnRequestDto);
-        // todo: redirect로 취소 반품 페이지로 가기
         return "redirect:/myPage/orderList";
     }
 

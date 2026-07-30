@@ -6,6 +6,8 @@ import jakarta.servlet.Filter;
 import myshop.shop.filter.LogbackFilter;
 import myshop.shop.interceptor.LoginCheckMemberInterceptor;
 import myshop.shop.interceptor.LoginCheckSellerInterceptor;
+import myshop.shop.service.JwtService;
+import myshop.shop.service.RedisService;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +36,12 @@ import java.util.UUID;
 
 @Configuration
 public class MyShopConfig implements WebMvcConfigurer {
+
+    private final RedisService redisService;
+
+    public MyShopConfig(RedisService redisService) {
+        this.redisService = redisService;
+    }
 
     /**
      * redis 설정
@@ -104,7 +112,7 @@ public class MyShopConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoginCheckMemberInterceptor())
+        registry.addInterceptor(new LoginCheckMemberInterceptor(new JwtService(redisService)))
                 .order(1)
                 .addPathPatterns("/myPage/**");
 
