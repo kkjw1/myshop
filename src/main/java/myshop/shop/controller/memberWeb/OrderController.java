@@ -14,6 +14,7 @@ import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.entity.order.Order;
 import myshop.shop.service.*;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -42,10 +43,12 @@ public class OrderController {
      * 장바구니 폼 -> 구매하기
      */
     @GetMapping("/myPage/order")
-    public String orderForm(@ModelAttribute CartToOrderDto cartToOrderDto, HttpServletRequest request, Model model) {
+    public String orderForm(@ModelAttribute CartToOrderDto cartToOrderDto,
+                            @AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto,
+                            HttpServletRequest request, Model model) {
         log.info("cartToOrderDto={}", cartToOrderDto);
-        new LoginCheckMemberDto().loginCheck(request, model);
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+//        new LoginCheckMemberDto().loginCheck(request, model);
+//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         Long memberNo = loginCheckMemberDto.getNo();
 
         // 구매 상품 재고 선점
@@ -89,10 +92,12 @@ public class OrderController {
      * 상품 상세 폼 -> 바로 구매(2. 주문/결제 폼에 띄울 데이터 불러오기)
      */
     @GetMapping("/myPage/directOrder")
-    public String directOrderForm(@ModelAttribute CheckDirectOrderDto checkDirectOrderDto, HttpServletRequest request, Model model) {
-        new LoginCheckMemberDto().loginCheck(request, model);
+    public String directOrderForm(@ModelAttribute CheckDirectOrderDto checkDirectOrderDto,
+                                  @AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto,
+                                  HttpServletRequest request, Model model) {
+//        new LoginCheckMemberDto().loginCheck(request, model);
 
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         Long memberNo = loginCheckMemberDto.getNo();
         checkDirectOrderDto.setMemberNo(memberNo);
         log.info("주문/결제 폼, checkDirectOrderDto={}", checkDirectOrderDto);
@@ -124,8 +129,8 @@ public class OrderController {
      */
     @GetMapping("/myPage/order/changeAddress")
     @ResponseBody
-    public List<ManageAddressDto> changeAddress(HttpServletRequest request) {
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+    public List<ManageAddressDto> changeAddress(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto, HttpServletRequest request) {
+//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         Long memberNo = loginCheckMemberDto.getNo();
 
         return addressService.getAddressesByMemberNo(memberNo);
@@ -140,9 +145,10 @@ public class OrderController {
     //reserve:5:cart:[1, 2, 3]
     @PostMapping("/myPage/order/payment")
     @ResponseBody
-    public Long payment(@RequestBody AddOrderDto addOrderDto, HttpServletRequest request) {
+    public Long payment(@RequestBody AddOrderDto addOrderDto,
+                        @AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto, HttpServletRequest request) {
         log.info("addOrderDto={}", addOrderDto);
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
 
         Long memberNo = loginCheckMemberDto.getNo();
         List<AddOrderItemDto> addOrderItemDtoList = addOrderDto.getAddOrderItemDtoList();
@@ -193,10 +199,11 @@ public class OrderController {
     //reserve:5:direct:3:null:1
     @PostMapping("/myPage/order/directPayment")
     @ResponseBody
-    public Long directPayment(@RequestBody AddOrderDto addOrderDto, HttpServletRequest request) {
+    public Long directPayment(@RequestBody AddOrderDto addOrderDto,
+                              @AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto, HttpServletRequest request) {
         log.info("addOrderDto={}", addOrderDto);
 
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         Long memberNo = loginCheckMemberDto.getNo();
 
         AddOrderItemDto addOrderItemDto = addOrderDto.getAddOrderItemDtoList().get(0);
@@ -226,7 +233,7 @@ public class OrderController {
      */
     @GetMapping("/order/complete")
     public String orderComplete(@RequestParam("orderNo") Long orderNo, HttpServletRequest request, Model model) {
-        new LoginCheckMemberDto().loginCheck(request, model);
+//        new LoginCheckMemberDto().loginCheck(request, model);
 
         log.info("orderComplete, orderNo={}", orderNo);
         DetailOrderDto detailOrderDto = orderService.getDetailOrder(orderNo);
@@ -245,10 +252,11 @@ public class OrderController {
      * 마이페이지 -> 주문 목록/배송 조회
      */
     @GetMapping("/myPage/orderList")
-    public String orderListForm(HttpServletRequest request, Model model) {
-        new LoginCheckMemberDto().loginCheck(request, model);
+    public String orderListForm(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto,
+            HttpServletRequest request, Model model) {
+//        new LoginCheckMemberDto().loginCheck(request, model);
 
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         Long memberNo = loginCheckMemberDto.getNo();
 
         List<ManageOrderDto> manageOrderDtoList = orderService.getManageOrder(memberNo);

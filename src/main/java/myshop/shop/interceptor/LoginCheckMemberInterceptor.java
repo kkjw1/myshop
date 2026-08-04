@@ -1,16 +1,15 @@
 package myshop.shop.interceptor;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import myshop.shop.service.JwtService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -18,14 +17,18 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 
-import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
 
+@Slf4j
 public class LoginCheckMemberInterceptor implements HandlerInterceptor {
 
-    private final JwtService jwtService;
+    @Value("${jwt.secret}")
+    String secret;
+    private SecretKey secretKey;
 
-    public LoginCheckMemberInterceptor(JwtService jwtService) {
-        this.jwtService = jwtService;
+
+    @PostConstruct
+    public void init() {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
@@ -43,7 +46,11 @@ public class LoginCheckMemberInterceptor implements HandlerInterceptor {
             }
 
             try {
-                jwtService.parseClaims(token);
+                Jwts.parser()
+                        .verifyWith(secretKey)
+                        .build()
+                        .parseSignedClaims(token)
+                        .getPayload();
                 return true;
 
             } catch (JwtException e) {          // 토큰 만료,위조

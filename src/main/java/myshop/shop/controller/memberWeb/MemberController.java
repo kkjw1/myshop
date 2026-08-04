@@ -17,6 +17,11 @@ import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.service.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -26,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Objects;
 
 import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
@@ -89,13 +95,13 @@ public class MemberController {
 /*        HttpSession session = request.getSession();
         session.setAttribute(LOGIN_MEMBER, new LoginCheckMemberDto(login));*/
 
-        String accessToken = jwtService.createAccessToken(login.getId(), login.getName());
+        String accessToken = jwtService.createAccessToken(login);
 
         long refreshDate = loginMemberDto.getLoginCheck() == true
                 ? Duration.ofDays(14).toMillis()
                 : Duration.ofHours(3).toMillis();
 
-        String refreshToken = jwtService.createRefreshToken(login.getId(), refreshDate);
+        String refreshToken = jwtService.createRefreshToken(login, refreshDate);
         redisService.tokenSave(login.getId(), refreshToken, refreshDate);
 
 
@@ -120,6 +126,12 @@ public class MemberController {
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
+
+        LoginCheckMemberDto loginCheckMemberDto = new LoginCheckMemberDto(login.getNo(), login.getId(), login.getName());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                loginCheckMemberDto, null, List.of(new SimpleGrantedAuthority("MEMBER_" + loginCheckMemberDto.getId()))
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String target = (redirectURL != null && !redirectURL.isBlank()) ? redirectURL : "/";
         log.info("redirectURL={} target={}", redirectURL, target);
@@ -425,9 +437,9 @@ public class MemberController {
      * 개인정보 확인/수정 폼
      */
     @GetMapping("/myPage/memberModify")
-    public String memberModifyForm(Model model, HttpServletRequest request,
+    public String memberModifyForm(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto, Model model, HttpServletRequest request,
                                    RedirectAttributes redirectAttributes) {
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         String memberId = loginCheckMemberDto.getId();
 
         String access = redisService.getData("ModifyCheckPW:" + memberId);
@@ -436,9 +448,9 @@ public class MemberController {
             return "redirect:/memberModifyCheckPW";
         }
 
-        if (!new LoginCheckMemberDto().loginCheck(request, model)) {
+/*        if (!new LoginCheckMemberDto().loginCheck(request, model)) {
             return "redirect:/login?redirectURL=" + request.getRequestURI();
-        }
+        }*/
 
         Member member = memberRepository.findById(memberId).orElse(null);
         UpdateMemberDto updateMember = new UpdateMemberDto(member);
@@ -494,7 +506,7 @@ public class MemberController {
 
         if (bindingResult.hasErrors()) {
             log.info("myPageUpdate Fail={}", bindingResult);
-            new LoginCheckMemberDto().loginCheck(request, model);
+//            new LoginCheckMemberDto().loginCheck(request, model);
             return "member/mypage/member_modify";
         }
 

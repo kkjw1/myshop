@@ -39,7 +39,7 @@ public class HomeController {
      */
     @GetMapping({"/", "/home"})
     public String homeForm(HttpServletRequest request, Model model) {
-        new LoginCheckMemberDto().loginCheck(request, model);
+//        new LoginCheckMemberDto().loginCheck(request, model);
         // 상품들 가져오기
         List<MainItemDto> mainItemDtoList = itemService.getMainItem(4L);
 
@@ -53,7 +53,7 @@ public class HomeController {
      */
     @GetMapping("/item")
     public String itemForm(@RequestParam("itemNo") Long itemNo, HttpServletRequest request, Model model) {
-        new LoginCheckMemberDto().loginCheck(request, model);
+//        new LoginCheckMemberDto().loginCheck(request, model);
 
         DetailItemDto detailItemDto = itemService.getDetailItem(itemNo);
         detailItemDto.setItemNo(itemNo);

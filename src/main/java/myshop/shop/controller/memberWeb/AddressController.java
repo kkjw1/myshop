@@ -12,6 +12,7 @@ import myshop.shop.entity.member.Member;
 import myshop.shop.repository.address.AddressRepository;
 import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.service.AddressService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -38,11 +39,11 @@ public class AddressController {
      * 베송지 관리 폼
      */
     @GetMapping("/myPage/addressManage")
-    public String addressManageForm(HttpServletRequest request, Model model) {
-        if (!new LoginCheckMemberDto().loginCheck(request, model)) {
+    public String addressManageForm(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto, HttpServletRequest request, Model model) {
+/*        if (!new LoginCheckMemberDto().loginCheck(request, model)) {
             return "redirect:/login?redirectURL=" + request.getRequestURI();
-        }
-        List<ManageAddressDto> manageAddressDtoList = addressService.getAddressesByMemberNo(((LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER)).getNo());
+        }*/
+        List<ManageAddressDto> manageAddressDtoList = addressService.getAddressesByMemberNo(loginCheckMemberDto.getNo());
 
         if(manageAddressDtoList.isEmpty()) {
             model.addAttribute("manageAddressDtoList", Collections.emptyList());
@@ -63,8 +64,9 @@ public class AddressController {
      * 배송지 관리 -> 기본배송지로 설정
      */
     @PostMapping("/myPage/addressManage/updateMain")
-    public String addressMainUpdate(@RequestParam("addressNo") Long addressNo, HttpServletRequest request) {
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+    public String addressMainUpdate(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto,
+                                    @RequestParam("addressNo") Long addressNo, HttpServletRequest request) {
+//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
 
         addressService.mainUpdate(addressNo, loginCheckMemberDto.getNo());
 
@@ -92,9 +94,9 @@ public class AddressController {
     @GetMapping("/myPage/addressManage/update")
     public String addressUpdateForm(@RequestParam("addressNo") Long addressNo, Model model, HttpServletRequest request) {
 
-        if (!new LoginCheckMemberDto().loginCheck(request, model)) {
+/*        if (!new LoginCheckMemberDto().loginCheck(request, model)) {
             return "redirect:/login?redirectURL=" + request.getRequestURI();
-        }
+        }*/
         Address address = addressRepository.findByNo(addressNo).orElse(null);
         UpdateAddressDto updateAddressDto = new UpdateAddressDto(address);
 
@@ -109,8 +111,9 @@ public class AddressController {
      */
     @GetMapping("myPage/addressManage/getMyInfo")
     @ResponseBody
-    public List<String> getMyInfo(HttpServletRequest request) {
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+    public List<String> getMyInfo(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto,
+                                  HttpServletRequest request) {
+//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         Member member = memberRepository.findById(loginCheckMemberDto.getId()).orElse(null);
 
         List<String> list = new ArrayList<>();
@@ -130,7 +133,7 @@ public class AddressController {
 
         if(bindingResult.hasErrors()) {
             log.info("Address Update Error no={}", addressNo);
-            new LoginCheckMemberDto().loginCheck(request, model);
+//            new LoginCheckMemberDto().loginCheck(request, model);
             return "member/mypage/address_manage_update";
         }
 
@@ -152,9 +155,9 @@ public class AddressController {
     @GetMapping("/myPage/addressManage/add")
     public String addressAddForm(HttpServletRequest request, Model model) {
 
-        if (!new LoginCheckMemberDto().loginCheck(request, model)) {
+/*        if (!new LoginCheckMemberDto().loginCheck(request, model)) {
             return "redirect:/login?redirectURL=" + request.getRequestURI();
-        }
+        }*/
 
         model.addAttribute("addAddressDto", new AddAddressDto());
         return "member/mypage/address_manage_add";
@@ -167,10 +170,11 @@ public class AddressController {
      */
     @PostMapping("/myPage/addressManage/add")
     public String addressAdd(@Validated @ModelAttribute("addAddressDto") AddAddressDto addAddressDto, BindingResult bindingResult,
+                             @AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto,
                              HttpServletRequest request, Model model) {
 
         if(bindingResult.hasErrors()) {
-            new LoginCheckMemberDto().loginCheck(request, model);
+//            new LoginCheckMemberDto().loginCheck(request, model);
             return "member/mypage/address_manage_add";
         }
 
@@ -178,7 +182,7 @@ public class AddressController {
             addAddressDto.setAddressName(addAddressDto.getRoadAddress());
         }
 
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         addressService.saveAddress(loginCheckMemberDto.getNo(), addAddressDto);
 
         return "redirect:/myPage/addressManage";
@@ -190,12 +194,13 @@ public class AddressController {
      */
     @PostMapping("/myPage/order/addressAdd")
     @ResponseBody
-    public boolean orderAddressAdd(@RequestBody AddAddressDto addAddressDto, HttpServletRequest request) {
+    public boolean orderAddressAdd(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto,
+                                   @RequestBody AddAddressDto addAddressDto, HttpServletRequest request) {
         if (!hasText(addAddressDto.getAddressName())) {
             addAddressDto.setAddressName(addAddressDto.getRoadAddress());
         }
 
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         try {
             addressService.saveAddress(loginCheckMemberDto.getNo(), addAddressDto);
         } catch (RuntimeException e) {

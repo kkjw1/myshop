@@ -9,6 +9,7 @@ import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.dto.returnRequest.SaveReturnRequestDto;
 import myshop.shop.service.CancelRequestService;
 import myshop.shop.service.ReturnRequestService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,9 +62,7 @@ public class CancelReturnController {
      * 반품 신청 -> 취소/반품 폼
      */
     @GetMapping("/myPage/cancel_return_list")
-    public String cancelReturnListForm(HttpServletRequest request, Model model) {
-        LoginCheckMemberDto loginCheckMemberDto = new LoginCheckMemberDto().loginCheck2(request, model);
-
+    public String cancelReturnListForm(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto, Model model) {
         List<ManageCancelReturnDto> cancelReturnList = returnRequestService.getCancelReturnList(loginCheckMemberDto.getNo());
         log.info("cancelReturnList={}", cancelReturnList);
 

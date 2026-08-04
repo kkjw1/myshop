@@ -10,6 +10,7 @@ import myshop.shop.dto.cart.SaveCartDto;
 import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.entity.Cart;
 import myshop.shop.service.CartService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,11 +31,11 @@ public class CartController {
      */
     @PostMapping("/cart/save")
     @ResponseBody
-    public boolean cartSave(@RequestBody SaveCartDto saveCartDto, HttpServletRequest request) {
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+    public boolean cartSave(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto, @RequestBody SaveCartDto saveCartDto, HttpServletRequest request) {
+ /*       LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
         if (loginCheckMemberDto == null) {
             return false;
-        }
+        }*/
 
         saveCartDto.setMemberNo(loginCheckMemberDto.getNo());
         cartService.saveCart(saveCartDto);
@@ -46,9 +47,9 @@ public class CartController {
      * 장바구니 폼
      */
     @GetMapping("/myPage/cart")
-    public String cartForm(HttpServletRequest request, Model model) {
-        new LoginCheckMemberDto().loginCheck(request, model);
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+    public String cartForm(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto, HttpServletRequest request, Model model) {
+//        new LoginCheckMemberDto().loginCheck(request, model);
+//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
 
         Long memberNo = loginCheckMemberDto.getNo();
         List<ManageCartDto> manageCartDtoList = cartService.findAllCart(memberNo);

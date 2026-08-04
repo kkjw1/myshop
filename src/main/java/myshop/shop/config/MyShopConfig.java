@@ -2,7 +2,9 @@ package myshop.shop.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.Filter;
+import myshop.shop.filter.JwtFilter;
 import myshop.shop.filter.LogbackFilter;
 import myshop.shop.interceptor.LoginCheckMemberInterceptor;
 import myshop.shop.interceptor.LoginCheckSellerInterceptor;
@@ -37,11 +39,9 @@ import java.util.UUID;
 @Configuration
 public class MyShopConfig implements WebMvcConfigurer {
 
-    private final RedisService redisService;
+    @PersistenceContext
+    private EntityManager em;
 
-    public MyShopConfig(RedisService redisService) {
-        this.redisService = redisService;
-    }
 
     /**
      * redis 설정
@@ -89,7 +89,7 @@ public class MyShopConfig implements WebMvcConfigurer {
      * Querydsl
      */
     @Bean
-    public JPAQueryFactory jpaQueryFactory(EntityManager em) {
+    public JPAQueryFactory jpaQueryFactory() {
         return new JPAQueryFactory(em);
     }
 
@@ -105,6 +105,14 @@ public class MyShopConfig implements WebMvcConfigurer {
         filter.addUrlPatterns("/*");
         return filter;
     }
+    @Bean
+    public FilterRegistrationBean jwtFilter(JwtService jwtService) {
+        FilterRegistrationBean<Filter> filter = new FilterRegistrationBean<>();
+        filter.setFilter(new JwtFilter(jwtService));
+        filter.setOrder(2);
+        filter.addUrlPatterns("/*");
+        return filter;
+    }
 
 
     /**
@@ -112,7 +120,7 @@ public class MyShopConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoginCheckMemberInterceptor(new JwtService(redisService)))
+        registry.addInterceptor(new LoginCheckMemberInterceptor())
                 .order(1)
                 .addPathPatterns("/myPage/**");
 

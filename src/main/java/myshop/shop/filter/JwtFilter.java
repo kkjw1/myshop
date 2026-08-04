@@ -3,13 +3,13 @@ package myshop.shop.filter;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
+import jakarta.servlet.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.service.JwtService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,41 +26,50 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 
-@Component
+import static myshop.shop.entity.member.QMember.member;
+
 @RequiredArgsConstructor
 @Slf4j
-public class JwtFilter extends OncePerRequestFilter {
+public class JwtFilter implements Filter {
     private final JwtService jwtService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain chain) throws ServletException, IOException {
+    public void init(FilterConfig filterConfig) throws ServletException {
+        Filter.super.init(filterConfig);
+    }
+
+    @Override
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest request = (HttpServletRequest) req;
+        HttpServletResponse response = (HttpServletResponse) res;
+        String requestURI = request.getRequestURI();
+
+//        // 정적 리소스 요청 검사
+//        if (isExcludedUrl(requestURI)) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+
         String token = getToken(request, "accessToken");
 
         if (token != null) {
             try {
-                Claims claims = jwtService.parseClaims(token);
-
-                String memberId = claims.getSubject();
-                String memberName = claims.get("name", String.class);
+                LoginCheckMemberDto loginCheckMemberDto = jwtService.getMember(token);
 
                 Authentication authentication = new UsernamePasswordAuthenticationToken(
-                        memberId, null, List.of(new SimpleGrantedAuthority("NAME_" + memberName))
+                        loginCheckMemberDto, null, List.of(new SimpleGrantedAuthority("MEMBER_" + loginCheckMemberDto.getId()))
                 );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.info("accessToken 인증 완료, memberId={}", memberId);
+                log.info("accessToken 인증 완료, url={}, loginCheckMemberDto={}", request.getRequestURI(), loginCheckMemberDto);
 
-            } catch (ExpiredJwtException e) {
+            } catch (ExpiredJwtException e) {       // 토큰 만료
                 String refreshToken = getToken(request, "refreshToken");
 
                 if (refreshToken != null && jwtService.validToken(refreshToken)) {
-                    // Refresh Token이 유효하다면 즉시 새 Access Token 발급!
-                    Claims refreshClaims = jwtService.parseClaims(refreshToken);
-                    String memberId = refreshClaims.getSubject();
-                    String memberName = refreshClaims.get("name", String.class);
+                    // Refresh Token이 유효하다면 즉시 새 Access Token 발급
+                    LoginCheckMemberDto loginCheckMemberDto = jwtService.getMember(refreshToken);
 
-
-                    String newAccessToken = jwtService.createAccessToken(memberId, memberName);
+                    String newAccessToken = jwtService.createAccessToken(loginCheckMemberDto);
 
                     ResponseCookie newAccessCookie = ResponseCookie
                             .from("accessToken", newAccessToken)
@@ -73,15 +83,21 @@ public class JwtFilter extends OncePerRequestFilter {
                     response.addHeader(HttpHeaders.SET_COOKIE, newAccessCookie.toString());
 
                     Authentication authentication = new UsernamePasswordAuthenticationToken(
-                            memberId, null, List.of(new SimpleGrantedAuthority("NAME_" + memberName))
+                            loginCheckMemberDto, null, List.of(new SimpleGrantedAuthority("MEMBER_" + loginCheckMemberDto.getId()))
                     );
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    log.info("accessToken 재발급 완료, memberId={}", memberId);
+                    log.info("accessToken 재발급 완료, url={}, loginCheckMemberDto={}", request.getRequestURI(), loginCheckMemberDto);
                 } else {
                     log.info("accessToken 만료, refreshToken 만료");
-                    response.sendRedirect("/");
-                    return;
+/*                    response.sendRedirect("/");
+                    return;*/
+                    chain.doFilter(request, response);
                 }
+            } catch (JwtException e) {  // 토큰 위조
+                log.error("토큰 위조 에러", e);
+/*                response.sendRedirect("/");
+                return;*/
+                chain.doFilter(request, response);
             }
         }
 
@@ -101,5 +117,35 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
         return null;
+    }
+
+
+    /**
+     * 제외할 URL 체크
+     */
+    private boolean isExcludedUrl(String uri) {
+        // 특정 정적 리소스 폴더 경로 제외
+/*        if (uri.startsWith("/css/") ||
+                uri.startsWith("/js/") ||
+                uri.startsWith("/images/") ||
+                uri.startsWith("/shop_image/") ||
+                uri.startsWith("/.well-known/")) {
+            return true;
+        }*/
+
+        // 특정 정적 파일 확장자 및 파비콘 제외
+        if (uri.endsWith(".css") ||
+                uri.endsWith(".js") ||
+                uri.endsWith(".jpg") ||
+                uri.endsWith(".jpeg") ||
+                uri.endsWith(".png") ||
+                uri.endsWith(".gif") ||
+                uri.endsWith(".ico") ||
+                uri.endsWith(".map") ||
+                uri.endsWith(".json")) {
+            return true;
+        }
+
+        return false;
     }
 }

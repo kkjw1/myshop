@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import myshop.shop.dto.inquiry.SaveInquiryDto;
 import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.service.InquiryService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,9 +39,10 @@ public class InquiryController {
      * 문의내역 확인 폼
      */
     @GetMapping("/myPage/inquiry")
-    public String inquiryListForm(HttpServletRequest request, Model model) {
-        new LoginCheckMemberDto().loginCheck(request, model);
-        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+    public String inquiryListForm(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto,
+                                  HttpServletRequest request, Model model) {
+//        new LoginCheckMemberDto().loginCheck(request, model);
+//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
 
         // todo: 판매자에서 상품문의 답하는 기능 만든 후, 문의확인페이지에서 데이터 나오는거 제작 해야 됨
         inquiryService.getInquiryList(loginCheckMemberDto.getNo());

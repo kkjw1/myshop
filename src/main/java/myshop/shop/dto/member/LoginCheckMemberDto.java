@@ -3,12 +3,14 @@ package myshop.shop.dto.member;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
+import lombok.ToString;
 import myshop.shop.entity.member.Member;
 import org.springframework.ui.Model;
 
 import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
 
 @Getter
+@ToString(of = {"no", "id", "name"})
 public class LoginCheckMemberDto {
     private Long no;
     private String id;
