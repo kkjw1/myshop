@@ -44,11 +44,11 @@ public class JwtFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
         String requestURI = request.getRequestURI();
 
-//        // 정적 리소스 요청 검사
-//        if (isExcludedUrl(requestURI)) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
+        // 정적 리소스 요청 검사
+        if (isExcludedUrl(requestURI)) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         String token = getToken(request, "accessToken");
 
@@ -91,13 +91,20 @@ public class JwtFilter implements Filter {
                     log.info("accessToken 만료, refreshToken 만료");
 /*                    response.sendRedirect("/");
                     return;*/
-                    chain.doFilter(request, response);
+//                    chain.doFilter(request, response);
                 }
             } catch (JwtException e) {  // 토큰 위조
-                log.error("토큰 위조 에러", e);
-/*                response.sendRedirect("/");
-                return;*/
-                chain.doFilter(request, response);
+                log.error("accessToken 위조 에러", e);
+
+                ResponseCookie deleteAccess = ResponseCookie.from("accessToken", "")
+                        .httpOnly(true)
+                        .secure(false)
+                        .path("/")
+                        .maxAge(0)
+                        .sameSite("Strict")
+                        .build();
+                response.addHeader(HttpHeaders.SET_COOKIE, deleteAccess.toString());
+                SecurityContextHolder.clearContext();
             }
         }
 
@@ -134,15 +141,16 @@ public class JwtFilter implements Filter {
         }*/
 
         // 특정 정적 파일 확장자 및 파비콘 제외
-        if (uri.endsWith(".css") ||
-                uri.endsWith(".js") ||
-                uri.endsWith(".jpg") ||
-                uri.endsWith(".jpeg") ||
-                uri.endsWith(".png") ||
-                uri.endsWith(".gif") ||
-                uri.endsWith(".ico") ||
-                uri.endsWith(".map") ||
-                uri.endsWith(".json")) {
+        if (uri.endsWith(".css")
+                || uri.endsWith(".js")
+                || uri.endsWith(".jpg")
+                || uri.endsWith(".jpeg")
+                || uri.endsWith(".png")
+                || uri.endsWith(".gif")
+                || uri.endsWith(".ico")
+                || uri.endsWith(".map")
+//                || uri.endsWith(".json")
+        ) {
             return true;
         }
 

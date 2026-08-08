@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.service.JwtService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -19,12 +20,12 @@ import java.nio.charset.StandardCharsets;
 
 
 @Slf4j
+@Component
 public class LoginCheckMemberInterceptor implements HandlerInterceptor {
 
     @Value("${jwt.secret}")
     String secret;
     private SecretKey secretKey;
-
 
     @PostConstruct
     public void init() {
@@ -36,14 +37,8 @@ public class LoginCheckMemberInterceptor implements HandlerInterceptor {
 
         //@Controller @RequestMapping
         if (handler instanceof HandlerMethod) {
-
-            Cookie[] cookies = request.getCookies();
-            String token = null;
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                }
-            }
+            log.info("preHandle start");
+            String token = getToken(request, "accessToken");
 
             try {
                 Jwts.parser()
@@ -51,9 +46,12 @@ public class LoginCheckMemberInterceptor implements HandlerInterceptor {
                         .build()
                         .parseSignedClaims(token)
                         .getPayload();
+
+                log.info("preHandle end");
                 return true;
 
             } catch (JwtException e) {          // 토큰 만료,위조
+                log.info("accessToken 만료, 위조");
                 String uri = request.getRequestURI();
                 String queryString = request.getQueryString();
                 String redirectURL = (queryString != null) ? uri + "?" + queryString : uri;
@@ -64,4 +62,20 @@ public class LoginCheckMemberInterceptor implements HandlerInterceptor {
         //정적 리소스
         return true;
     }
+
+    /**
+     * 쿠키에서 token 가져옴
+     */
+    private String getToken(HttpServletRequest request, String tokenType) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (tokenType.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
 }

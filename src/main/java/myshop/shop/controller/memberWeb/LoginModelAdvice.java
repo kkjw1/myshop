@@ -19,6 +19,7 @@ public class LoginModelAdvice {
 
     @ModelAttribute
     public void addLoginInfo(Model model) {
+        log.info("advice start");
         // 여기서 SecurityContextHolder.getContext().getAuthentication();를 사용해서 로그인 관련 처리하기 + 로그인을 했을 때도
         // SecurityContextHolder.getContext().getAuthentication(); 에 저장하는거 넣기
         // todo: myPage접근시 로그인 확인하는 것 까지 제작함, model에 isLogin과 loginCheckMemberDto보내는거 추가하기,
@@ -34,19 +35,5 @@ public class LoginModelAdvice {
         if (authentication.getPrincipal() instanceof LoginCheckMemberDto loginCheckMemberDto) {
             model.addAttribute("loginCheckMemberDto", loginCheckMemberDto);
         }
-
-
-
-/*        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        boolean isLogin = authentication != null
-                && authentication.isAuthenticated()
-                && authentication.getPrincipal() instanceof LoginMemberPrincipal;
-
-        model.addAttribute("isLogin", isLogin);
-
-        if (isLogin) {
-            model.addAttribute("loginMember", authentication.getPrincipal());
-        }*/
     }
 }

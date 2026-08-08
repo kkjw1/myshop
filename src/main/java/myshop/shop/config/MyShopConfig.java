@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.Filter;
+import lombok.RequiredArgsConstructor;
 import myshop.shop.filter.JwtFilter;
 import myshop.shop.filter.LogbackFilter;
 import myshop.shop.interceptor.LoginCheckMemberInterceptor;
@@ -37,11 +38,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Configuration
+@RequiredArgsConstructor
 public class MyShopConfig implements WebMvcConfigurer {
 
     @PersistenceContext
     private EntityManager em;
 
+    private final LoginCheckMemberInterceptor loginCheckMemberInterceptor;
 
     /**
      * redis 설정
@@ -120,7 +123,7 @@ public class MyShopConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoginCheckMemberInterceptor())
+        registry.addInterceptor(loginCheckMemberInterceptor)
                 .order(1)
                 .addPathPatterns("/myPage/**");
 

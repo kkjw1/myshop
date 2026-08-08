@@ -41,6 +41,7 @@ public class SecurityConfig {
                     .invalidateHttpSession(true) // 세션 무효화
                     .deleteCookies("JSESSIONID") // 쿠키 삭제
                     .permitAll())*/
+                .logout(logout -> logout.disable())
 
                 .csrf(csrf -> csrf.disable());      // CSRF 보호를 끔, POST요청 특정토큰 필요없이 사용 가능
         return http.build();

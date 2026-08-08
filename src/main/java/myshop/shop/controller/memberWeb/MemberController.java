@@ -143,7 +143,6 @@ public class MemberController {
      */
     @PostMapping("/logout")
     public String logout(@RequestParam("memberId") String memberId, HttpServletResponse response) {
-
         redisService.tokenDelete(memberId);
 
         // 클라이언트 쿠키 삭제
