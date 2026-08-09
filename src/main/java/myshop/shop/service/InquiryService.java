@@ -41,6 +41,6 @@ public class InquiryService {
      * 문의내역 확인 폼
      */
     public List<CheckInquiryDto> getInquiryList(Long memberNo) {
-        return null;
+        return inquiryRepository.getCheckInquiryDtoList(memberNo);
     }
 }

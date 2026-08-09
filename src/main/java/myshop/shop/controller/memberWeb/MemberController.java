@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
+import static myshop.shop.service.JwtService.*;
 import static org.springframework.util.StringUtils.hasText;
 
 @Controller
@@ -92,14 +93,12 @@ public class MemberController {
             return "member/login";
         }
 
-/*        HttpSession session = request.getSession();
-        session.setAttribute(LOGIN_MEMBER, new LoginCheckMemberDto(login));*/
 
         String accessToken = jwtService.createAccessToken(login);
 
         long refreshDate = loginMemberDto.getLoginCheck() == true
-                ? Duration.ofDays(14).toMillis()
-                : Duration.ofHours(3).toMillis();
+                ? Duration.ofMillis(checkRefreshTokenValidity).toMillis()
+                : Duration.ofMillis(unCheckRefreshTokenValidity).toMillis();
 
         String refreshToken = jwtService.createRefreshToken(login, refreshDate);
         redisService.tokenSave(login.getId(), refreshToken, refreshDate);
@@ -121,17 +120,20 @@ public class MemberController {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(Duration.ofMinutes(30))
+                .maxAge(Duration.ofMillis(accessCookieValidity))
                 .sameSite("Strict")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
 
         LoginCheckMemberDto loginCheckMemberDto = new LoginCheckMemberDto(login.getNo(), login.getId(), login.getName());
+        // Spring Security의 Authentication
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 loginCheckMemberDto, null, List.of(new SimpleGrantedAuthority("MEMBER_" + loginCheckMemberDto.getId()))
         );
+        // SecurityContext에 인증 정보 등록
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
 
         String target = (redirectURL != null && !redirectURL.isBlank()) ? redirectURL : "/";
         log.info("redirectURL={} target={}", redirectURL, target);

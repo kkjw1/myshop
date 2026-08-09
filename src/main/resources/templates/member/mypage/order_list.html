@@ -12,7 +12,58 @@
         .order-date { font-weight: bold; font-size: 1.1rem; }
 
         .product-img { width: 100px; height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #eee; }
-        .status-txt { color: #0089ff; font-weight: bold; font-size: 1.1rem; }
+
+        /* 공통 배지 스타일 */
+        .status-badge {
+            display: inline-block;
+            padding: 0.3em 0.5em;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 20px; /* 둥근 알약 형태 */
+        }
+
+        /* 상품준비중 */
+        .status-ready {
+            background-color: #F3F4F6;
+            color: #4B5563;
+        }
+
+        /* 배송중 */
+        .status-shipping {
+            background-color: #EFF6FF;
+            color: #1D4ED8;
+        }
+
+        /* 배송완료 */
+        .status-delivered {
+            background-color: #ECFDF5;
+            color: #047857;
+        }
+
+        /* 취소접수 */
+        .status-cancel-req {
+            background-color: #FFFBEB;
+            color: #B45309;
+        }
+
+        /* 취소완료 */
+        .status-cancel-done {
+            background-color: #FEF2F2;
+            color: #B91C1C;
+        }
+
+        /* 반품접수 */
+        .status-return-req {
+            background-color: #F5F3FF;
+            color: #6D28D9;
+        }
+
+        /* 반품완료 */
+        .status-return-done {
+            background-color: #FFF1F2;
+            color: #BE123C;
+        }
+
 
         /* 버튼 스타일 */
         .btn-outline-secondary { color: #555; border-color: #ccc; font-size: 13px; }
@@ -270,7 +321,20 @@
                         </div>
 
                         <div class="col-md-6">
-                            <div class="status-txt mb-1" th:text="${manageOrderItemDto.orderItemStatus}">배송 완료</div>
+                            <div class="status-badge mb-1"
+                                 th:text="${manageOrderItemDto.orderItemStatus}"
+                                 th:classappend="${
+                                     manageOrderItemDto.orderItemStatus.name() == '상품준비중' ? 'status-ready' :
+                                    (manageOrderItemDto.orderItemStatus.name() == '배송중' ? 'status-shipping' :
+                                    (manageOrderItemDto.orderItemStatus.name() == '배송완료' ? 'status-delivered' :
+                                    (manageOrderItemDto.orderItemStatus.name() == '취소접수' ? 'status-cancel-req' :
+                                    (manageOrderItemDto.orderItemStatus.name() == '취소완료' ? 'status-cancel-done' :
+                                    (manageOrderItemDto.orderItemStatus.name() == '반품접수' ? 'status-return-req' :
+                                    (manageOrderItemDto.orderItemStatus.name() == '반품완료' ? 'status-return-done' : ''
+                                    ))))))}">
+                                배송완료
+                            </div>
+
 
                             <div class="font-weight-bold mb-1" th:text="${manageOrderItemDto.itemName}">무선 저소음 기계식 키보드</div>
 

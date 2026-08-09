@@ -22,19 +22,19 @@ public class JwtService {
 
     @Value("${jwt.secret}")
     String secret;
-
     private SecretKey secretKey;
-
-    private final long accessTokenValidity = 1000 * 60 * 30; // 30분
-    private final long refreshTokenValidity = 1000L * 60 * 60 * 24 * 14; // 14일
-    private final RedisService redisService;
-
 
     @PostConstruct
     public void init() {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
+    private final RedisService redisService;
+
+    public static long accessTokenValidity = 1000L * 60 * 30; // 30분
+    public static long checkRefreshTokenValidity = 1000L * 60 * 60 * 24 * 30; // 30일, 쿠키도 같이 쓰임
+    public static long unCheckRefreshTokenValidity = 1000L * 60 * 60 * 5; // 5시간, 쿠키도 같이 쓰임
+    public static long accessCookieValidity = 1000L * 60 * 30;   // 30분
 
 
     /**
@@ -118,6 +118,11 @@ public class JwtService {
         }
     }
 
+
+    /**
+     * 토큰으로 Member데이터 뽑기
+     * 인증데이터로
+     */
     public LoginCheckMemberDto getMember(String token) {
         Claims claims = parseClaims(token);
         Number noNumber = claims.get("no", Number.class);

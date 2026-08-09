@@ -3,6 +3,7 @@ package myshop.shop.controller.memberWeb;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import myshop.shop.dto.inquiry.CheckInquiryDto;
 import myshop.shop.dto.inquiry.SaveInquiryDto;
 import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.service.InquiryService;
@@ -12,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.List;
 
 import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
 
@@ -39,13 +42,12 @@ public class InquiryController {
      * 문의내역 확인 폼
      */
     @GetMapping("/myPage/inquiry")
-    public String inquiryListForm(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto,
-                                  HttpServletRequest request, Model model) {
-//        new LoginCheckMemberDto().loginCheck(request, model);
-//        LoginCheckMemberDto loginCheckMemberDto = (LoginCheckMemberDto) request.getSession().getAttribute(LOGIN_MEMBER);
+    public String inquiryListForm(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto, Model model) {
 
         // todo: 판매자에서 상품문의 답하는 기능 만든 후, 문의확인페이지에서 데이터 나오는거 제작 해야 됨
-        inquiryService.getInquiryList(loginCheckMemberDto.getNo());
+        List<CheckInquiryDto> checkInquiryDtoList = inquiryService.getInquiryList(loginCheckMemberDto.getNo());
+
+        model.addAttribute("checkInquiryDtoList", checkInquiryDtoList);
         return "member/mypage/inquiry_list";
     }
 }

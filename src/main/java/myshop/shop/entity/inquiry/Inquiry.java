@@ -24,6 +24,7 @@ public class Inquiry extends BaseDateEntity {
     private InquiryCategory inquiryCategory;
     private String content;
     private InquiryStatus inquiryStatus;
+    private String answerContent;
 
     public Inquiry() {
     }

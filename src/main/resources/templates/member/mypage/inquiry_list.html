@@ -55,7 +55,22 @@
         .btn-inquiry { background-color: #4285f4; color: white; font-weight: bold; }
         .btn-inquiry:hover { background-color: #357abd; color: white; }
 
-        .category-tag { font-weight: bold; color: #4285f4; }
+        .category-tag { font-weight: bold;}
+        /* 상품/기타 문의 */
+        .txt-product {
+            color: #6B7280;
+        }
+
+        /* 결제 취소 문의 */
+        .txt-cancel {
+            color: #D97706;
+        }
+
+        /* 상품 반품 문의 */
+        .txt-return {
+            color: #7C3AED;
+        }
+
         .option-tag { font-weight: normal; color: #777; font-size: 14px; }
     </style>
 </head>
@@ -134,29 +149,36 @@
                 </div>
 
                 <!-- 문의 목록 루프 시작 -->
-                <div th:if="${inquiryList ne null and !#lists.isEmpty(inquiryList)}">
-                    <div class="inquiry-card" th:each="inquiry : ${inquiryList}">
+                <div th:if="${checkInquiryDtoList ne null and !#lists.isEmpty(checkInquiryDtoList)}">
+                    <div class="inquiry-card" th:each="checkInquiryDto : ${checkInquiryDtoList}">
                         <div class="inquiry-header d-flex justify-content-between align-items-center" onclick="toggleInquiry(this)">
                             <div>
                                 <div class="mb-2">
                                     <!-- 답변 상태 (InquiryStatus Enum 처리) -->
-                                    <span th:if="${inquiry.inquiryStatus.name() eq 'COMPLETED' or inquiry.inquiryStatus.name() eq 'ANSWERED'}" class="badge badge-status-completed p-2 mr-2">답변완료</span>
-                                    <span th:unless="${inquiry.inquiryStatus.name() eq 'COMPLETED' or inquiry.inquiryStatus.name() eq 'ANSWERED'}" class="badge badge-status-waiting p-2 mr-2">답변대기</span>
+                                    <span th:if="${checkInquiryDto.inquiryStatus.name() eq '답변완료'}" class="badge badge-status-completed p-2 mr-2">답변완료</span>
+                                    <span th:if="${checkInquiryDto.inquiryStatus.name() eq '답변대기'}" class="badge badge-status-waiting p-2 mr-2">답변대기</span>
                                 </div>
 
                                 <!-- [카테고리] 상품명 (옵션) 타이틀 라인 -->
                                 <div class="font-weight-bold text-dark mt-1" style="font-size: 15px;">
-                                    <span class="category-tag" th:text="| [${inquiry.inquiryCategory.description}] |">[상품/기타 문의]</span>
+                                    <span class="category-txt"
+                                          th:text="| [${checkInquiryDto.inquiryCategory.description}] |"
+                                          th:classappend="${
+                                                  checkInquiryDto.inquiryCategory.name() == 'PRODUCT' ? 'txt-product' :
+                                                 (checkInquiryDto.inquiryCategory.name() == 'CANCEL' ? 'txt-cancel' :
+                                                 (checkInquiryDto.inquiryCategory.name() == 'RETURN' ? 'txt-return' : ''))
+                                              }"> [상품/기타 문의]
+                                    </span>
 
                                     <!-- 상품명이 존재할 경우 -->
-                                    <span th:if="${inquiry.item ne null}" th:text="${inquiry.item.name}">남성 가을 캐주얼 맨투맨</span>
+                                    <span th:if="${checkInquiryDto.itemName ne null}" th:text="${checkInquiryDto.itemName}">남성 가을 캐주얼 맨투맨</span>
                                     <!-- 상품이 직접 지정되지 않았거나 삭제된 경우 예외 처리 -->
-                                    <span th:if="${inquiry.item eq null}">상품 정보 없음</span>
+                                    <span th:if="${checkInquiryDto.itemName eq null}">상품 정보 없음</span>
 
                                     <!-- 옵션명이 존재하는 경우에만 출력 -->
                                     <span class="option-tag"
-                                          th:if="${inquiry.optionName ne null and !#strings.isEmpty(inquiry.optionName)}"
-                                          th:text="| (${inquiry.optionName})|"> (블랙 / L)</span>
+                                          th:if="${checkInquiryDto.optionName ne null and !#strings.isEmpty(checkInquiryDto.optionName)}"
+                                          th:text="| (${checkInquiryDto.optionName})|"> (블랙 / L)</span>
                                 </div>
                             </div>
                             <div class="text-right">
@@ -167,14 +189,14 @@
                         <!-- 문의 상세 content & 답변 (기본 숨김) -->
                         <div class="inquiry-body">
                             <!-- 질문 내용 -->
-                            <div class="text-dark mb-3" style="white-space: pre-line; line-height: 1.6;" th:text="${inquiry.content}">
+                            <div class="text-dark mb-3" style="white-space: pre-line; line-height: 1.6;" th:text="${checkInquiryDto.content}">
                                 문의 내용이 출력되는 영역입니다.
                             </div>
 
                             <!-- 답변 내용 (DTO나 Entity에 answer 필드가 있을 경우) -->
-                            <div class="answer-box" th:if="${inquiry.answer ne null and !#strings.isEmpty(inquiry.answer)}">
+                            <div class="answer-box" th:if="${checkInquiryDto.answerContent ne null and !#strings.isEmpty(checkInquiryDto.answerContent)}">
                                 <span class="answer-badge">↳ 판매자/관리자 답변</span>
-                                <div class="text-dark" style="white-space: pre-line; line-height: 1.6;" th:text="${inquiry.answer}">
+                                <div class="text-dark" style="white-space: pre-line; line-height: 1.6;" th:text="${checkInquiryDto.answerContent}">
                                     답변 내용이 출력됩니다.
                                 </div>
                             </div>
@@ -183,7 +205,7 @@
                 </div>
 
                 <!-- 내역이 없을 경우 -->
-                <div th:if="${inquiryList eq null or #lists.isEmpty(inquiryList)}" class="text-center py-5">
+                <div th:if="${checkInquiryDtoList eq null or #lists.isEmpty(checkInquiryDtoList)}" class="text-center py-5">
                     <p class="text-muted mb-0">등록된 문의 내역이 없습니다.</p>
                 </div>
 

@@ -27,6 +27,7 @@ import java.time.Duration;
 import java.util.List;
 
 import static myshop.shop.entity.member.QMember.member;
+import static myshop.shop.service.JwtService.accessCookieValidity;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -76,7 +77,7 @@ public class JwtFilter implements Filter {
                             .httpOnly(true)
                             .secure(false)
                             .path("/")
-                            .maxAge(Duration.ofMinutes(30))
+                            .maxAge(Duration.ofMillis(accessCookieValidity))
                             .sameSite("Strict")
                             .build();
 
