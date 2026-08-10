@@ -24,6 +24,7 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom{
                         inquiry.inquiryCategory,
                         item.name.as("itemName"),
                         inquiry.optionName,
+                        inquiry.title,
                         inquiry.content,
                         inquiry.inquiryStatus,
                         inquiry.memberNo,

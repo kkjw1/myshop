@@ -31,6 +31,7 @@ public class InquiryService {
                 saveInquiryDto.getMemberNo(),
                 saveInquiryDto.getOptionName(),
                 saveInquiryDto.getInquiryCategory(),
+                saveInquiryDto.getTitle(),
                 saveInquiryDto.getContent(),
                 InquiryStatus.답변대기));
     }

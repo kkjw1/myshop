@@ -151,51 +151,58 @@
                 <!-- 문의 목록 루프 시작 -->
                 <div th:if="${checkInquiryDtoList ne null and !#lists.isEmpty(checkInquiryDtoList)}">
                     <div class="inquiry-card" th:each="checkInquiryDto : ${checkInquiryDtoList}">
-                        <div class="inquiry-header d-flex justify-content-between align-items-center" onclick="toggleInquiry(this)">
-                            <div>
+                        <div class="inquiry-header d-flex justify-content-between align-items-center p-3" onclick="toggleInquiry(this)">
+                            <div class="w-100 mr-3">
+                                <!-- 답변 상태 배지 -->
                                 <div class="mb-2">
-                                    <!-- 답변 상태 (InquiryStatus Enum 처리) -->
-                                    <span th:if="${checkInquiryDto.inquiryStatus.name() eq '답변완료'}" class="badge badge-status-completed p-2 mr-2">답변완료</span>
-                                    <span th:if="${checkInquiryDto.inquiryStatus.name() eq '답변대기'}" class="badge badge-status-waiting p-2 mr-2">답변대기</span>
+                                    <span th:if="${checkInquiryDto.inquiryStatus.name() eq 'COMPLETED' or checkInquiryDto.inquiryStatus.name() eq '답변완료'}" class="badge badge-status-completed p-2">답변완료</span>
+                                    <span th:if="${checkInquiryDto.inquiryStatus.name() eq 'WAITING' or checkInquiryDto.inquiryStatus.name() eq '답변대기'}" class="badge badge-status-waiting p-2">답변대기</span>
                                 </div>
 
-                                <!-- [카테고리] 상품명 (옵션) 타이틀 라인 -->
-                                <div class="font-weight-bold text-dark mt-1" style="font-size: 15px;">
-                                    <span class="category-txt"
-                                          th:text="| [${checkInquiryDto.inquiryCategory.description}] |"
+                                <!-- (메인 노출) -->
+                                <div class="inquiry-title font-weight-bold text-dark mb-1" style="font-size: 16px; word-break: break-all;">
+                                    <!-- 카테고리 -->
+                                    <span class="category-txt mr-1"
+                                          th:text="|[${checkInquiryDto.inquiryCategory.description}]|"
                                           th:classappend="${
-                                                  checkInquiryDto.inquiryCategory.name() == 'PRODUCT' ? 'txt-product' :
-                                                 (checkInquiryDto.inquiryCategory.name() == 'CANCEL' ? 'txt-cancel' :
-                                                 (checkInquiryDto.inquiryCategory.name() == 'RETURN' ? 'txt-return' : ''))
-                                              }"> [상품/기타 문의]
+                                          checkInquiryDto.inquiryCategory.name() == 'PRODUCT' ? 'txt-product' :
+                                         (checkInquiryDto.inquiryCategory.name() == 'CANCEL' ? 'txt-cancel' :
+                                         (checkInquiryDto.inquiryCategory.name() == 'RETURN' ? 'txt-return' : ''))
+                                      }">[상품/기타 문의]
                                     </span>
+                                    <!-- 제목 -->
+                                    <span th:text="${checkInquiryDto.title}">배송 관련 문의드립니다.</span>
+                                </div>
 
-                                    <!-- 상품명이 존재할 경우 -->
-                                    <span th:if="${checkInquiryDto.itemName ne null}" th:text="${checkInquiryDto.itemName}">남성 가을 캐주얼 맨투맨</span>
-                                    <!-- 상품이 직접 지정되지 않았거나 삭제된 경우 예외 처리 -->
-                                    <span th:if="${checkInquiryDto.itemName eq null}">상품 정보 없음</span>
+                                <!-- 서브 정보 -->
+                                <div class="inquiry-sub-info text-secondary small" style="font-size: 13px;">
+                                    <!-- 상품명 -->
+                                    <span class="item-name text-dark" th:if="${checkInquiryDto.itemName ne null}"
+                                          th:text="${checkInquiryDto.itemName}">남성 가을 캐주얼 맨투맨</span>
 
-                                    <!-- 옵션명이 존재하는 경우에만 출력 -->
-                                    <span class="option-tag"
+                                    <!-- 옵션명 (상품명 옆에 괄호 형태로 출력) -->
+                                    <span class="option-tag text-muted"
                                           th:if="${checkInquiryDto.optionName ne null and !#strings.isEmpty(checkInquiryDto.optionName)}"
-                                          th:text="| (${checkInquiryDto.optionName})|"> (블랙 / L)</span>
+                                          th:text="|(${checkInquiryDto.optionName})|"> (블랙 / L)</span>
                                 </div>
                             </div>
-                            <div class="text-right">
+
+                            <!-- 토글 아이콘 -->
+                            <div class="text-right flex-shrink-0">
                                 <span class="small text-secondary toggle-icon">▼</span>
                             </div>
                         </div>
 
                         <!-- 문의 상세 content & 답변 (기본 숨김) -->
-                        <div class="inquiry-body">
+                        <div class="inquiry-body p-3 bg-light border-top" style="display: none;">
                             <!-- 질문 내용 -->
                             <div class="text-dark mb-3" style="white-space: pre-line; line-height: 1.6;" th:text="${checkInquiryDto.content}">
                                 문의 내용이 출력되는 영역입니다.
                             </div>
 
-                            <!-- 답변 내용 (DTO나 Entity에 answer 필드가 있을 경우) -->
-                            <div class="answer-box" th:if="${checkInquiryDto.answerContent ne null and !#strings.isEmpty(checkInquiryDto.answerContent)}">
-                                <span class="answer-badge">↳ 판매자/관리자 답변</span>
+                            <!-- 답변 내용 -->
+                            <div class="answer-box mt-3 p-3 bg-white border-radius-sm" th:if="${checkInquiryDto.answerContent ne null and !#strings.isEmpty(checkInquiryDto.answerContent)}">
+                                <div class="font-weight-bold text-primary mb-2" style="font-size: 14px;">↳ 판매자/관리자 답변</div>
                                 <div class="text-dark" style="white-space: pre-line; line-height: 1.6;" th:text="${checkInquiryDto.answerContent}">
                                     답변 내용이 출력됩니다.
                                 </div>
@@ -211,6 +218,7 @@
 
             </div>
         </div>
+
     </div>
 </div>
 

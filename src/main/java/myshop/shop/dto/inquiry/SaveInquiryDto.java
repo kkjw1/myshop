@@ -13,6 +13,7 @@ public class SaveInquiryDto {
     private Long memberNo;
     private String optionName;
     private InquiryCategory inquiryCategory;
+    private String title;
     private String content;
 
     public SaveInquiryDto() {
