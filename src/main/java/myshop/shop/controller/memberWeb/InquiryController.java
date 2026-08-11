@@ -25,6 +25,7 @@ public class InquiryController {
 
     private final InquiryService inquiryService;
 
+
     /**
      * 문의하기
      * 주문 목록/배송 조회 -> 문의하기
@@ -35,8 +36,20 @@ public class InquiryController {
         log.info("saveInquiryDto={}", saveInquiryDto);
         inquiryService.saveInquiry(saveInquiryDto);
         return "redirect:/myPage/inquiry";
-        //todo: 문의확인 페이지 만들었으니까 문의확인페이지에서 나오는거 확인하
     }
+
+
+    /**
+     * 상품/기타 문의하기
+     * 아이템 상세 -> 문의하기
+     */
+    @PostMapping("/inquiry")
+    public String inquiry2(@ModelAttribute SaveInquiryDto saveInquiryDto) {
+        log.info("inquiry2 saveInquiryDto={}", saveInquiryDto);
+        inquiryService.saveProductInquiry(saveInquiryDto);
+        return "redirect:/myPage/inquiry";
+    }
+
 
     /**
      * 문의내역 확인 폼
@@ -44,7 +57,6 @@ public class InquiryController {
     @GetMapping("/myPage/inquiry")
     public String inquiryListForm(@AuthenticationPrincipal LoginCheckMemberDto loginCheckMemberDto, Model model) {
 
-        // todo: 판매자에서 상품문의 답하는 기능 만든 후, 문의확인페이지에서 데이터 나오는거 제작 해야 됨
         List<CheckInquiryDto> checkInquiryDtoList = inquiryService.getInquiryList(loginCheckMemberDto.getNo());
 
         model.addAttribute("checkInquiryDtoList", checkInquiryDtoList);

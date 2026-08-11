@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import myshop.shop.dto.inquiry.CheckInquiryDto;
 import myshop.shop.dto.inquiry.SaveInquiryDto;
 import myshop.shop.entity.inquiry.Inquiry;
+import myshop.shop.entity.inquiry.InquiryCategory;
 import myshop.shop.entity.inquiry.InquiryStatus;
 import myshop.shop.entity.item.Item;
 import myshop.shop.repository.Item.ItemRepository;
@@ -31,6 +32,22 @@ public class InquiryService {
                 saveInquiryDto.getMemberNo(),
                 saveInquiryDto.getOptionName(),
                 saveInquiryDto.getInquiryCategory(),
+                saveInquiryDto.getTitle(),
+                saveInquiryDto.getContent(),
+                InquiryStatus.답변대기));
+    }
+
+    /**
+     * 상품/기타 문의하기
+     * 아이템 상세 -> 문의하기
+     */
+    public void saveProductInquiry(SaveInquiryDto saveInquiryDto) {
+        Item itemProxy = itemRepository.getReferenceById(saveInquiryDto.getItemNo());
+
+        inquiryRepository.save(new Inquiry(itemProxy,
+                saveInquiryDto.getMemberNo(),
+                saveInquiryDto.getOptionName(),
+                InquiryCategory.PRODUCT,
                 saveInquiryDto.getTitle(),
                 saveInquiryDto.getContent(),
                 InquiryStatus.답변대기));
