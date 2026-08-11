@@ -69,6 +69,29 @@
         .btn-outline-secondary { color: #555; border-color: #ccc; font-size: 13px; }
         .btn-outline-secondary:hover { background-color: #f8f8f8; color: #333; }
         .btn-track { color: #4285f4; border-color: #4285f4; font-weight: bold; }
+
+        /* 별점 기본 스타일 */
+        .star-rating {
+            font-size: 2rem;
+        }
+
+        /* 라디오 버튼 숨김 */
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+
+        /* 별 기본 색상 (회색) */
+        .star-rating label.star-item {
+            color: #e0e0e0;
+            cursor: pointer;
+            margin: 0 2px;
+            transition: color 0.15s ease-in-out;
+        }
+
+        /* JS가 붙여주는 active 클래스가 있으면 노란색 (이것만 남기면 됩니다) */
+        .star-rating label.star-item.active {
+            color: #ffc107 !important;
+        }
     </style>
 
     <style th:replace="~{/member/common :: style}">
@@ -400,10 +423,29 @@
                                 반품 신청
                             </button>
 
-                            <button th:if="${manageOrderItemDto.orderItemStatus.name() == '배송완료'}"
-                                    class="btn btn-block btn-track btn-sm">
+                            <button
+                                    th:if="${manageOrderItemDto.orderItemStatus.name() == '배송완료' and manageOrderItemDto.review == false}"
+                                    class="btn btn-block btn-primary btn-sm btn-review-write"
+                                    data-toggle="modal"
+                                    data-target="#reviewModal"
+                                    th:data-order-item-no="${manageOrderItemDto.orderItemNo}"
+                                    th:data-item-name="${manageOrderItemDto.itemName}"
+                                    th:data-option-name="${manageOrderItemDto.optionName}"
+                                    th:data-image-url="${manageOrderItemDto.imageUrl}"
+                                    th:data-member-no="${loginCheckMemberDto.no}"
+                                    th:data-item-no="${manageOrderItemDto.itemNo}"
+                                    th:data-count="${manageOrderItemDto.count}"
+                            >
                                 리뷰 작성하기
                             </button>
+
+                            <button
+                                    th:if="${manageOrderItemDto.orderItemStatus.name() == '배송완료' and manageOrderItemDto.review == true}"
+                                    class="btn btn-block btn-light btn-sm text-muted mb-2" disabled >
+                                <i class="fas font-weight-bold">✓</i> 리뷰 작성 완료
+                            </button>
+
+
 
 <!--                            <div th:if="${#strings.contains(manageOrderItemDto.orderItemStatus.name(), '취소') or #strings.contains(manageOrderItemDto.orderItemStatus.name(), '반품')}"
                                  class="text-muted small text-right pr-2">
@@ -412,6 +454,75 @@
                         </div>
                     </div> </div>
             </div> </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- 리뷰 작성 모달 -->
+<div class="modal fade" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="reviewModalLabel">상품 리뷰 작성</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form id="reviewForm" th:action="@{/myPage/review}" method="post">
+                <!-- 백엔드로 전달할 폼 전송용 히든 필드 -->
+                <input type="hidden" id="reviewOrderItemNo" name="orderItemNo">
+                <input type="hidden" id="reviewItemNo" name="itemNo">
+                <input type="hidden" id="reviewMemberNo" name="memberNo">
+                <input type="hidden" id="reviewRating" name="score" value="0">
+                <input type="hidden" id="reviewCount" name="count">
+                <input type="hidden" id="reviewOptionName" name="optionName">
+
+
+                <div class="modal-body">
+                    <!-- 상품 정보 요약 영역 -->
+                    <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                        <img id="reviewModalImg" src="https://via.placeholder.com/60" class="rounded mr-3" style="width: 60px; height: 60px; object-fit: cover;" alt="상품 이미지">
+                        <div>
+                            <div id="reviewModalItemName" class="font-weight-bold">상품명</div>
+                            <div id="reviewModalOptionName" class="small text-muted">옵션명</div>
+                        </div>
+                    </div>
+
+                    <!-- 별점 선택 영역 -->
+                    <div class="form-group text-center my-3">
+                        <label class="d-block font-weight-bold mb-2">상품은 어떠셨나요?</label>
+                        <div class="star-rating d-inline-flex fs-3" id="starRatingGroup">
+                            <!-- checked 속성 모두 제거 -->
+                            <input type="radio" id="star1" name="starRating" value="1" /><label for="star1" class="star-item" data-value="1" title="1점">★</label>
+                            <input type="radio" id="star2" name="starRating" value="2" /><label for="star2" class="star-item" data-value="2" title="2점">★</label>
+                            <input type="radio" id="star3" name="starRating" value="3" /><label for="star3" class="star-item" data-value="3" title="3점">★</label>
+                            <input type="radio" id="star4" name="starRating" value="4" /><label for="star4" class="star-item" data-value="4" title="4점">★</label>
+                            <input type="radio" id="star5" name="starRating" value="5" /><label for="star5" class="star-item" data-value="5" title="5점">★</label>
+                        </div>
+                    </div>
+
+                    <!-- 리뷰 내용 작성 -->
+                    <div class="form-group">
+                        <label for="reviewContent" class="font-weight-bold">상세 리뷰</label>
+                        <textarea class="form-control" id="reviewContent" name="content" rows="4"
+                                  placeholder="다른 구매자들에게 도움이 되도록 솔직한 리뷰를 남겨주세요. (최소 10자 이상)" required maxlength="500"></textarea>
+                        <div class="text-right mt-1">
+                            <small class="text-muted"><span id="reviewCharCount">0</span> / 500자</small>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">리뷰 등록</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -839,6 +950,117 @@
                 e.preventDefault();
             }
         });
+
+        // 별점 색상 갱신 함수 (N번째 별까지 노란색 칠하기)
+        function updateStarRating(score) {
+            $('.star-item').each(function() {
+                var val = parseInt($(this).data('value'));
+                if (val <= score) {
+                    $(this).addClass('active');
+                } else {
+                    $(this).removeClass('active');
+                }
+            });
+        }
+
+        // 1. 라디오 버튼 change 이벤트로 점수 처리 통합 (label 클릭 시 자동으로 input change가 실행됨)
+        $('input[name="starRating"]').on('change', function() {
+            var score = parseInt($(this).val());
+            $('#reviewRating').val(score);
+            updateStarRating(score);
+        });
+
+        // 2. 마우스 호버 시 실시간 프리뷰
+        $('.star-item').on('mouseenter', function() {
+            var score = parseInt($(this).data('value'));
+            updateStarRating(score);
+        });
+
+        // 3. 마우스가 별점 영역을 벗어나면 실제 '선택된 값(reviewRating)'으로 복구
+        $('#starRatingGroup').on('mouseleave', function() {
+            var selectedScore = parseInt($('#reviewRating').val()) || 0;
+            updateStarRating(selectedScore);
+        });
+
+        // 리뷰 작성하기 버튼 클릭 시 모달 데이터 세팅
+        $('.btn-review-write').on('click', function() {
+            var orderItemNo = $(this).attr('data-order-item-no');
+            var itemName = $(this).attr('data-item-name');
+            var optionName = $(this).attr('data-option-name') || '옵션 없음';
+            var imageUrl = $(this).attr('data-image-url');
+            var memberNo = $(this).attr('data-member-no');
+            var itemNo = $(this).attr('data-item-no');
+            var count = $(this).attr('data-count');
+
+
+            // 모달 내 필드 데이터 바인딩
+            $('#reviewOrderItemNo').val(orderItemNo);
+            $('#reviewItemNo').val(itemNo);
+            $('#reviewMemberNo').val(memberNo);
+            $('#reviewCount').val(count);
+            $('#reviewOptionName').val(optionName);
+
+
+            $('#reviewModalItemName').text(itemName);
+            $('#reviewModalOptionName').text('옵션: ' + optionName);
+
+            if (imageUrl) {
+                $('#reviewModalImg').attr('src', imageUrl);
+            } else {
+                $('#reviewModalImg').attr('src', 'https://via.placeholder.com/60');
+            }
+
+            // 초기화
+            $('#reviewContent').val('');
+            $('#reviewCharCount').text('0');
+            $('#reviewImage').val('');
+            $('.custom-file-label').text('이미지 파일을 선택하세요');
+
+            // 별점 0점으로 초기화
+            $('input[name="starRating"]').prop('checked', false);
+            $('#reviewRating').val(0);
+            updateStarRating(0);
+        });
+
+        // 별점 선택 시 Hidden Input 값 갱신
+        $('input[name="starRating"]').on('change', function() {
+            $('#reviewRating').val($(this).val());
+        });
+
+        // 리뷰 글자수 실시간 세기
+        $('#reviewContent').on('input', function() {
+            var length = $(this).val().length;
+            $('#reviewCharCount').text(length);
+        });
+
+        // 파일 선택 시 파일명 표시 (Bootstrap 커스텀 파일 인풋 처리)
+        $('#reviewImage').on('change', function() {
+            var fileName = $(this).val().split('\\').pop();
+            $(this).siblings('.custom-file-label').addClass("selected").html(fileName || '이미지 파일을 선택하세요');
+        });
+
+        // 리뷰 폼 유효성 검사
+        $('#reviewForm').on('submit', function(e) {
+            var rating = parseInt($('#reviewRating').val()) || 0;
+            if (rating === 0) {
+                alert('별점을 선택해 주세요.');
+                e.preventDefault();
+                return false;
+            }
+
+            var content = $('#reviewContent').val().trim();
+/*            if (content.length < 10) {
+                alert('리뷰 내용은 최소 10자 이상 작성해주세요.');
+                e.preventDefault();
+                return false;
+            }*/
+
+            if (!confirm('리뷰를 등록하시겠습니까?')) {
+                e.preventDefault();
+            }
+        });
+
+
     });
 </script>
 
