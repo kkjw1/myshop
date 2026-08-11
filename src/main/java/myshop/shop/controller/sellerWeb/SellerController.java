@@ -82,8 +82,7 @@ public class SellerController {
      */
     @GetMapping("/seller/inquiry_manage")
     public String requestInquiryForm() {
-        // todo: 사용자 페이지 -> 문의하기 기능, 상품상세 들어가면 문의하기 기능
-        // todo: 판매자 페이지-> 대시보드, 고객 문의 페이지 기능
+        // todo: 판매자 페이지-> 고객 문의 페이지 기능
         return "seller/inquiry/inquiry_manage";
     }
 

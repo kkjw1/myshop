@@ -90,7 +90,8 @@ public class OrderItemRepositoryImpl implements OrderItemRepositoryCustom {
                             orderItem.itemName,
                             orderItem.optionName,
                             orderItem.price.as("totalPrice"),
-                            orderItem.count
+                            orderItem.count,
+                            orderItem.review
                     ))
                     .from(orderItem)
                     .leftJoin(orderItem.delivery, delivery)

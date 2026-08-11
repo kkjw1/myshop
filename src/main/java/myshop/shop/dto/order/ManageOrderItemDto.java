@@ -22,6 +22,7 @@ public class ManageOrderItemDto {
     private String optionName;
     private BigDecimal totalPrice;
     private int count;
+    private Boolean review;
 
     public ManageOrderItemDto() {
     }

@@ -40,6 +40,8 @@ public class OrderItem extends BaseDateEntity {
     @Enumerated(EnumType.STRING)
     private OrderItemStatus orderItemStatus;
 
+    private Boolean review;     // 리뷰 있으면 true
+
     public OrderItem() {
     }
 
@@ -53,6 +55,7 @@ public class OrderItem extends BaseDateEntity {
         this.itemName = itemName;
         this.optionName = optionName;
         this.orderItemStatus = orderItemStatus;
+        this.review = false;
     }
     public OrderItem(Order order, Item item, Delivery delivery, int count, int price, String imageUrl, String itemName, String optionName, OrderItemStatus orderItemStatus) {
         this.order = order;
@@ -64,6 +67,7 @@ public class OrderItem extends BaseDateEntity {
         this.itemName = itemName;
         this.optionName = optionName;
         this.orderItemStatus = orderItemStatus;
+        this.review = false;
     }
 
     //==========편의 메서드===========
@@ -75,6 +79,10 @@ public class OrderItem extends BaseDateEntity {
     public void updateItem(Item item) {
         this.item = item;
         item.getOrderItemList().add(this);
+    }
+
+    public void updateReview(Boolean review) {
+        this.review = review;
     }
 
     public void updateOrderItemStatus(OrderItemStatus orderItemStatus) {
