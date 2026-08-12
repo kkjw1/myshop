@@ -101,7 +101,8 @@ public class DeliveryRepositoryImpl implements DeliveryRepositoryCustom{
                         orderItem.price,
                         delivery.deliveryStatus,
                         delivery.courier,
-                        delivery.trackingNumber))
+                        delivery.trackingNumber,
+                        orderItem.orderItemStatus))
                 .from(orderItem)
                 .leftJoin(orderItem.delivery, delivery)
                 .where(orderItem.order.no.eq(orderNo))

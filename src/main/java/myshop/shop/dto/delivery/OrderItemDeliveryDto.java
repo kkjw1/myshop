@@ -4,11 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import myshop.shop.entity.delivery.DeliveryStatus;
+import myshop.shop.entity.orderItem.OrderItemStatus;
 
 import java.math.BigDecimal;
 
 @Getter @Setter
-@ToString(of = {"orderItemNo", "itemName", "count", "price", "deliveryStatus", "courier", "trackingNumber"})
+@ToString(of = {"orderItemNo", "itemName", "count", "price", "deliveryStatus", "courier", "trackingNumber", "orderItemStatus"})
 public class OrderItemDeliveryDto {
     /**
      * - 관리 쪽 -
@@ -18,9 +19,10 @@ public class OrderItemDeliveryDto {
     private String itemName;
     private int count;
     private BigDecimal price;
-    private DeliveryStatus deliveryStatus;
+    private DeliveryStatus deliveryStatus;      // 배송상태
     private String courier;
     private String trackingNumber;
+    private OrderItemStatus orderItemStatus;        // 상품주문상태
 
     public OrderItemDeliveryDto() {
     }
