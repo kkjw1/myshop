@@ -26,7 +26,6 @@ public class ReviewController {
 
        reviewService.saveReview(saveReviewDto);
 
-       // todo: 판매자의 주문/배송 관리 -> 관리 -> 현재 상태가 배송상태를 기준으로 뜨는거 상품주문상태로 변경
         // todo: 상품 상세에서 리뷰와 문의 내역 뜨는 기능 추가하기
        return "redirect:/myPage/orderList";
     }

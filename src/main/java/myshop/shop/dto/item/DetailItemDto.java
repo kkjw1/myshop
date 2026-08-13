@@ -3,6 +3,9 @@ package myshop.shop.dto.item;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import myshop.shop.controller.ItemController;
+import myshop.shop.controller.ItemController.DetailItemInquiryDto;
+import myshop.shop.controller.ItemController.DetailItemReviewDto;
 import myshop.shop.entity.item.ItemCategory;
 import myshop.shop.entity.item.ItemOption;
 
@@ -25,6 +28,10 @@ public class DetailItemDto {
     private int totalStock;
 
     private List<DetailItemOptionDto> detailItemOptionDtoList = new ArrayList<>();
+    private List<DetailItemReviewDto> detailItemReviewDtoList = new ArrayList<>();
+    private List<DetailItemInquiryDto> detailItemInquiryDtoList = new ArrayList<>();
+
+    // todo: Impl에서 detailItemReviewDtoList, detailItemInquiryDtoList 이거 두 개 데이터 채우기
 
     private String content;
 
@@ -53,6 +60,5 @@ public class DetailItemDto {
                                         .toList();
         this.content = content;
     }
-
 
 }
