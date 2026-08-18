@@ -22,6 +22,7 @@ public class Review {
     private int count;
     private Long score;
     private String content;
+    private Long goodCount;
 
     public Review() {
     }
@@ -33,5 +34,10 @@ public class Review {
         this.count = count;
         this.score = score;
         this.content = content;
+        this.goodCount = 0L;
+    }
+
+    public void addGoodCount() {
+        this.goodCount += 1;
     }
 }
