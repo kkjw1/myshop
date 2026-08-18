@@ -1,6 +1,9 @@
 package myshop.shop.service;
 
 import lombok.RequiredArgsConstructor;
+import myshop.shop.controller.HomeItemController;
+import myshop.shop.controller.HomeItemController.DetailItemReviewDto;
+import myshop.shop.dto.review.ReviewScoreDto;
 import myshop.shop.dto.review.SaveReviewDto;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.orderItem.OrderItem;
@@ -8,6 +11,8 @@ import myshop.shop.entity.review.Review;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.repository.orderItem.OrderItemRepository;
 import myshop.shop.repository.review.ReviewRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,5 +43,19 @@ public class ReviewService {
         if (orderItem != null) {
             orderItem.updateReview(true);
         }
+    }
+
+
+    /**
+     * 상품 상세 -> 상품 리뷰
+     */
+    public Page<DetailItemReviewDto> itemDetailReview(Pageable pageable, Long itemNo) {
+//        return reviewRepository.findDetailItemReview(pageable, itemNo);
+        return null;
+    }
+
+
+    public ReviewScoreDto itemDetailReviewScore(Long itemNo) {
+        return reviewRepository.findReviewScore(itemNo);
     }
 }

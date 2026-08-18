@@ -212,6 +212,47 @@
             border-color: #dc3545 !important;
             color: #dc3545;
         }
+
+
+        /* 상품 별점 관련 css */
+        .rating-filter-dropdown { max-width: 240px; }
+        .rating-filter-dropdown .dropdown-toggle-box {
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            background: #fff;
+            font-size: 0.95rem;
+        }
+        .rating-filter-dropdown .dropdown-toggle-box:hover { border-color: #4285f4; }
+        .rating-filter-menu {
+            display: none;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            margin-top: 6px;
+            background: #fff;
+            overflow: hidden;
+        }
+        .rating-filter-menu.show { display: block; }
+        .rating-filter-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            color: #333;
+            cursor: pointer;
+        }
+        .rating-filter-item:hover { background: #f5f8ff; }
+        .rating-filter-item.active { font-weight: bold; color: #4285f4; background: #f0f6ff; }
+        .rating-filter-item .count { color: #999; font-size: 0.85rem; }
+        .rating-filter-item .star-icon { color: #ff9800; margin-right: 3px; }
+
+
     </style>
 </head>
 <body>
@@ -454,8 +495,48 @@
             <div class="tab-pane fade" id="review" role="tabpanel">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h5 class="font-weight-bold">상품평</h5>
-                    <button class="btn btn-outline-primary btn-sm" onclick="location.href='/myPage/review/write'">리뷰 작성하기</button>
                 </div>
+
+                <div class="rating-filter-dropdown mb-4" id="ratingFilterDropdown">
+                    <div class="dropdown-toggle-box" onclick="toggleRatingMenu()">
+                        <span id="ratingDropdownLabel">모든 별점</span>
+                        <span>▾</span>
+                    </div>
+                    <div class="rating-filter-menu" id="ratingFilterMenu">
+                        <div class="rating-filter-item active" data-score="" data-label="모든 별점" onclick="selectRating(this)">
+                            <span>모든 별점</span>
+                            <span class="count" th:text="${reviewScoreDto.total}">3979</span>
+                        </div>
+                        <div class="rating-filter-item" data-score="5" data-label="최고 ★★★★★" onclick="selectRating(this)">
+                            <span><span class="star-icon">★★★★★</span>최고</span>
+                            <span class="count" th:text="${reviewScoreDto.score5}">2663</span>
+                        </div>
+                        <div class="rating-filter-item" data-score="4" data-label="좋음 ★★★★☆" onclick="selectRating(this)">
+                            <span><span class="star-icon">★★★★☆</span>좋음</span>
+                            <span class="count" th:text="${reviewScoreDto.score4}">645</span>
+                        </div>
+                        <div class="rating-filter-item" data-score="3" data-label="보통 ★★★☆☆" onclick="selectRating(this)">
+                            <span><span class="star-icon">★★★☆☆</span>보통</span>
+                            <span class="count" th:text="${reviewScoreDto.score3}">323</span>
+                        </div>
+                        <div class="rating-filter-item" data-score="2" data-label="별로 ★★☆☆☆" onclick="selectRating(this)">
+                            <span><span class="star-icon">★★☆☆☆</span>별로</span>
+                            <span class="count" th:text="${reviewScoreDto.score2}">126</span>
+                        </div>
+                        <div class="rating-filter-item" data-score="1" data-label="나쁨 ★☆☆☆☆" onclick="selectRating(this)">
+                            <span><span class="star-icon">★☆☆☆☆</span>나쁨</span>
+                            <span class="count" th:text="${reviewScoreDto.score1}">222</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="reviewListContainer">
+                    <!-- 이전 답변과 동일 -->
+                </div>
+
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center" id="reviewPagination"></ul>
+                </nav>
 
                 <!-- 리뷰 리스트 (반복문) -->
 <!--                <div th:if="${not #lists.isEmpty(detailItemDto.detailItemOptionDtoList)}">
@@ -854,6 +935,31 @@
         alert("문의가 정상적으로 등록되었습니다.");
         closeQnaModal();
     }
+
+    // 상품 평점
+    function toggleRatingMenu() {
+        document.getElementById('ratingFilterMenu').classList.toggle('show');
+    }
+
+    function selectRating(el) {
+        document.querySelectorAll('.rating-filter-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+
+        document.getElementById('ratingDropdownLabel').innerText = el.getAttribute('data-label');
+        currentScore = el.getAttribute('data-score') || null;
+
+        document.getElementById('ratingFilterMenu').classList.remove('show');
+        loadReviews(0);
+    }
+
+    // 바깥 클릭 시 드롭다운 닫기
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('ratingFilterDropdown');
+        const menu = document.getElementById('ratingFilterMenu');
+        if (dropdown && !dropdown.contains(event.target)) {
+            menu.classList.remove('show');
+        }
+    });
 
 </script>
 

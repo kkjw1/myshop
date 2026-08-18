@@ -9,6 +9,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import myshop.shop.dto.item.DetailItemDto;
 import myshop.shop.dto.member.LoginCheckMemberDto;
+import myshop.shop.dto.review.ReviewScoreDto;
 import myshop.shop.entity.inquiry.InquiryCategory;
 import myshop.shop.entity.inquiry.InquiryStatus;
 import myshop.shop.entity.item.Item;
@@ -16,6 +17,8 @@ import myshop.shop.entity.item.ItemOption;
 import myshop.shop.repository.Item.ItemOptionRepository;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.service.ItemService;
+import myshop.shop.service.ReviewService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,27 +28,36 @@ import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOG
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-public class ItemController {
+public class HomeItemController {
 
     private final ItemService itemService;
     private final ItemRepository itemRepository;
     private final ItemOptionRepository itemOptionRepository;
-
+    private final ReviewService reviewService;
 
 
     /**
      * 상품 상세 폼
      */
     @GetMapping("/item")
-    public String itemForm(@RequestParam("itemNo") Long itemNo, HttpServletRequest request, Model model) {
-//        new LoginCheckMemberDto().loginCheck(request, model);
+    public String itemForm(Pageable pageable,
+            @RequestParam("itemNo") Long itemNo, HttpServletRequest request, Model model) {
 
         DetailItemDto detailItemDto = itemService.getDetailItem(itemNo);
         detailItemDto.setItemNo(itemNo);
-        model.addAttribute("detailItemDto", detailItemDto);
 
+        // todo: findDetailItemReview 메서드를 reviewService에서 구현하게 하고 reviewService 사용하기
+        // 마찬가지로 detailItemInquiryDto 를 부르는것 추가하기(메모장에 조금 만들어둠)
+        reviewService.itemDetailReview(pageable, itemNo);
+        ReviewScoreDto reviewScoreDto = reviewService.itemDetailReviewScore(itemNo);
+
+        // todo: 3. Service / Controller — 최초 진입 시에만 로드, 클로드 여기부터 시작
         //조회수 증가
         itemService.addViewCount(itemNo);
+
+
+        model.addAttribute("reviewScoreDto", reviewScoreDto);
+        model.addAttribute("detailItemDto", detailItemDto);
         return "shop/item_detail";
     }
     @Getter @Setter
@@ -56,6 +68,8 @@ public class ItemController {
         private int count;
         private Long score;
         private String content;
+        private String memberId;
+        private String memberName;
 
         public DetailItemReviewDto() {
         }
@@ -64,6 +78,8 @@ public class ItemController {
     @ToString
     public static class DetailItemInquiryDto {
         private Long memberNo;
+        private String memberId;
+        private String memberName;
         private String optionName;
         private InquiryCategory inquiryCategory;
         private String title;

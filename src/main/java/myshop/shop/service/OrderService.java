@@ -2,7 +2,7 @@ package myshop.shop.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import myshop.shop.controller.HomeController.CheckDirectOrderDto;
+import myshop.shop.controller.HomeItemController.CheckDirectOrderDto;
 import myshop.shop.dto.order.*;
 import myshop.shop.entity.orderItem.OrderItem;
 import myshop.shop.entity.delivery.Delivery;

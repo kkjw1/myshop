@@ -4,12 +4,9 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import myshop.shop.controller.HomeController.CheckDirectOrderDto;
-import myshop.shop.dto.cart.ManageCartDto;
+import myshop.shop.controller.HomeItemController.CheckDirectOrderDto;
 import myshop.shop.dto.order.DirectOrderDto;
-import myshop.shop.entity.item.QItemImage;
 
-import static myshop.shop.entity.QCart.cart;
 import static myshop.shop.entity.item.QItem.item;
 import static myshop.shop.entity.item.QItemImage.itemImage;
 import static myshop.shop.entity.item.QItemOption.itemOption;

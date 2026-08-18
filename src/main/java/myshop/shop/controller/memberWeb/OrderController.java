@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import myshop.shop.controller.HomeController.CheckDirectOrderDto;
+import myshop.shop.controller.HomeItemController.CheckDirectOrderDto;
 import myshop.shop.dto.order.*;
 import myshop.shop.dto.address.ManageAddressDto;
 import myshop.shop.dto.cart.ManageCartDto;
@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static myshop.shop.controller.memberWeb.MemberController.SessionConst.LOGIN_MEMBER;
 import static myshop.shop.service.RedisService.RESERVE_KEY;
 
 @Controller
