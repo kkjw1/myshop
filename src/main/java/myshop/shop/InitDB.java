@@ -14,15 +14,20 @@ import myshop.shop.entity.*;
 import myshop.shop.entity.cancelRequest.CancelReasonCode;
 import myshop.shop.entity.cancelRequest.CancelRequestStatus;
 import myshop.shop.entity.delivery.DeliveryStatus;
+import myshop.shop.entity.item.Item;
 import myshop.shop.entity.item.ItemCategory;
 import myshop.shop.entity.item.ItemStatus;
 import myshop.shop.entity.member.Gender;
 import myshop.shop.entity.member.Member;
 import myshop.shop.entity.member.MemberLevel;
+import myshop.shop.entity.orderItem.OrderItemStatus;
 import myshop.shop.entity.returnRequest.ReturnReasonCode;
 import myshop.shop.entity.returnRequest.ReturnRequestStatus;
+import myshop.shop.entity.review.Review;
+import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.repository.address.AddressRepository;
 import myshop.shop.repository.member.MemberRepository;
+import myshop.shop.repository.review.ReviewRepository;
 import myshop.shop.repository.seller.SellerRepository;
 import myshop.shop.service.*;
 import org.springframework.context.annotation.Profile;
@@ -62,6 +67,8 @@ public class InitDB {
         private final OrderService orderService;
         private final CancelRequestService cancelRequestService;
         private final ReturnRequestService returnRequestService;
+        private final ItemRepository itemRepository;
+        private final ReviewRepository reviewRepository;
 
 
         public void dbInit() {
@@ -234,6 +241,47 @@ public class InitDB {
                     .setParameter("updateDate2", LocalDateTime.of(2026, 7, 7, 0, 0))
                     .executeUpdate();
 
+
+            /**
+             * 배송완료 데이터
+             */
+            List<AddOrderItemDto> addOrderItemDtoList4 = new ArrayList<>();
+            addOrderItemDtoList4.add(new AddOrderItemDto(5L, 1L, 1L, 2, null, BigDecimal.valueOf(48600),
+                    "/shop_image/8ea0eafb-b1a7-492c-b574-654946184243.jpg", "상품테스트1", "검정색"));
+            orderService.saveOrder(5L, new AddOrderDto("메인수령인", "010-1234-1234", "12345", "인천광역시 서구",
+                    "A아파트", "배송 전 미리 연락 부탁드립니다.", addOrderItemDtoList4, BigDecimal.valueOf(48600),
+                    0, BigDecimal.valueOf(48600)));
+            em.createQuery("update Delivery d " +
+                            "set d.deliveryStatus=:status, d.courier=:courier, d.trackingNumber=:trackingNumber " +
+                            "where d.no = 5L")
+                    .setParameter("status", DeliveryStatus.배송완료)
+                    .setParameter("courier", "우체국택배")
+                    .setParameter("trackingNumber", "12345432")
+                    .executeUpdate();
+            em.createQuery("update OrderItem oi set oi.orderItemStatus=:orderItemStatus where oi.no = 5L")
+                    .setParameter("orderItemStatus", OrderItemStatus.배송완료)
+                    .executeUpdate();
+
+            /**
+             * 상품리뷰 데이터
+             */
+            //itemNo=1, itemOption 1,2,3,4 존재함
+            Item itemProxy = itemRepository.getReferenceById(1L);
+            for (int i=1; i<10; i++) {
+                reviewRepository.save(new Review(itemProxy, 1L, "검정색", i, 5L, "상품 1번의 검정색 옵션 상품리뷰" + i));
+            }
+            for (int i=1; i<9; i++) {
+                reviewRepository.save(new Review(itemProxy, 2L, "나이키", i, 4L, "상품 1번의 나이키 옵션 상품리뷰" + i));
+            }
+            for (int i=1; i<8; i++) {
+                reviewRepository.save(new Review(itemProxy, 3L, "흰색", i, 3L, "상품 1번의 흰색 옵션 상품리뷰" + i));
+            }
+            for (int i=1; i<7; i++) {
+                reviewRepository.save(new Review(itemProxy, 4L, "로고", i, 2L, "상품 1번의 로고 옵션 상품리뷰" + i));
+            }
+            for (int i=1; i<6; i++) {
+                reviewRepository.save(new Review(itemProxy, 3L, "검정색", i, 1L, "상품 1번의 검정색 옵션 상품리뷰" + i));
+            }
             em.flush();
             em.clear();
         }

@@ -75,6 +75,8 @@ public class OrderItemRepositoryImpl implements OrderItemRepositoryCustom {
                 .where(order.member.no.eq(memberNo))
                 .fetch();
 
+
+
         for (ManageOrderDto manageOrderDto : manageOrderDtoList) {
             Long orderNo = manageOrderDto.getOrderNo();
 

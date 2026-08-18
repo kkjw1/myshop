@@ -2,6 +2,7 @@ package myshop.shop.repository.review;
 
 import myshop.shop.controller.HomeItemController;
 import myshop.shop.dto.review.ReviewScoreDto;
+import myshop.shop.dto.review.SearchReviewDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,7 +12,7 @@ public interface ReviewRepositoryCustom {
     /**
      * 상품상세 -> 상품 리뷰
      */
-    Page<HomeItemController.DetailItemReviewDto> findDetailItemReview(Pageable pageable, Long itemNo, Long score);
+    Page<HomeItemController.DetailItemReviewDto> findDetailItemReview(Pageable pageable, Long itemNo, SearchReviewDto searchReviewDto);
 
 
     /**

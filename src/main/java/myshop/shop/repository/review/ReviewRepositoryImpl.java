@@ -1,17 +1,21 @@
 package myshop.shop.repository.review;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import myshop.shop.controller.HomeItemController.DetailItemReviewDto;
 import myshop.shop.dto.review.ReviewScoreDto;
+import myshop.shop.dto.review.SearchReviewDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.io.Serializable;
 import java.util.List;
 
 import static myshop.shop.entity.member.QMember.member;
@@ -22,8 +26,9 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+
     @Override
-    public Page<DetailItemReviewDto> findDetailItemReview(Pageable pageable, Long itemNo, Long score) {
+    public Page<DetailItemReviewDto> findDetailItemReview(Pageable pageable, Long itemNo, SearchReviewDto searchReviewDto) {
         List<DetailItemReviewDto> content = queryFactory
                 .select(Projections.fields(DetailItemReviewDto.class,
                         review.no.as("reviewNo"),
@@ -31,13 +36,18 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
                         review.count,
                         review.score,
                         review.content,
-                        member.id.as("memberId"),
-                        member.name.as("memberName")
+                        Expressions.stringTemplate(
+                                "CASE WHEN LENGTH({0}) <= 3 THEN {0} ELSE CONCAT(LEFT({0}, 3), REPEAT('*', LENGTH({0}) - 3)) END",
+                                member.id
+                        ).as("maskedMemberId"),
+                        member.name.as("memberName"),
+                        review.goodCount
                 ))
                 .from(review)
                 .leftJoin(member)
                 .on(review.memberNo.eq(member.no))
-                .where(review.item.no.eq(itemNo), scoreEq(score))
+                .where(review.item.no.eq(itemNo), scoreEq(searchReviewDto.getScore()))
+                .orderBy(orderBy(searchReviewDto))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -47,7 +57,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
                 .from(review)
                 .leftJoin(member)
                 .on(review.memberNo.eq(member.no))
-                .where(review.item.no.eq(itemNo));
+                .where(review.item.no.eq(itemNo), scoreEq(searchReviewDto.getScore()));
 
         return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
     }
@@ -55,6 +65,10 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
     private BooleanExpression scoreEq(Long score) {
         return score != null ? review.score.eq(score) : null;
     }
+    private OrderSpecifier<? extends Serializable> orderBy(SearchReviewDto searchReviewDto) {
+        return searchReviewDto.getSortType().equals("best") ? review.goodCount.desc() : review.createdDate.desc();
+    }
+
 
     @Override
     public ReviewScoreDto findReviewScore(Long itemNo) {

@@ -40,6 +40,15 @@ public class LoginCheckMemberInterceptor implements HandlerInterceptor {
             log.info("preHandle start");
             String token = getToken(request, "accessToken");
 
+            if (token == null) {
+                log.info("token이 없습니다. 최초 로그인");
+                String uri = request.getRequestURI();
+                String queryString = request.getQueryString();
+                String redirectURL = (queryString != null) ? uri + "?" + queryString : uri;
+                response.sendRedirect("/login?redirectURL=" + redirectURL);
+                return false;
+            }
+
             try {
                 Jwts.parser()
                         .verifyWith(secretKey)

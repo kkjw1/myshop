@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import myshop.shop.dto.item.DetailItemDto;
 import myshop.shop.dto.member.LoginCheckMemberDto;
 import myshop.shop.dto.review.ReviewScoreDto;
+import myshop.shop.dto.review.SearchReviewDto;
 import myshop.shop.entity.inquiry.InquiryCategory;
 import myshop.shop.entity.inquiry.InquiryStatus;
 import myshop.shop.entity.item.Item;
@@ -18,7 +19,10 @@ import myshop.shop.repository.Item.ItemOptionRepository;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.service.ItemService;
 import myshop.shop.service.ReviewService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -40,22 +44,23 @@ public class HomeItemController {
      * 상품 상세 폼
      */
     @GetMapping("/item")
-    public String itemForm(Pageable pageable,
+    public String itemForm(@PageableDefault(size = 5) Pageable pageable,
             @RequestParam("itemNo") Long itemNo, HttpServletRequest request, Model model) {
 
         DetailItemDto detailItemDto = itemService.getDetailItem(itemNo);
         detailItemDto.setItemNo(itemNo);
 
-        // todo: findDetailItemReview 메서드를 reviewService에서 구현하게 하고 reviewService 사용하기
-        // 마찬가지로 detailItemInquiryDto 를 부르는것 추가하기(메모장에 조금 만들어둠)
-        reviewService.itemDetailReview(pageable, itemNo);
+        SearchReviewDto searchReviewDto = new SearchReviewDto();
+        searchReviewDto.setSortType("latest");
+        Page<DetailItemReviewDto> detailItemReviewDtoPage = reviewService.itemDetailReview(pageable, itemNo, searchReviewDto);
         ReviewScoreDto reviewScoreDto = reviewService.itemDetailReviewScore(itemNo);
 
-        // todo: 3. Service / Controller — 최초 진입 시에만 로드, 클로드 여기부터 시작
+        //todo: detailItemInquiryDto 를 부르는것 추가
+
         //조회수 증가
         itemService.addViewCount(itemNo);
 
-
+        model.addAttribute("detailItemReviewDtoPage", detailItemReviewDtoPage);
         model.addAttribute("reviewScoreDto", reviewScoreDto);
         model.addAttribute("detailItemDto", detailItemDto);
         return "shop/item_detail";
@@ -68,8 +73,9 @@ public class HomeItemController {
         private int count;
         private Long score;
         private String content;
-        private String memberId;
+        private String maskedMemberId;
         private String memberName;
+        private Long goodCount;
 
         public DetailItemReviewDto() {
         }
@@ -92,6 +98,28 @@ public class HomeItemController {
     }
 
 
+    /**
+     * 상품 리뷰 -> 정렬/별점/페이징
+     */
+    @GetMapping("/item/reviews")
+    @ResponseBody
+    public Page<DetailItemReviewDto> searchItemReview(@RequestParam("itemNo") Long itemNo,
+                                                      @ModelAttribute SearchReviewDto searchReviewDto, Pageable pageable) {
+        log.info("searchReviewDto={}, pageable={}", searchReviewDto, pageable);
+        return reviewService.itemDetailReview(pageable, itemNo, searchReviewDto);
+    }
+
+
+    /**
+     * 도움이 돼요 버튼
+     * 상품상세 -> 상품 리뷰
+     */
+    @PostMapping("/item/review/good/{reviewNo}")
+    @ResponseBody
+    public ResponseEntity<Long> addGoodCount(@PathVariable Long reviewNo, @RequestParam Boolean like) {
+        Long goodCount = reviewService.toggleGoodCount(reviewNo, like);
+        return ResponseEntity.ok(goodCount);
+    }
 
 
     /**

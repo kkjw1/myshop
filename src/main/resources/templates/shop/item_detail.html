@@ -215,7 +215,11 @@
 
 
         /* 상품 별점 관련 css */
-        .rating-filter-dropdown { max-width: 240px; }
+        /* 부모 컨테이너: 드롭다운 메뉴의 기준점(relative)을 잡아줍니다. */
+        .rating-filter-dropdown {
+            position: relative; /* 중요: 레이아웃을 밀어내지 않게 하는 핵심 */
+            width: 170px;
+        }
         .rating-filter-dropdown .dropdown-toggle-box {
             border: 1px solid #ccc;
             border-radius: 6px;
@@ -228,15 +232,22 @@
             font-size: 0.95rem;
         }
         .rating-filter-dropdown .dropdown-toggle-box:hover { border-color: #4285f4; }
+        /* 드롭다운 메뉴: absolute를 적용해 레이어 형태로 띄웁니다. */
         .rating-filter-menu {
             display: none;
+            position: absolute; /* 중요: 문서 흐름에서 제외하여 Floating 처리 */
+            top: calc(100% + 4px); /* 버튼 바로 밑에 배치 */
+            right: 0;             /* 오른쪽 기준으로 정렬 (필요시 left: 0 으로 변경) */
+            min-width: 220px;     /* 메뉴 목록 폭 설정 */
+
             border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-            margin-top: 6px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Floating 느낌을 주는 그림자 */
             background: #fff;
             overflow: hidden;
+            z-index: 1000;        /* 다른 요소(구분선, 다음 컨텐츠 등) 위에 표시되도록 제어 */
         }
+
         .rating-filter-menu.show { display: block; }
         .rating-filter-item {
             display: flex;
@@ -251,6 +262,35 @@
         .rating-filter-item.active { font-weight: bold; color: #4285f4; background: #f0f6ff; }
         .rating-filter-item .count { color: #999; font-size: 0.85rem; }
         .rating-filter-item .star-icon { color: #ff9800; margin-right: 3px; }
+
+
+        /*베스트순 최신순*/
+        .sort-filters {
+            display: flex;
+            align-items: center;
+            gap: 12px; /* 베스트순과 최신순 사이의 간격 (원하는 크기로 조정 가능) */
+        }
+
+        /* 정렬 아이템 기본 스타일 */
+        .sort-filters .sort-item {
+            font-size: 0.95rem;
+            color: #666666; /* 비활성화 상태 색상 */
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: normal;
+            transition: color 0.2s ease, font-weight 0.2s ease;
+        }
+
+        /* 마우스 호버 시 */
+        .sort-filters .sort-item:hover {
+            color: #333333;
+        }
+
+        /* 활성화 상태 (파란색 + 두꺼운 폰트) */
+        .sort-filters .sort-item.active {
+            color: #3858f6; /* 파란색 */
+            font-weight: bold; /* 폰트 두껍게 */
+        }
 
 
     </style>
@@ -475,7 +515,7 @@
                 <a class="nav-link active" id="detail-tab" data-toggle="tab" href="#detail" role="tab">상품상세</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="review-tab" data-toggle="tab" href="#review" role="tab">상품리뷰(0)</a>
+                <a class="nav-link" id="review-tab" data-toggle="tab" href="#review" role="tab" th:text="|상품리뷰(${reviewScoreDto.getTotal()})|">상품리뷰(0)</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" id="qna-tab" data-toggle="tab" href="#qna" role="tab">상품문의</a>
@@ -493,66 +533,59 @@
 
             <!-- 2. 상품 리뷰 -->
             <div class="tab-pane fade" id="review" role="tabpanel">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="font-weight-bold">상품평</h5>
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                    <!-- 정렬 필터 (왼쪽) -->
+                    <div class="sort-filters d-flex align-items-center">
+                        <a href="javascript:void(0)" class="sort-item active" onclick="selectSort(this, 'latest')">최신순</a>
+                        <a href="javascript:void(0)" class="sort-item" onclick="selectSort(this, 'best')">베스트순</a>
+                    </div>
+
+                    <!-- 2-2. 검색 및 별점 필터 (오른쪽) -->
+                    <div class="d-flex align-items-center">
+                        <!-- 별점 필터 드롭다운 (스타일 수정) -->
+                        <div class="rating-filter-dropdown" id="ratingFilterDropdown">
+                            <div class="dropdown-toggle-box" onclick="toggleRatingMenu()">
+                                <span id="ratingDropdownLabel">모든 별점</span>
+                            </div>
+                            <div class="rating-filter-menu" id="ratingFilterMenu">
+                                <div class="rating-filter-item active" data-score="" data-label="모든 별점" onclick="selectRating(this)">
+                                    <span>모든 별점</span>
+                                    <span class="count" th:text="${reviewScoreDto.total}">3979</span>
+                                </div>
+                                <div class="rating-filter-item" data-score="5" data-label="최고 ★★★★★" onclick="selectRating(this)">
+                                    <span><span class="star-icon">★★★★★</span>최고</span>
+                                    <span class="count" th:text="${reviewScoreDto.score5}">2663</span>
+                                </div>
+                                <div class="rating-filter-item" data-score="4" data-label="좋음 ★★★★☆" onclick="selectRating(this)">
+                                    <span><span class="star-icon">★★★★☆</span>좋음</span>
+                                    <span class="count" th:text="${reviewScoreDto.score4}">645</span>
+                                </div>
+                                <div class="rating-filter-item" data-score="3" data-label="보통 ★★★☆☆" onclick="selectRating(this)">
+                                    <span><span class="star-icon">★★★☆☆</span>보통</span>
+                                    <span class="count" th:text="${reviewScoreDto.score3}">323</span>
+                                </div>
+                                <div class="rating-filter-item" data-score="2" data-label="별로 ★★☆☆☆" onclick="selectRating(this)">
+                                    <span><span class="star-icon">★★☆☆☆</span>별로</span>
+                                    <span class="count" th:text="${reviewScoreDto.score2}">126</span>
+                                </div>
+                                <div class="rating-filter-item" data-score="1" data-label="나쁨 ★☆☆☆☆" onclick="selectRating(this)">
+                                    <span><span class="star-icon">★☆☆☆☆</span>나쁨</span>
+                                    <span class="count" th:text="${reviewScoreDto.score1}">222</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="rating-filter-dropdown mb-4" id="ratingFilterDropdown">
-                    <div class="dropdown-toggle-box" onclick="toggleRatingMenu()">
-                        <span id="ratingDropdownLabel">모든 별점</span>
-                        <span>▾</span>
-                    </div>
-                    <div class="rating-filter-menu" id="ratingFilterMenu">
-                        <div class="rating-filter-item active" data-score="" data-label="모든 별점" onclick="selectRating(this)">
-                            <span>모든 별점</span>
-                            <span class="count" th:text="${reviewScoreDto.total}">3979</span>
-                        </div>
-                        <div class="rating-filter-item" data-score="5" data-label="최고 ★★★★★" onclick="selectRating(this)">
-                            <span><span class="star-icon">★★★★★</span>최고</span>
-                            <span class="count" th:text="${reviewScoreDto.score5}">2663</span>
-                        </div>
-                        <div class="rating-filter-item" data-score="4" data-label="좋음 ★★★★☆" onclick="selectRating(this)">
-                            <span><span class="star-icon">★★★★☆</span>좋음</span>
-                            <span class="count" th:text="${reviewScoreDto.score4}">645</span>
-                        </div>
-                        <div class="rating-filter-item" data-score="3" data-label="보통 ★★★☆☆" onclick="selectRating(this)">
-                            <span><span class="star-icon">★★★☆☆</span>보통</span>
-                            <span class="count" th:text="${reviewScoreDto.score3}">323</span>
-                        </div>
-                        <div class="rating-filter-item" data-score="2" data-label="별로 ★★☆☆☆" onclick="selectRating(this)">
-                            <span><span class="star-icon">★★☆☆☆</span>별로</span>
-                            <span class="count" th:text="${reviewScoreDto.score2}">126</span>
-                        </div>
-                        <div class="rating-filter-item" data-score="1" data-label="나쁨 ★☆☆☆☆" onclick="selectRating(this)">
-                            <span><span class="star-icon">★☆☆☆☆</span>나쁨</span>
-                            <span class="count" th:text="${reviewScoreDto.score1}">222</span>
-                        </div>
-                    </div>
-                </div>
-
+                <!-- 3. 리뷰 리스트 영역 -->
                 <div id="reviewListContainer">
-                    <!-- 이전 답변과 동일 -->
+                    <!-- JS(renderReviewList)가 이 안을 채웁니다. 최초 진입 시엔 reviewPage.content를 inline해서 렌더링 -->
                 </div>
 
+                <!-- 4. 페이지네이션 -->
                 <nav class="mt-4">
                     <ul class="pagination justify-content-center" id="reviewPagination"></ul>
                 </nav>
-
-                <!-- 리뷰 리스트 (반복문) -->
-<!--                <div th:if="${not #lists.isEmpty(detailItemDto.detailItemOptionDtoList)}">
-                    <div th:each="detailItemOptionDto : ${detailItemDto.detailItemOptionDtoList}" class="border-bottom pb-3 mb-3">
-                        <div class="text-warning mb-1">
-                            <span th:each="i : ${#numbers.sequence(1, review.rating)}">⭐</span>
-                        </div>
-                        <div class="small text-muted mb-2">
-                            <span th:text="${review.writer}">작성자</span> | <span th:text="${#temporals.format(review.regDate, 'yyyy-MM-dd')}">2026-05-07</span>
-                        </div>
-                        <p th:text="${review.content}">정말 만족스러운 상품입니다!</p>
-                    </div>
-                </div>
-                <div th:if="${#lists.isEmpty(detailItemDto.reviewList)}" class="text-center py-5 text-muted">
-                    등록된 리뷰가 없습니다.
-                </div>-->
             </div>
 
             <!-- 3. 상품 문의 -->
@@ -936,7 +969,136 @@
         closeQnaModal();
     }
 
-    // 상품 평점
+    // ================ 상품 리뷰 관련 ================
+
+    let reviewItemNo = /*[[${detailItemDto.itemNo}]]*/ 0;
+    let currentScore = null;
+    let currentSortType = 'latest';
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // 최초 진입 시 서버가 이미 계산해둔 1페이지 데이터를 그대로 렌더링
+        const initialContent = /*[[${detailItemReviewDtoPage.content}]]*/ [];
+        const initialPage = /*[[${detailItemReviewDtoPage.number}]]*/ 0;
+        const initialTotalPages = /*[[${detailItemReviewDtoPage.totalPages}]]*/ 1;
+        const initialTotal = /*[[${detailItemReviewDtoPage.totalElements}]]*/ 0;
+
+        renderReviewList(initialContent);
+        renderPagination(initialPage, initialTotalPages);
+        document.getElementById('review-tab').innerText = `상품리뷰(${initialTotal})`;
+    });
+
+    // isUserAction: 사용자가 정렬/별점/페이지를 "클릭"해서 호출된 경우에만 true
+    // → 최초 자동 로드 시엔 스크롤 보정을 하지 않기 위한 구분
+    async function loadReviews(page, isUserAction = true) {
+        let url = `/item/reviews?itemNo=${reviewItemNo}&page=${page}&size=5&sortType=${currentSortType}`;
+        if (currentScore) url += `&score=${currentScore}`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        renderReviewList(data.content);
+        renderPagination(data.number, data.totalPages);
+        document.getElementById('review-tab').innerText = `상품리뷰(${data.totalElements})`;
+
+        if (isUserAction) {
+            scrollToReviewTop();
+        }
+    }
+
+    // 쿠팡처럼 "리뷰 섹션 상단"으로만 부드럽게 스크롤 보정
+    function scrollToReviewTop() {
+        const reviewPane = document.getElementById('review');
+        if (!reviewPane) return;
+        reviewPane.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderReviewList(reviews) {
+        const container = document.getElementById('reviewListContainer');
+        if (!reviews || reviews.length === 0) {
+            container.innerHTML = '<div class="text-center py-5 text-muted">등록된 리뷰가 없습니다.</div>';
+            return;
+        }
+        container.innerHTML = reviews.map(r => {
+            const liked = localStorage.getItem(`review-liked-${r.reviewNo}`) === 'true';
+            return `
+        <div class="border-bottom pb-3 mb-3">
+            <div class="text-warning mb-1">${'⭐'.repeat(r.score)}<span class="text-muted">${'☆'.repeat(5 - r.score)}</span></div>
+            <div class="small text-muted mb-2">
+                <span class="font-weight-bold">${escapeHtml(r.memberName)}</span>
+                <span>(${escapeHtml(r.memberId)})</span>
+                ${r.optionName ? `<span class="ml-2">· 옵션: ${escapeHtml(r.optionName)}</span>` : ''}
+                <span class="ml-2">· ${r.count}개 구매</span>
+            </div>
+            <p class="mb-2">${escapeHtml(r.content)}</p>
+            <button type="button"
+                    class="btn btn-sm ${liked ? 'btn-primary' : 'btn-outline-secondary'} good-btn"
+                    data-review-no="${r.reviewNo}"
+                    data-liked="${liked}"
+                    onclick="toggleGood(this, ${r.reviewNo})">
+                👍 도움이 돼요 <span class="good-count">${r.goodCount ?? 0}</span>
+            </button>
+        </div>
+        `;
+        }).join('');
+    }
+
+    async function toggleGood(button, reviewNo) {
+        const isLiked = button.getAttribute('data-liked') === 'true';
+        const nextLike = !isLiked; // 좋아요 상태였으면 취소 요청, 아니었으면 좋아요 요청
+
+        button.disabled = true; // 응답 오기 전 중복 클릭 방지
+
+        try {
+            const res = await fetch(`/item/review/good/${reviewNo}?like=${nextLike}`, { method: 'POST' });
+            if (!res.ok) throw new Error('요청 실패');
+
+            const updatedCount = await res.json();
+
+            // 서버가 계산한 최종 값으로 화면 갱신 (클라이언트 연산 대신)
+            button.querySelector('.good-count').innerText = updatedCount;
+            button.setAttribute('data-liked', nextLike);
+            button.classList.toggle('btn-primary', nextLike);
+            button.classList.toggle('btn-outline-secondary', !nextLike);
+
+            if (nextLike) {
+                localStorage.setItem(`review-liked-${reviewNo}`, 'true');
+            } else {
+                localStorage.removeItem(`review-liked-${reviewNo}`);
+            }
+        } catch (e) {
+            alert('처리 중 오류가 발생했습니다.');
+        } finally {
+            button.disabled = false;
+        }
+    }
+    function renderPagination(page, totalPages) {
+        const pagination = document.getElementById('reviewPagination');
+        if (!pagination) return;
+        if (totalPages <= 1) { pagination.innerHTML = ''; return; }
+
+        let html = `<li class="page-item ${page === 0 ? 'disabled' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="loadReviews(${page - 1})">이전</a>
+                 </li>`;
+
+        for (let i = 0; i < totalPages; i++) {
+            html += `<li class="page-item ${i === page ? 'active' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="loadReviews(${i})">${i + 1}</a>
+                 </li>`;
+        }
+
+        html += `<li class="page-item ${page === totalPages - 1 ? 'disabled' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="loadReviews(${page + 1})">다음</a>
+             </li>`;
+
+        pagination.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
     function toggleRatingMenu() {
         document.getElementById('ratingFilterMenu').classList.toggle('show');
     }
@@ -961,6 +1123,22 @@
         }
     });
 
+    // 정렬 선택 함수
+    function selectSort(el, sortType) {
+        // 1. 모든 정렬 항목에서 active 클래스 제거
+        document.querySelectorAll('.sort-filters .sort-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        // 2. 클릭한 항목에 active 클래스 추가 (파란색 + 두껍게 변경)
+        el.classList.add('active');
+
+        // 3. 현재 정렬 값 변경 및 데이터 로드
+        currentSortType = sortType;
+
+        // 기존에 만드신 리뷰 조회 함수 호출 (0페이지부터 다시 로드)
+        loadReviews(0);
+    }
 </script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

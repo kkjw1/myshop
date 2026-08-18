@@ -96,13 +96,14 @@
                             <td class="text-center"><input class="form-check-input order-checkbox table-checkbox" type="checkbox" th:data-order-id="${orderDeliveryDto.orderNo}"></td>
                             <td th:switch="${orderDeliveryDto.orderStatus.name()}">
                                 <span th:case="'결제완료'" class="badge bg-warning text-dark">결제 완료</span>
-                                <span th:case="'상품준비중'" class="badge bg-info">상품 준비 중</span>
+                                <span th:case="'처리완료'" class="badge bg-success">처리완료</span>
+<!--                                <span th:case="'상품준비중'" class="badge bg-info">상품 준비 중</span>
                                 <span th:case="'배송중'" class="badge bg-primary">배송 중</span>
                                 <span th:case="'배송완료'" class="badge bg-success">배송 완료</span>
                                 <span th:case="'취소접수'" class="badge bg-danger-subtle text-danger border border-danger">취소 접수</span>
                                 <span th:case="'취소완료'" class="badge bg-danger">취소 완료</span>
                                 <span th:case="'환불완료'" class="badge bg-secondary">환불 완료</span>
-                                <span th:case="*" class="badge bg-dark" th:text="${orderDeliveryDto.orderStatus.name()}">기타</span>
+                                <span th:case="*" class="badge bg-dark" th:text="${orderDeliveryDto.orderStatus.name()}">기타</span>-->
                             </td>
                             <td class="order-id" th:text="${orderDeliveryDto.orderNo}">20240720-00123</td>
                             <td th:text="${orderDeliveryDto.orderInfo}">프리미엄 와이드 팬츠 외 1건</td>
@@ -157,12 +158,13 @@
                         <select id="batchUpdateStatus" class="form-select form-select-lg border-info" required>
                             <option selected disabled value="">상태를 선택하세요</option>
                             <option value="결제완료">결제 완료</option>
-                            <option value="상품준비중">상품 준비 중</option>
+                            <option value="처리완료">처리 완료</option>
+<!--                            <option value="상품준비중">상품 준비 중</option>
                             <option value="배송중">배송 중</option>
                             <option value="배송완료">배송 완료</option>
                             <option value="취소접수">취소 접수</option>
                             <option value="환불완료">환불 완료</option>
-                            <option value="취소완료">취소 완료</option>
+                            <option value="취소완료">취소 완료</option>-->
                         </select>
                     </div>
                     <div class="form-text text-muted">

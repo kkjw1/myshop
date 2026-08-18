@@ -5,6 +5,7 @@ import myshop.shop.controller.HomeItemController;
 import myshop.shop.controller.HomeItemController.DetailItemReviewDto;
 import myshop.shop.dto.review.ReviewScoreDto;
 import myshop.shop.dto.review.SaveReviewDto;
+import myshop.shop.dto.review.SearchReviewDto;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.orderItem.OrderItem;
 import myshop.shop.entity.review.Review;
@@ -49,13 +50,27 @@ public class ReviewService {
     /**
      * 상품 상세 -> 상품 리뷰
      */
-    public Page<DetailItemReviewDto> itemDetailReview(Pageable pageable, Long itemNo) {
-//        return reviewRepository.findDetailItemReview(pageable, itemNo);
-        return null;
+    public Page<DetailItemReviewDto> itemDetailReview(Pageable pageable, Long itemNo, SearchReviewDto searchReviewDto) {
+        return reviewRepository.findDetailItemReview(pageable, itemNo, searchReviewDto);
     }
 
 
     public ReviewScoreDto itemDetailReviewScore(Long itemNo) {
         return reviewRepository.findReviewScore(itemNo);
+    }
+
+
+    /**
+     * 도움이 돼요 버튼
+     */
+    public Long toggleGoodCount(Long reviewNo, boolean like) {
+        Review review = reviewRepository.findById(reviewNo).orElseThrow(() ->
+                new IllegalArgumentException("존재하지 않는 리뷰입니다. reviewNo=" + reviewNo));
+        if (like) {
+            review.addGoodCount();
+        } else {
+            review.subGoodCount();
+        }
+        return review.getGoodCount();
     }
 }
