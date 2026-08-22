@@ -26,7 +26,6 @@ public class ReviewController {
 
        reviewService.saveReview(saveReviewDto);
 
-        // todo: 상품 상세에서 리뷰와 문의 내역 뜨는 기능 추가하기
        return "redirect:/myPage/orderList";
     }
 }

@@ -39,4 +39,15 @@ public class Inquiry extends BaseDateEntity {
         this.content = content;
         this.inquiryStatus = inquiryStatus;
     }
+
+    public Inquiry(Item item, Long memberNo, String optionName, InquiryCategory inquiryCategory, String title, String content, InquiryStatus inquiryStatus, String answerContent) {
+        this.item = item;
+        this.memberNo = memberNo;
+        this.optionName = optionName;
+        this.inquiryCategory = inquiryCategory;
+        this.title = title;
+        this.content = content;
+        this.inquiryStatus = inquiryStatus;
+        this.answerContent = answerContent;
+    }
 }

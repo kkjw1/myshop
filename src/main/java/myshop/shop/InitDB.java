@@ -14,6 +14,9 @@ import myshop.shop.entity.*;
 import myshop.shop.entity.cancelRequest.CancelReasonCode;
 import myshop.shop.entity.cancelRequest.CancelRequestStatus;
 import myshop.shop.entity.delivery.DeliveryStatus;
+import myshop.shop.entity.inquiry.Inquiry;
+import myshop.shop.entity.inquiry.InquiryCategory;
+import myshop.shop.entity.inquiry.InquiryStatus;
 import myshop.shop.entity.item.Item;
 import myshop.shop.entity.item.ItemCategory;
 import myshop.shop.entity.item.ItemStatus;
@@ -26,6 +29,7 @@ import myshop.shop.entity.returnRequest.ReturnRequestStatus;
 import myshop.shop.entity.review.Review;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.repository.address.AddressRepository;
+import myshop.shop.repository.inquiry.InquiryRepository;
 import myshop.shop.repository.member.MemberRepository;
 import myshop.shop.repository.review.ReviewRepository;
 import myshop.shop.repository.seller.SellerRepository;
@@ -69,7 +73,7 @@ public class InitDB {
         private final ReturnRequestService returnRequestService;
         private final ItemRepository itemRepository;
         private final ReviewRepository reviewRepository;
-
+        private final InquiryRepository inquiryRepository;
 
         public void dbInit() {
             /**
@@ -282,6 +286,26 @@ public class InitDB {
             for (int i=1; i<6; i++) {
                 reviewRepository.save(new Review(itemProxy, 3L, "검정색", i, 1L, "상품 1번의 검정색 옵션 상품리뷰" + i));
             }
+
+
+            /**
+             * 상품문의 데이터
+             * 상품 기타 문의 10개, 상품 반품 문의 5개, 결제 취소 문의 3개
+             */
+
+            for (int i=1; i<11; i++) {
+                inquiryRepository.save(new Inquiry(itemProxy, 5L, "나이키", InquiryCategory.PRODUCT, "상품/기타 제목" + i, "기타문의 상세내용" + i,
+                        InquiryStatus.답변완료, "문의 답변 완료" + i));
+            }
+            for (int i=1; i<6; i++) {
+                inquiryRepository.save(new Inquiry(itemProxy, 5L, "검정색", InquiryCategory.CANCEL, "결제 취소 제목" + i, "결제 취소 상세내용" + i,
+                        InquiryStatus.답변대기));
+            }
+            for (int i=1; i<6; i++) {
+                inquiryRepository.save(new Inquiry(itemProxy, 5L, "흰색", InquiryCategory.RETURN, "상품 반품 문의" + i, "상품 반품 상세내용" + i,
+                        InquiryStatus.답변완료, "상품 반품 답변 완료" + i));
+            }
+
             em.flush();
             em.clear();
         }

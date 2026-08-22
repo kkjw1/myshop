@@ -1,6 +1,7 @@
 package myshop.shop.service;
 
 import lombok.RequiredArgsConstructor;
+import myshop.shop.controller.HomeItemController;
 import myshop.shop.dto.inquiry.CheckInquiryDto;
 import myshop.shop.dto.inquiry.SaveInquiryDto;
 import myshop.shop.entity.inquiry.Inquiry;
@@ -9,6 +10,8 @@ import myshop.shop.entity.inquiry.InquiryStatus;
 import myshop.shop.entity.item.Item;
 import myshop.shop.repository.Item.ItemRepository;
 import myshop.shop.repository.inquiry.InquiryRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -60,5 +63,14 @@ public class InquiryService {
      */
     public List<CheckInquiryDto> getInquiryList(Long memberNo) {
         return inquiryRepository.getCheckInquiryDtoList(memberNo);
+    }
+
+
+    /**
+     * 상품문의 내역
+     * 상품 상세 -> 상품문의
+     */
+    public Page<HomeItemController.DetailItemInquiryDto> itemDetailInquiry(Pageable pageable, Long itemNo) {
+        return inquiryRepository.findDetailItemInquiry(pageable, itemNo);
     }
 }

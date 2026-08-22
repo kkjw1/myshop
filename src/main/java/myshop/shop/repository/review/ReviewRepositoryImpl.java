@@ -66,7 +66,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
         return score != null ? review.score.eq(score) : null;
     }
     private OrderSpecifier<? extends Serializable> orderBy(SearchReviewDto searchReviewDto) {
-        return searchReviewDto.getSortType().equals("best") ? review.goodCount.desc() : review.createdDate.desc();
+        return "best".equals(searchReviewDto.getSortType()) ? review.goodCount.desc() : review.createdDate.desc();
     }
 
 
